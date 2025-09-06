@@ -1,4 +1,4 @@
-// API client configuration
+// API client configuration for production
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export interface ApiResponse<T> {
