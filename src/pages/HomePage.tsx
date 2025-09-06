@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 
 const HomePage: React.FC = () => {
@@ -22,19 +23,19 @@ const HomePage: React.FC = () => {
               HelperU
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed font-medium">
-              The future of reaching students. Connect with skilled college students instantly through our AI-powered platform.
+              The future of reaching college students
             </p>
           </div>
 
           {/* Glassmorphism CTA */}
           <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-8 max-w-2xl mx-auto mb-12 animate-glow">
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25 font-display">
+              <Link to="/auth/client" className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25 font-display text-center">
                 Get Started Free
-              </button>
-              <button className="px-8 py-4 bg-white/20 text-white font-semibold rounded-xl border border-white/30 hover:bg-white/30 transition-all duration-300 backdrop-blur-sm font-display">
-                Watch Demo
-              </button>
+              </Link>
+              <Link to="/tasks/browse" className="px-8 py-4 bg-white/20 text-white font-semibold rounded-xl border border-white/30 hover:bg-white/30 transition-all duration-300 backdrop-blur-sm font-display text-center">
+                Browse Posts
+              </Link>
             </div>
             <p className="text-sm text-gray-400 mt-4 font-mono">No credit card required • Join 1,000+ users</p>
           </div>
@@ -65,7 +66,7 @@ const HomePage: React.FC = () => {
               What is HelperU?
             </h2>
             <p className="text-xl text-blue-200 max-w-3xl mx-auto font-medium">
-            A streamlined way to share opportunities with college students — from everyday help to company jobs to advertisements.
+             A platform to share opportunities with college students — from everyday help to company jobs to advertisements.
             </p>
           </div>
 
@@ -78,7 +79,7 @@ const HomePage: React.FC = () => {
                 </svg>
               </div>
               <h3 className="text-xl font-semibold text-white mb-4 font-display">Lightning Fast</h3>
-              <p className="text-blue-200">Get eyes on your posts in seconds.</p>
+              <p className="text-blue-200">Post tasks, jobs, and advertisements. Then, reach students in seconds.</p>
             </div>
 
             {/* Feature 2 */}
@@ -133,7 +134,7 @@ const HomePage: React.FC = () => {
                 </svg>
               </div>
               <h3 className="text-xl font-semibold text-white mb-4 font-display">Real-time Monitoring</h3>
-              <p className="text-blue-200">Our team is constantly monitoring your posts to ensure students apply.</p>
+              <p className="text-blue-200">Our team constantly monitors your posts to ensure students apply.</p>
             </div>
           </div>
         </div>
@@ -147,7 +148,7 @@ const HomePage: React.FC = () => {
               How It Works
             </h2>
             <p className="text-xl text-blue-200 max-w-3xl mx-auto font-medium">
-              Get attention in three simple steps. Our streamlined process makes assistance effortless.
+              Get things done in three simple steps. Our streamlined process makes assistance effortless.
             </p>
           </div>
 
@@ -214,12 +215,12 @@ const HomePage: React.FC = () => {
               Join thousands of users who are already experiencing the future of the college student market.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="px-10 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25 text-lg font-display">
+              <Link to="/auth/client" className="px-10 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25 text-lg font-display text-center">
                 Begin your first post
-              </button>
-              <button className="px-10 py-4 bg-white/20 text-white font-semibold rounded-xl border border-blue-300/30 hover:bg-white/30 transition-all duration-300 backdrop-blur-sm text-lg font-display">
+              </Link>
+              <Link to="/auth/helper" className="px-10 py-4 bg-white/20 text-white font-semibold rounded-xl border border-blue-300/30 hover:bg-white/30 transition-all duration-300 backdrop-blur-sm text-lg font-display text-center">
                 Become a Helper
-              </button>
+              </Link>
             </div>
           </div>
         </div>
