@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import { AIChat } from '../components/ai/AIChat';
 
 const Dashboard: React.FC = () => {
-  const { user, profileStatus, isAuthenticated } = useAuth();
+  const { profileStatus, isAuthenticated } = useAuth();
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
 
   if (!isAuthenticated) {
