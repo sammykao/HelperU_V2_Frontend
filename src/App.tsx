@@ -1,13 +1,17 @@
-import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './lib/contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import { HomePage } from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
+import AIAssistantPage from './pages/AIAssistantPage';
 
 // Task Pages
 import BrowseTasks from './pages/tasks/BrowseTasks';
 import CreateTask from './pages/tasks/CreateTask';
+import MyPosts from './pages/tasks/MyPosts';
+import MyApplications from './pages/tasks/MyApplications';
+import SingleTask from './pages/tasks/SingleTask';
 
 // Auth Pages
 import ClientAuth from './pages/auth/ClientAuth';
@@ -39,12 +43,46 @@ function App() {
           <Route path="/auth/helper/verify-email" element={<HelperVerifyEmail />} />
           <Route path="/auth/helper/complete-profile" element={<HelperCompleteProfile />} />
           
-          {/* Task Routes */}
-          <Route path="/tasks/browse" element={<BrowseTasks />} />
-          <Route path="/tasks/create" element={<CreateTask />} />
+          {/* General Protected Routes (Any authenticated user) */}
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/ai-assistant" element={
+            <ProtectedRoute>
+              <AIAssistantPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/tasks/browse" element={
+            <ProtectedRoute>
+              <BrowseTasks />
+            </ProtectedRoute>
+          } />
+          <Route path="/tasks/browse/:id" element={
+            <ProtectedRoute>
+              <SingleTask />
+            </ProtectedRoute>
+          } />
           
-          {/* Protected Routes */}
-          <Route path="/dashboard" element={<Dashboard />} />
+          {/* Client-Only Routes */}
+          <Route path="/tasks/create" element={
+            <ProtectedRoute requiredRole="client">
+              <CreateTask />
+            </ProtectedRoute>
+          } />
+          <Route path="/tasks/my-posts" element={
+            <ProtectedRoute requiredRole="client">
+              <MyPosts />
+            </ProtectedRoute>
+          } />
+          
+          {/* Helper-Only Routes */}
+          <Route path="/tasks/my-applications" element={
+            <ProtectedRoute requiredRole="helper">
+              <MyApplications />
+            </ProtectedRoute>
+          } />
         </Routes>
         
         <Toaster

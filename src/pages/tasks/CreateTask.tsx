@@ -21,7 +21,8 @@ const CreateTask: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [selectedDates, setSelectedDates] = useState<string[]>([]);
+  const [selectedDates, setSelectedDates] = useState<{timestamp: string, display: string}[]>([]);
+
 
   if (!isAuthenticated) {
     navigate('/auth/client/signin');
@@ -30,7 +31,13 @@ const CreateTask: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Clear ZIP code when switching away from in-person
+    if (name === 'location_type' && value !== 'in-person') {
+      setFormData(prev => ({ ...prev, [name]: value, zip_code: '' }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
     
     // Clear error when user starts typing
     if (errors[name]) {
@@ -40,16 +47,62 @@ const CreateTask: React.FC = () => {
 
   const handleDateAdd = () => {
     const dateInput = document.getElementById('date-input') as HTMLInputElement;
-    if (dateInput.value && !selectedDates.includes(dateInput.value)) {
-      setSelectedDates(prev => [...prev, dateInput.value].sort());
-      setFormData(prev => ({ ...prev, dates: [...prev.dates, dateInput.value].sort() }));
-      dateInput.value = '';
+    
+    if (dateInput.value) {
+      const rawDate = dateInput.value; // YYYY-MM-DD format
+      const timestampFormat = formatDate(rawDate); // Full timestamp for backend
+      
+      // Check if this timestamp already exists
+      if (!selectedDates.some(dateObj => dateObj.timestamp === timestampFormat)) {
+        const displayFormat = formatDateForDisplay(rawDate); // Nice format for user
+        
+        setSelectedDates(prev => {
+          const updated = [...prev, { timestamp: timestampFormat, display: displayFormat }].sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+          return updated;
+        });
+        
+        setFormData(prev => {
+          const updated = { ...prev, dates: [...prev.dates, timestampFormat].sort() };
+          return updated;
+        });
+        
+        dateInput.value = '';
+      }
     }
   };
 
-  const handleDateRemove = (dateToRemove: string) => {
-    setSelectedDates(prev => prev.filter(date => date !== dateToRemove));
-    setFormData(prev => ({ ...prev, dates: prev.dates.filter(date => date !== dateToRemove) }));
+  const handleDateRemove = (timestampToRemove: string) => {
+    setSelectedDates(prev => prev.filter(dateObj => dateObj.timestamp !== timestampToRemove));
+    setFormData(prev => ({ ...prev, dates: prev.dates.filter(date => date !== timestampToRemove) }));
+  };
+
+  const formatDate = (dateString: string) => {
+    try {
+      // Parse the date string as local date to avoid timezone issues
+      const [year, month, day] = dateString.split('-').map(Number);
+      const date = new Date(year, month - 1, day); // month is 0-indexed
+      // Return the full date string with time and timezone
+      return date.toString();
+    } catch (error) {
+      return dateString; // fallback to original string
+    }
+  };
+
+  const formatDateForDisplay = (dateString: string) => {
+    try {
+      // Parse the date string as local date to avoid timezone issues
+      const [year, month, day] = dateString.split('-').map(Number);
+      const date = new Date(year, month - 1, day); // month is 0-indexed
+      
+      return date.toLocaleDateString('en-US', {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch (error) {
+      return dateString; // fallback to original string
+    }
   };
 
   const validateForm = (): boolean => {
@@ -94,10 +147,16 @@ const CreateTask: React.FC = () => {
       return;
     }
 
+    // Clean up the data before sending
+    const cleanedFormData = {
+      ...formData,
+      zip_code: formData.location_type === 'in-person' && formData.zip_code ? formData.zip_code : undefined
+    };
+
     setIsLoading(true);
 
     try {
-      await taskApi.createTask(formData);
+      await taskApi.createTask(cleanedFormData);
       toast.success('Task created successfully!');
       navigate('/dashboard');
     } catch (err: any) {
@@ -164,15 +223,15 @@ const CreateTask: React.FC = () => {
               </div>
               {selectedDates.length > 0 && (
                 <div className="flex flex-wrap gap-2">
-                  {selectedDates.map((date) => (
+                  {selectedDates.map((dateObj) => (
                     <span
-                      key={date}
+                      key={dateObj.timestamp}
                       className="inline-flex items-center px-3 py-1 bg-blue-500/20 text-blue-300 rounded-lg text-sm"
                     >
-                      {new Date(date).toLocaleDateString()}
+                      {dateObj.display}
                       <button
                         type="button"
-                        onClick={() => handleDateRemove(date)}
+                        onClick={() => handleDateRemove(dateObj.timestamp)}
                         className="ml-2 text-blue-400 hover:text-blue-200"
                       >
                         ×
@@ -196,40 +255,47 @@ const CreateTask: React.FC = () => {
                   name="location_type"
                   value={formData.location_type}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 bg-white/10 border rounded-xl text-white transition-all duration-300 ${
+                  className={`w-full px-4 py-3 pr-10 bg-white/10 border rounded-xl text-white transition-all duration-300 appearance-none cursor-pointer ${
                     errors.location_type ? 'border-red-400 bg-red-500/10' : 'border-white/20 hover:bg-white/15'
                   } focus:outline-none focus:ring-2 focus:ring-blue-500/50`}
+                  style={{
+                    backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
+                    backgroundPosition: 'right 0.75rem center',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: '1.5em 1.5em'
+                  }}
                   disabled={isLoading}
                 >
-                  <option value="in-person">In-Person</option>
-                  <option value="remote">Remote</option>
-                  <option value="hybrid">Hybrid</option>
+                  <option value="in-person" className="bg-slate-800 text-white">In-Person</option>
+                  <option value="remote" className="bg-slate-800 text-white">Remote</option>
                 </select>
                 {errors.location_type && (
                   <p className="mt-1 text-sm text-red-400">{errors.location_type}</p>
                 )}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  ZIP Code {formData.location_type === 'in-person' ? '*' : ''}
-                </label>
-                <input
-                  type="text"
-                  name="zip_code"
-                  value={formData.zip_code}
-                  onChange={handleInputChange}
-                  maxLength={5}
-                  className={`w-full px-4 py-3 bg-white/10 border rounded-xl text-white placeholder-gray-400 transition-all duration-300 ${
-                    errors.zip_code ? 'border-red-400 bg-red-500/10' : 'border-white/20 hover:bg-white/15'
-                  } focus:outline-none focus:ring-2 focus:ring-blue-500/50`}
-                  placeholder="02138"
-                  disabled={isLoading}
-                />
-                {errors.zip_code && (
-                  <p className="mt-1 text-sm text-red-400">{errors.zip_code}</p>
-                )}
-              </div>
+              {formData.location_type === 'in-person' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    ZIP Code *
+                  </label>
+                  <input
+                    type="text"
+                    name="zip_code"
+                    value={formData.zip_code}
+                    onChange={handleInputChange}
+                    maxLength={5}
+                    className={`w-full px-4 py-3 bg-white/10 border rounded-xl text-white placeholder-gray-400 transition-all duration-300 ${
+                      errors.zip_code ? 'border-red-400 bg-red-500/10' : 'border-white/20 hover:bg-white/15'
+                    } focus:outline-none focus:ring-2 focus:ring-blue-500/50`}
+                    placeholder="02138"
+                    disabled={isLoading}
+                  />
+                  {errors.zip_code && (
+                    <p className="mt-1 text-sm text-red-400">{errors.zip_code}</p>
+                  )}
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -283,7 +349,7 @@ const CreateTask: React.FC = () => {
             {/* Tools Info */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Tools/Equipment Required
+                Any Tools/Equipment Needed? (Optional)
               </label>
               <textarea
                 name="tools_info"
@@ -299,7 +365,7 @@ const CreateTask: React.FC = () => {
             {/* Public Transport Info */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Public Transportation Info
+                Public Transportation Info (Optional)
               </label>
               <textarea
                 name="public_transport_info"

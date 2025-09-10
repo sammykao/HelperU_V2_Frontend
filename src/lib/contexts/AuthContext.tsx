@@ -8,7 +8,8 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   token: string | null;
-  login: (token: string, user: CurrentUser) => void;
+  authRoute: 'client' | 'helper' | null;
+  login: (token: string, user: CurrentUser, authRoute: 'client' | 'helper') => void;
   logout: () => Promise<void>;
   updateProfileStatus: (status: ProfileStatusResponse) => void;
   refreshProfileStatus: () => Promise<void>;
@@ -24,6 +25,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<CurrentUser | null>(null);
   const [profileStatus, setProfileStatus] = useState<ProfileStatusResponse | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [authRoute, setAuthRoute] = useState<'client' | 'helper' | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const isAuthenticated = !!user && !!apiClient;
@@ -32,15 +34,38 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       const token = localStorage.getItem('access_token');
+      const storedAuthRoute = localStorage.getItem('auth_route') as 'client' | 'helper' | null;
+      const storedUser = localStorage.getItem('user_data');
+      
       if (token) {
         apiClient.setToken(token);
+        setToken(token);
+        setAuthRoute(storedAuthRoute);
+        
+        // Restore user data if available
+        if (storedUser) {
+          try {
+            const userData = JSON.parse(storedUser);
+            setUser(userData);
+          } catch (error) {
+            console.error('Failed to parse stored user data:', error);
+          }
+        }
+        
         try {
           const status = await authApi.getProfileStatus();
           setProfileStatus(status);
         } catch (error) {
           console.error('Failed to verify token:', error);
+          // Clear all auth data on token verification failure
           localStorage.removeItem('access_token');
+          localStorage.removeItem('auth_route');
+          localStorage.removeItem('user_data');
           apiClient.setToken(null);
+          setToken(null);
+          setUser(null);
+          setAuthRoute(null);
+          setProfileStatus(null);
         }
       }
       setIsLoading(false);
@@ -49,10 +74,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initializeAuth();
   }, []);
 
-  const login = (accessToken: string, userData: CurrentUser) => {
+  const login = (accessToken: string, userData: CurrentUser, authRoute: 'client' | 'helper') => {
     setToken(accessToken);
     apiClient.setToken(accessToken);
     setUser(userData);
+    setAuthRoute(authRoute);
+    localStorage.setItem('access_token', accessToken);
+    localStorage.setItem('auth_route', authRoute);
+    localStorage.setItem('user_data', JSON.stringify(userData));
   };
 
   const logout = async () => {
@@ -65,7 +94,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(null);
       setToken(null);
       setProfileStatus(null);
+      setAuthRoute(null);
       localStorage.removeItem('access_token');
+      localStorage.removeItem('auth_route');
+      localStorage.removeItem('user_data');
     }
   };
 
@@ -88,6 +120,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isLoading,
     isAuthenticated,
     token,
+    authRoute,
     login,
     logout,
     updateProfileStatus,

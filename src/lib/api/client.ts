@@ -1,4 +1,6 @@
 // API client configuration for production
+import { refreshToken } from '../utils/tokenRefresh';
+
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export interface ApiResponse<T> {
@@ -42,8 +44,22 @@ class ApiClient {
     return headers;
   }
 
-  private async handleResponse<T>(response: Response): Promise<T> {
+  private async handleResponse<T>(response: Response, originalRequest?: () => Promise<Response>): Promise<T> {
     if (!response.ok) {
+      // If we get a 401, try to refresh the token
+      if (response.status === 401 && originalRequest) {
+        const newToken = await refreshToken();
+        if (newToken) {
+          // Update the token in the client
+          this.setToken(newToken);
+          // Retry the original request with the new token
+          const retryResponse = await originalRequest();
+          if (retryResponse.ok) {
+            return retryResponse.json();
+          }
+        }
+      }
+
       const error: ApiError = await response.json().catch(() => ({
         detail: 'An error occurred',
         status_code: response.status,
@@ -55,41 +71,45 @@ class ApiClient {
   }
 
   async get<T>(endpoint: string): Promise<T> {
-    const response = await fetch(`${this.baseURL}${endpoint}`, {
+    const makeRequest = () => fetch(`${this.baseURL}${endpoint}`, {
       method: 'GET',
       headers: this.getHeaders(),
     });
 
-    return this.handleResponse<T>(response);
+    const response = await makeRequest();
+    return this.handleResponse<T>(response, makeRequest);
   }
 
   async post<T>(endpoint: string, data?: any): Promise<T> {
-    const response = await fetch(`${this.baseURL}${endpoint}`, {
+    const makeRequest = () => fetch(`${this.baseURL}${endpoint}`, {
       method: 'POST',
       headers: this.getHeaders(),
       body: data ? JSON.stringify(data) : undefined,
     });
 
-    return this.handleResponse<T>(response);
+    const response = await makeRequest();
+    return this.handleResponse<T>(response, makeRequest);
   }
 
   async put<T>(endpoint: string, data?: any): Promise<T> {
-    const response = await fetch(`${this.baseURL}${endpoint}`, {
+    const makeRequest = () => fetch(`${this.baseURL}${endpoint}`, {
       method: 'PUT',
       headers: this.getHeaders(),
       body: data ? JSON.stringify(data) : undefined,
     });
 
-    return this.handleResponse<T>(response);
+    const response = await makeRequest();
+    return this.handleResponse<T>(response, makeRequest);
   }
 
   async delete<T>(endpoint: string): Promise<T> {
-    const response = await fetch(`${this.baseURL}${endpoint}`, {
+    const makeRequest = () => fetch(`${this.baseURL}${endpoint}`, {
       method: 'DELETE',
       headers: this.getHeaders(),
     });
 
-    return this.handleResponse<T>(response);
+    const response = await makeRequest();
+    return this.handleResponse<T>(response, makeRequest);
   }
 }
 

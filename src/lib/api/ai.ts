@@ -16,5 +16,5 @@ export interface AIResponse {
 export const aiApi = {
   // Send message to AI assistant
   sendMessage: (data: AIRequest): Promise<AIResponse> =>
-    apiClient.post('/ai-agent/chat', data),
+    apiClient.post('/ai/chat', data),
 };

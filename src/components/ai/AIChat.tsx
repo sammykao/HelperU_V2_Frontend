@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { aiApi, AIRequest, AIResponse } from '../../lib/api/ai';
+import { getAIChatThreadId } from '../../lib/utils/aiChatStorage';
 import toast from 'react-hot-toast';
 
 interface Message {
@@ -25,7 +26,9 @@ export const AIChat: React.FC<AIChatProps> = ({ isOpen, onClose }) => {
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [threadId, setThreadId] = useState<string | undefined>();
+  const [threadId, setThreadId] = useState<string | undefined>(() => {
+    return getAIChatThreadId();
+  });
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
