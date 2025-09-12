@@ -49,6 +49,7 @@ export interface InvitationResponse {
   status: string;
   created_at: string;
   updated_at: string;
+  helpers?: HelperResponse;
 }
 
 export interface InvitationListResponse {

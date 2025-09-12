@@ -13,6 +13,13 @@ import MyPosts from './pages/tasks/MyPosts';
 import MyApplications from './pages/tasks/MyApplications';
 import SingleTask from './pages/tasks/SingleTask';
 
+// Helper Pages
+import SearchHelpers from './pages/helpers/SearchHelpers';
+
+// Subscription Pages
+import SubscriptionUpgrade from './pages/subscriptions/SubscriptionUpgrade';
+import SubscriptionSuccess from './pages/subscriptions/SubscriptionSuccess';
+
 // Auth Pages
 import ClientAuth from './pages/auth/ClientAuth';
 import ClientVerifyOTP from './pages/auth/ClientVerifyOTP';
@@ -21,6 +28,8 @@ import HelperAuth from './pages/auth/HelperAuth';
 import HelperVerifyOTP from './pages/auth/HelperVerifyOTP';
 import HelperVerifyEmail from './pages/auth/HelperVerifyEmail';
 import HelperCompleteProfile from './pages/auth/HelperCompleteProfile';
+import EditProfile from './pages/auth/EditProfile';
+import Profile from './pages/auth/Profile';
 
 /* removes print statements in production */
 import "../print.config.ts";
@@ -49,6 +58,16 @@ function App() {
               <Dashboard />
             </ProtectedRoute>
           } />
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          } />
+          <Route path="/profile/edit" element={
+            <ProtectedRoute>
+              <EditProfile />
+            </ProtectedRoute>
+          } />
           <Route path="/ai-assistant" element={
             <ProtectedRoute>
               <AIAssistantPage />
@@ -74,6 +93,21 @@ function App() {
           <Route path="/tasks/my-posts" element={
             <ProtectedRoute requiredRole="client">
               <MyPosts />
+            </ProtectedRoute>
+          } />
+          <Route path="/subscription/upgrade" element={
+            <ProtectedRoute requiredRole="client">
+              <SubscriptionUpgrade />
+            </ProtectedRoute>
+          } />
+          <Route path="/subscription/success" element={
+            <ProtectedRoute requiredRole="client">
+              <SubscriptionSuccess />
+            </ProtectedRoute>
+          } />
+          <Route path="/helpers/search" element={
+            <ProtectedRoute requiredRole="client">
+              <SearchHelpers />
             </ProtectedRoute>
           } />
           
