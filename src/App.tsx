@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { HomePage } from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
 import AIAssistantPage from './pages/AIAssistantPage';
+import ChatPage from './pages/ChatPage';
 
 // Task Pages
 import BrowseTasks from './pages/tasks/BrowseTasks';
@@ -28,7 +29,6 @@ import HelperAuth from './pages/auth/HelperAuth';
 import HelperVerifyOTP from './pages/auth/HelperVerifyOTP';
 import HelperVerifyEmail from './pages/auth/HelperVerifyEmail';
 import HelperCompleteProfile from './pages/auth/HelperCompleteProfile';
-import EditProfile from './pages/auth/EditProfile';
 import Profile from './pages/auth/Profile';
 
 /* removes print statements in production */
@@ -63,14 +63,14 @@ function App() {
               <Profile />
             </ProtectedRoute>
           } />
-          <Route path="/profile/edit" element={
-            <ProtectedRoute>
-              <EditProfile />
-            </ProtectedRoute>
-          } />
           <Route path="/ai-assistant" element={
             <ProtectedRoute>
               <AIAssistantPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/chat" element={
+            <ProtectedRoute>
+              <ChatPage />
             </ProtectedRoute>
           } />
           <Route path="/tasks/browse" element={
@@ -112,7 +112,7 @@ function App() {
           } />
           
           {/* Helper-Only Routes */}
-          <Route path="/tasks/my-applications" element={
+          <Route path="/applications" element={
             <ProtectedRoute requiredRole="helper">
               <MyApplications />
             </ProtectedRoute>

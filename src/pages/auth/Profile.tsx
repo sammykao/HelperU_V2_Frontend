@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useRef } from 'react';
-//
+import React, { useEffect, useState } from 'react';
 import Navbar from '../../components/Navbar';
 import { useAuth } from '../../lib/contexts/AuthContext';
 import { profileApi, ClientProfileData, HelperProfileData } from '../../lib/api/profile';
+import { FileUpload } from '../../components/ui/FileUpload';
 import { authApi, ClientProfileUpdateRequest, HelperProfileUpdateRequest } from '../../lib/api/auth';
 
 const Profile: React.FC = () => {
@@ -12,8 +12,6 @@ const Profile: React.FC = () => {
   const [profile, setProfile] = useState<ClientProfileData | HelperProfileData | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [uploadingImage, setUploadingImage] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -34,44 +32,14 @@ const Profile: React.FC = () => {
     load();
   }, [authRoute]);
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      setError('Please select a valid image file');
-      return;
-    }
-
-    // Validate file size (5MB max)
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Image size must be less than 5MB');
-      return;
-    }
-
-    try {
-      setUploadingImage(true);
-      setError(null);
-
-      // Convert to base64 for now (in production, you'd upload to a service like Cloudinary)
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        if (profile) {
-          setProfile({ ...profile, pfp_url: result });
-        }
-      };
-      reader.readAsDataURL(file);
-    } catch (e: any) {
-      setError(e?.message || 'Failed to upload image');
-    } finally {
-      setUploadingImage(false);
-    }
+  const handleFileSelect = (_file: File) => {
+    // FileUpload component handles the file internally
   };
 
-  const triggerImageUpload = () => {
-    fileInputRef.current?.click();
+  const handleFileUpload = (url: string) => {
+    if (profile) {
+      setProfile({ ...profile, pfp_url: url });
+    }
   };
 
   return (
@@ -177,20 +145,16 @@ const Profile: React.FC = () => {
                     </div>
                   )}
                   {isEditing && (
-                    <button
-                      onClick={triggerImageUpload}
-                      disabled={uploadingImage}
-                      className="absolute bottom-0 right-0 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full p-3 shadow-lg transition-colors disabled:opacity-50"
-                    >
-                      {uploadingImage ? (
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      ) : (
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                      )}
-                    </button>
+                    <div className="absolute bottom-0 right-0">
+                      <FileUpload
+                        onFileSelect={handleFileSelect}
+                        onUpload={handleFileUpload}
+                        currentUrl={profile.pfp_url || ''}
+                        accept="image/*"
+                        maxSize={5}
+                        disabled={false}
+                      />
+                    </div>
                   )}
                 </div>
                 <h2 className="text-2xl font-bold text-white mb-2">
@@ -220,14 +184,6 @@ const Profile: React.FC = () => {
               </div>
             </div>
 
-            {/* Hidden file input */}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-            />
 
             {/* Profile Details */}
             <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-6">

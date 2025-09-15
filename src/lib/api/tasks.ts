@@ -30,16 +30,24 @@ export interface TaskResponse {
 
 export interface TaskSearchRequest {
   search_zip_code: string;
-  query?: string;
-  location_type?: string;
+  search_query?: string;
+  search_location_type?: string;
   min_hourly_rate?: number;
   max_hourly_rate?: number;
-  limit?: number;
-  offset?: number;
+  search_limit?: number;
+  search_offset?: number;
+}
+
+export interface ClientInfo {
+  id: string;
+  first_name: string;
+  last_name: string;
+  pfp_url?: string;
 }
 
 export interface TaskSearchResponse extends TaskResponse {
   distance?: number;
+  client: ClientInfo;
 }
 
 export interface TaskUpdate {
@@ -62,7 +70,6 @@ export interface TaskListResponse {
 
 export interface TaskSearchListResponse {
   tasks: TaskSearchResponse[];
-  total_count: number;
   limit: number;
   offset: number;
 }
@@ -90,8 +97,34 @@ export const taskApi = {
     apiClient.post('/tasks/', data),
 
   // Get tasks with search/filtering
-  getTasks: (searchRequest: TaskSearchRequest): Promise<TaskSearchListResponse> =>
-    apiClient.get(`/tasks/?${new URLSearchParams(searchRequest as any).toString()}`),
+  getTasks: (searchRequest: TaskSearchRequest): Promise<TaskSearchListResponse> => {
+    // Filter out undefined/null values and convert to proper query params
+    const params = new URLSearchParams();
+    
+    if (searchRequest.search_zip_code) {
+      params.append('search_zip_code', searchRequest.search_zip_code);
+    }
+    if (searchRequest.search_query) {
+      params.append('search_query', searchRequest.search_query);
+    }
+    if (searchRequest.search_location_type) {
+      params.append('search_location_type', searchRequest.search_location_type);
+    }
+    if (searchRequest.min_hourly_rate !== undefined && searchRequest.min_hourly_rate !== null) {
+      params.append('min_hourly_rate', searchRequest.min_hourly_rate.toString());
+    }
+    if (searchRequest.max_hourly_rate !== undefined && searchRequest.max_hourly_rate !== null) {
+      params.append('max_hourly_rate', searchRequest.max_hourly_rate.toString());
+    }
+    if (searchRequest.search_limit !== undefined) {
+      params.append('search_limit', searchRequest.search_limit.toString());
+    }
+    if (searchRequest.search_offset !== undefined) {
+      params.append('search_offset', searchRequest.search_offset.toString());
+    }
+    
+    return apiClient.get(`/tasks/?${params.toString()}`);
+  },
 
   // Get available tasks (public)
   getAvailableTasks: (): Promise<PublicTaskResponse> =>

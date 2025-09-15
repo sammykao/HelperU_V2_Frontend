@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../lib/contexts/AuthContext';
 import Navbar from '../../components/Navbar';
 import { AIChat } from '../../components/ai/AIChat';
 
 const HelperDashboard: React.FC = () => {
-  const { profileStatus } = useAuth();
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
 
   return (
@@ -30,26 +28,6 @@ const HelperDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Profile Status */}
-        {profileStatus && (
-          <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-6 mb-8">
-            <h2 className="text-xl font-semibold text-white mb-4">Profile Status</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="flex items-center space-x-3">
-                <div className={`w-3 h-3 rounded-full ${profileStatus.profile_completed ? 'bg-green-400' : 'bg-red-400'}`}></div>
-                <span className="text-gray-300">Profile Completed</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className={`w-3 h-3 rounded-full ${profileStatus.email_verified ? 'bg-green-400' : 'bg-red-400'}`}></div>
-                <span className="text-gray-300">Email Verified</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className={`w-3 h-3 rounded-full ${profileStatus.phone_verified ? 'bg-green-400' : 'bg-red-400'}`}></div>
-                <span className="text-gray-300">Phone Verified</span>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

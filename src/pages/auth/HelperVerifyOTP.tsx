@@ -45,7 +45,7 @@ const HelperVerifyOTP: React.FC = () => {
       const response = await authApi.helperVerifyOTP(request);
       
       if (response.success && response.access_token) {
-        login(response.access_token, { id: response.user_id || '' } as any, 'helper');
+        login(response.access_token, { id: response.user_id || '' } as any, 'helper', response.refresh_token);
         toast.success('Successfully signed in!');
         
         // Check profile status to determine next step

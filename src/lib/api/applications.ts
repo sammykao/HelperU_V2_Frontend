@@ -41,6 +41,11 @@ export interface ApplicationCreateRequest {
   supplements_url?: string;
 }
 
+export interface ApplicationCreateData {
+  introduction_message: string;
+  supplements_url?: string;
+}
+
 export interface InvitationResponse {
   id: string;
   task_id: string;
@@ -72,8 +77,8 @@ export const applicationApi = {
     apiClient.get('/applications/helper'),
 
   // Create application
-  createApplication: (taskId: string, data: ApplicationCreateRequest): Promise<ApplicationResponse> =>
-    apiClient.post(`/applications/`, data),
+  createApplication: (taskId: string, data: ApplicationCreateData): Promise<ApplicationResponse> =>
+    apiClient.post(`/applications/`, { task_id: taskId, ...data }),
 
   // Get specific application
   getApplication: (applicationId: string): Promise<ApplicationResponse> =>

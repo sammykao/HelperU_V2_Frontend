@@ -47,7 +47,7 @@ const Navbar: React.FC = () => {
                       <Link to="/tasks/create" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">
                         Create Post
                       </Link>
-                      <Link to="/chats" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                      <Link to="/chat" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">
                         My Chats
                       </Link>
                     </>
@@ -57,7 +57,7 @@ const Navbar: React.FC = () => {
                       <Link to="/tasks/browse" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">
                         Browse Posts
                       </Link>
-                      <Link to="/chats" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                      <Link to="/chat" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">
                         Chats
                       </Link>
                       <Link to="/applications" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">

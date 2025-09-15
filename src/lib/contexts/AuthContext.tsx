@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { apiClient } from '../api/client';
 import { authApi, CurrentUser, ProfileStatusResponse } from '../api/auth';
+import { refreshToken } from '../utils/tokenRefresh';
 
 interface AuthContextType {
   user: CurrentUser | null;
@@ -9,7 +10,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   token: string | null;
   authRoute: 'client' | 'helper' | null;
-  login: (token: string, user: CurrentUser, authRoute: 'client' | 'helper') => void;
+  login: (token: string, user: CurrentUser, authRoute: 'client' | 'helper', refreshToken?: string) => void;
   logout: () => Promise<void>;
   updateProfileStatus: (status: ProfileStatusResponse) => void;
   refreshProfileStatus: () => Promise<void>;
@@ -56,16 +57,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           const status = await authApi.getProfileStatus();
           setProfileStatus(status);
         } catch (error) {
-          console.error('Failed to verify token:', error);
-          // Clear all auth data on token verification failure
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('auth_route');
-          localStorage.removeItem('user_data');
-          apiClient.setToken(null);
-          setToken(null);
-          setUser(null);
-          setAuthRoute(null);
-          setProfileStatus(null);
+          try {
+            if (error instanceof Error && error.message.includes('401')) {
+              // Auth error: refresh token and retry
+              console.log('Auth error detected, attempting token refresh...');
+              const newToken = await refreshToken();
+              if (newToken) {
+                console.log('Token refreshed successfully, retrying...');
+                const status = await authApi.getProfileStatus();
+                setProfileStatus(status);
+              }
+            } else {
+              // other error, we should retry once
+              const status = await authApi.getProfileStatus();
+              setProfileStatus(status);
+            }
+          } catch (error) {
+            console.error('Failed to get profile status:', error);
+            await logout();
+          }
         }
       }
       setIsLoading(false);
@@ -74,7 +84,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initializeAuth();
   }, []);
 
-  const login = (accessToken: string, userData: CurrentUser, authRoute: 'client' | 'helper') => {
+  const login = (accessToken: string, userData: CurrentUser, authRoute: 'client' | 'helper', refreshToken?: string) => {
     setToken(accessToken);
     apiClient.setToken(accessToken);
     setUser(userData);
@@ -82,6 +92,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.setItem('access_token', accessToken);
     localStorage.setItem('auth_route', authRoute);
     localStorage.setItem('user_data', JSON.stringify(userData));
+    
+    // Store refresh token if provided
+    if (refreshToken) {
+      localStorage.setItem('refresh_token', refreshToken);
+    }
   };
 
   const logout = async () => {
@@ -96,6 +111,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setProfileStatus(null);
       setAuthRoute(null);
       localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
       localStorage.removeItem('auth_route');
       localStorage.removeItem('user_data');
     }

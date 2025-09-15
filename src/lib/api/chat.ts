@@ -7,8 +7,7 @@ export interface ChatCreateRequest {
 
 export interface ChatResponse {
   id: string;
-  client_id: string;
-  helper_id: string;
+  users: ChatParticipantInfo[];
   created_at: string;
   updated_at: string;
 }
@@ -43,20 +42,19 @@ export interface ChatMarkReadRequest {
   message_ids: string[];
 }
 
+export interface ChatParticipantInfo {
+  id: string;
+  first_name: string;
+  last_name: string;
+  pfp_url?: string;
+  college?: string;
+}
+
 export interface ChatWithParticipantsResponse extends ChatResponse {
-  client: {
-    id: string;
-    first_name: string;
-    last_name: string;
-    pfp_url?: string;
-  };
-  helper: {
-    id: string;
-    first_name: string;
-    last_name: string;
-    college: string;
-    pfp_url?: string;
-  };
+  participants: ChatParticipantInfo[];
+  last_message?: string;
+  last_message_at?: string;
+  unread_count: number;
 }
 
 export interface WebSocketChatMessage {
@@ -96,7 +94,7 @@ export const chatApi = {
 
   // Get chat with participants
   getChatWithParticipants: (chatId: string): Promise<ChatWithParticipantsResponse> =>
-    apiClient.get(`/chat/${chatId}/participants`),
+    apiClient.get(`/chat/${chatId}`),
 };
 
 // WebSocket connection for real-time chat

@@ -46,7 +46,7 @@ const ClientVerifyOTP: React.FC = () => {
       const response = await authApi.clientVerifyOTP(request);
       
       if (response.success && response.access_token) {
-        login(response.access_token, { id: response.user_id || '' } as any, 'client');
+        login(response.access_token, { id: response.user_id || '' } as any, 'client', response.refresh_token);
         toast.success(isSignup ? 'Successfully verified!' : 'Successfully signed in!');
         
         // Check profile status to determine next step

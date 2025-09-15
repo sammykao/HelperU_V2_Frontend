@@ -17,7 +17,18 @@ export const refreshToken = async (): Promise<string | null> => {
   }
 
   try {
-    const { data, error } = await supabase.auth.refreshSession();
+    // Get the current refresh token from localStorage
+    const refreshToken = localStorage.getItem('refresh_token');
+    
+    if (!refreshToken) {
+      console.error('No refresh token found in localStorage');
+      return null;
+    }
+
+    // Refresh the session using the refresh token
+    const { data, error } = await supabase.auth.refreshSession({
+      refresh_token: refreshToken
+    });
     
     if (error) {
       console.error('Token refresh failed:', error);
@@ -25,8 +36,11 @@ export const refreshToken = async (): Promise<string | null> => {
     }
 
     if (data.session?.access_token) {
-      // Update localStorage with new token
+      // Update localStorage with new tokens
       localStorage.setItem('access_token', data.session.access_token);
+      if (data.session.refresh_token) {
+        localStorage.setItem('refresh_token', data.session.refresh_token);
+      }
       return data.session.access_token;
     }
 

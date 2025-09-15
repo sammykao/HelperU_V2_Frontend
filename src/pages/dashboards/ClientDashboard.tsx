@@ -29,7 +29,7 @@ const ClientDashboard: React.FC = () => {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 cursor-pointer">
+          <Link to="/tasks/create" className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 cursor-pointer block">
             <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mb-4">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -37,9 +37,9 @@ const ClientDashboard: React.FC = () => {
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">Create New Post</h3>
             <p className="text-gray-300 text-sm">Post a new opportunity for students to help with</p>
-          </div>
+          </Link>
 
-          <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 cursor-pointer">
+          <Link to="/tasks/my-posts" className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 cursor-pointer block">
             <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center mb-4">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -47,9 +47,9 @@ const ClientDashboard: React.FC = () => {
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">My Posts</h3>
             <p className="text-gray-300 text-sm">View and manage your posted opportunities</p>
-          </div>
+          </Link>
 
-          <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 cursor-pointer">
+          <Link to="/chat" className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 cursor-pointer block">
             <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-xl flex items-center justify-center mb-4">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
@@ -57,7 +57,7 @@ const ClientDashboard: React.FC = () => {
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">My Chats</h3>
             <p className="text-gray-300 text-sm">Chat with student helpers</p>
-          </div>
+          </Link>
           {/* AI Assistant */}
           <Link to="/ai-assistant" className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 cursor-pointer block">
             <div className="flex items-center space-x-3 mb-4">
@@ -71,7 +71,7 @@ const ClientDashboard: React.FC = () => {
             <p className="text-gray-300 text-sm">Get help with creating posts, managing opportunities, or answering questions about HelperU</p>
           </Link>
 
-          <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 cursor-pointer">
+          <Link to="/helpers/search" className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 cursor-pointer block">
             <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mb-4">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -79,17 +79,17 @@ const ClientDashboard: React.FC = () => {
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">Search Helpers</h3>
             <p className="text-gray-300 text-sm">Find and invite qualified student helpers to apply to your post(s)</p>
-          </div>
+          </Link>
 
-          <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 cursor-pointer">
+          <Link to="/profile" className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 cursor-pointer block">
             <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-4">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2">Edit Profile</h3>
-            <p className="text-gray-300 text-sm">Update your profile information and preferences</p>
-          </div>
+            <h3 className="text-lg font-semibold text-white mb-2">Your Profile</h3>
+            <p className="text-gray-300 text-sm">View and update your profile information and preferences</p>
+          </Link>
 
           
 
