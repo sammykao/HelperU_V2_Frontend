@@ -9,6 +9,8 @@ interface FileUploadProps {
   accept?: string;
   maxSize?: number; // in MB
   disabled?: boolean;
+  variant?: 'preview' | 'button' | 'icon';
+  buttonLabel?: string;
 }
 
 // Supabase configuration - these should be in your environment variables
@@ -22,6 +24,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   accept = 'image/*',
   maxSize = 5,
   disabled = false,
+  variant = 'preview',
+  buttonLabel = 'Change photo',
 }) => {
   const { token } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
@@ -179,8 +183,45 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         className="hidden"
         disabled={disabled || isUploading}
       />
-
-      {currentUrl ? (
+      {variant === 'icon' ? (
+        <button
+          type="button"
+          onClick={handleClick}
+          disabled={disabled || isUploading}
+          aria-label={isUploading ? `Uploading ${uploadProgress}%` : 'Change photo'}
+          className={`w-9 h-9 rounded-full border border-white/30 shadow-lg flex items-center justify-center transition-colors ${
+            disabled || isUploading
+              ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+              : 'bg-indigo-600 hover:bg-indigo-500 text-white'
+          }`}
+        >
+          {isUploading ? (
+            <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+          ) : (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7a2 2 0 012-2h2l1-2h6l1 2h2a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11a3 3 0 100 6 3 3 0 000-6z" />
+            </svg>
+          )}
+        </button>
+      ) : variant === 'button' ? (
+        <button
+          type="button"
+          onClick={handleClick}
+          disabled={disabled || isUploading}
+          className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-2 ${
+            disabled || isUploading
+              ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+              : 'bg-indigo-600/90 hover:bg-indigo-600 text-white'
+          }`}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7a2 2 0 012-2h2l1-2h6l1 2h2a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11a3 3 0 100 6 3 3 0 000-6z" />
+          </svg>
+          {isUploading ? `Uploading... ${uploadProgress}%` : buttonLabel}
+        </button>
+      ) : currentUrl ? (
         <div className="space-y-3">
           <div className="relative">
             <img

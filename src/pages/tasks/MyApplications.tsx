@@ -120,10 +120,7 @@ const MyApplications: React.FC = () => {
   }, [tab]);
 
   const emptyState = useMemo(() => {
-    const title = tab === 'applications' ? (isHelper ? 'No applications yet' : 'No applications on your posts yet') : 'No invitations yet';
-    const desc = tab === 'applications'
-      ? (isHelper ? 'Start browsing tasks and apply to opportunities you like.' : 'Your posted tasks will show applications from helpers here.')
-      : 'You will see invitations you receive here.';
+    const title = tab === 'applications' ? 'No applications yet' : 'No invitations yet';
     return (
       <div className="text-center py-16">
         <div className="w-16 h-16 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -132,10 +129,9 @@ const MyApplications: React.FC = () => {
           </svg>
         </div>
         <h2 className="text-xl font-semibold text-white mb-2">{title}</h2>
-        <p className="text-gray-300">{desc}</p>
       </div>
     );
-  }, [tab, isHelper]);
+  }, [tab]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900">

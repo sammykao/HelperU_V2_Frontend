@@ -172,7 +172,7 @@ const BrowseTasks: React.FC = () => {
               {isLoading && hasSearched && (
                 <div className="flex items-center space-x-2 text-blue-400">
                   <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
-                  <span className="text-sm">Updating...</span>
+                  <span className="text-sm">Updating...</span>  
                 </div>
               )}
             </div>
@@ -209,7 +209,6 @@ const BrowseTasks: React.FC = () => {
                   <option value="" className="bg-gray-800 text-white">All Locations</option>
                   <option value="remote" className="bg-gray-800 text-white">Remote</option>
                   <option value="in-person" className="bg-gray-800 text-white">In-Person</option>
-                  <option value="hybrid" className="bg-gray-800 text-white">Hybrid</option>
                 </select>
               </div>
 
@@ -371,8 +370,10 @@ const BrowseTasks: React.FC = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                     <span className="text-sm text-gray-300 capitalize">{task.location_type}</span>
-                    <span className="text-sm text-blue-400">• {task.zip_code}</span>
-                    {task.distance && (
+                    {task.location_type !== 'remote' && task.zip_code && (
+                      <span className="text-sm text-blue-400">• {task.zip_code}</span>
+                    )}
+                    {task.location_type !== 'remote' && task.distance !== undefined && task.distance !== null && (
                       <span className="text-sm text-blue-400">• {formatDistance(task.distance)}</span>
                     )}
                   </div>

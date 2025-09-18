@@ -95,6 +95,14 @@ export const chatApi = {
   // Get chat with participants
   getChatWithParticipants: (chatId: string): Promise<ChatWithParticipantsResponse> =>
     apiClient.get(`/chat/${chatId}`),
+
+  // Check if a chat exists with a participant
+  getChatWithParticipant: (participantId: string): Promise<{ chat_id: string | null }> =>
+    apiClient.get(`/chat/with/${participantId}`),
+
+  // Batch check chats with multiple participants
+  batchCheckChatsWithParticipants: (participantIds: string[]): Promise<Record<string, string | null>> =>
+    apiClient.post('/chat/batch-check', participantIds),
 };
 
 // WebSocket connection for real-time chat

@@ -5,6 +5,7 @@ import { taskApi, TaskResponse } from '../../lib/api/tasks';
 import { applicationApi, ApplicationResponse, InvitationResponse, ApplicationCreateData } from '../../lib/api/applications';
 import { useAuth } from '../../lib/contexts/AuthContext';
 import CreateChatButton from '../../components/chat/CreateChatButton';
+import { chatApi } from '../../lib/api/chat';
 import toast from 'react-hot-toast';
 
 const SingleTask: React.FC = () => {
@@ -23,6 +24,8 @@ const SingleTask: React.FC = () => {
   const [applicationMessage, setApplicationMessage] = useState('');
   const [myApplication, setMyApplication] = useState<ApplicationResponse | null>(null);
   const [myApplicationLoading, setMyApplicationLoading] = useState(false);
+  const [helperChatMap, setHelperChatMap] = useState<Record<string, string | null>>({});
+  const [helperChatLoading, setHelperChatLoading] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -68,8 +71,25 @@ const SingleTask: React.FC = () => {
           
           if (applicantsData && applicantsData.applications) {
             setApplicants(applicantsData.applications);
+            // After applicants load, batch check for existing chats per helper
+            const helperIds = applicantsData.applications.map(a => a.helper.id);
+            if (helperIds.length > 0) {
+              setHelperChatLoading(true);
+              try {
+                const chatMap = await chatApi.batchCheckChatsWithParticipants(helperIds);
+                setHelperChatMap(chatMap);
+              } catch (e) {
+                console.warn('Failed to check chats:', e);
+                // Fallback: set all to null
+                setHelperChatMap(Object.fromEntries(helperIds.map(id => [id, null])));
+              }
+              setHelperChatLoading(false);
+            } else {
+              setHelperChatMap({});
+            }
           } else {
             setApplicants([]);
+            setHelperChatMap({});
           }
           
           if (invitationsData && invitationsData.invitations) {
@@ -82,6 +102,7 @@ const SingleTask: React.FC = () => {
           console.warn('Failed to load applications/invitations:', appErr);
           setApplicants([]);
           setInvitations([]);
+          setHelperChatMap({});
         } finally {
           setApplicantsLoading(false);
           setInvitationsLoading(false);
@@ -332,12 +353,23 @@ const SingleTask: React.FC = () => {
                               </svg>
                             </a>
                           )}
-                          <CreateChatButton 
-                            helperId={helper.id}
-                            helperName={`${helper.first_name} ${helper.last_name}`}
-                            size="sm"
-                            className="ml-auto"
-                          />
+                          {helperChatLoading ? (
+                            <div className="text-sm text-gray-400 ml-auto">Checking chat...</div>
+                          ) : helperChatMap[helper.id] ? (
+                            <button
+                              onClick={() => navigate('/chat')}
+                              className="ml-auto inline-flex items-center px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm"
+                            >
+                              Open My Chats
+                            </button>
+                          ) : (
+                            <CreateChatButton 
+                              helperId={helper.id}
+                              helperName={`${helper.first_name} ${helper.last_name}`}
+                              size="sm"
+                              className="ml-auto"
+                            />
+                          )}
                         </div>
                       </li>
                     ))}

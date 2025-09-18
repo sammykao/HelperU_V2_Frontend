@@ -11,10 +11,11 @@ const SearchHelpers: React.FC = () => {
   const taskId = searchParams.get('task_id');
 
   const handleBack = () => {
-    if (taskId) {
-      navigate(`/tasks/browse/${taskId}`);
+    if (window.history.length > 2) {
+      navigate(-1);
     } else {
-      navigate('/tasks/my-posts');
+      // Fallback to dashboard if no history
+      navigate('/dashboard');
     }
   };
 

@@ -48,7 +48,7 @@ const HelperDashboard: React.FC = () => {
 
           <div 
             className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 cursor-pointer"
-            onClick={() => navigate('/tasks/my-applications')}
+            onClick={() => navigate('/applications')}
           >
             <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center mb-4">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

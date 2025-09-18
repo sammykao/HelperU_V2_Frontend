@@ -145,7 +145,7 @@ const Profile: React.FC = () => {
                     </div>
                   )}
                   {isEditing && (
-                    <div className="absolute bottom-0 right-0">
+                    <div className="absolute -bottom-2 -right-2">
                       <FileUpload
                         onFileSelect={handleFileSelect}
                         onUpload={handleFileUpload}
@@ -153,6 +153,7 @@ const Profile: React.FC = () => {
                         accept="image/*"
                         maxSize={5}
                         disabled={false}
+                        variant="icon"
                       />
                     </div>
                   )}
