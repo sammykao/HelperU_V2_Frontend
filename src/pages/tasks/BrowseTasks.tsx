@@ -19,17 +19,40 @@ const BrowseTasks: React.FC = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [hasSearched, setHasSearched] = useState(false);
 
-  // Fetch user profile and set zip code on mount
+  // Fetch user profile and set zip code on mount, then automatically load tasks
   useEffect(() => {
-    const initializeZipCode = async () => {
+    const initializeZipCodeAndLoadTasks = async () => {
       if (authRoute === 'helper') {
         try {
           const profileResponse = await profileApi.getProfile();
           if (profileResponse.profile?.helper?.zip_code) {
+            const zipCode = profileResponse.profile!.helper!.zip_code!;
             setSearchParams(prev => ({
               ...prev,
-              search_zip_code: profileResponse.profile!.helper!.zip_code!
+              search_zip_code: zipCode
             }));
+            
+            // Automatically load tasks with the user's ZIP code
+            setIsLoading(true);
+            try {
+              const response = await taskApi.getTasks({
+                search_zip_code: zipCode,
+                search_limit: 20,
+                search_offset: 0,
+              });
+              
+              setTasks(response.tasks);
+              setTotalCount(response.tasks.length < response.limit ? 
+                response.tasks.length : 
+                response.tasks.length + 1
+              );
+              setHasSearched(true);
+            } catch (error: any) {
+              toast.error('Failed to load tasks');
+              console.error('Error fetching tasks:', error);
+            } finally {
+              setIsLoading(false);
+            }
           }
         } catch (error) {
           console.log('Could not fetch profile for zip code');
@@ -37,7 +60,7 @@ const BrowseTasks: React.FC = () => {
       }
     };
     
-    initializeZipCode();
+    initializeZipCodeAndLoadTasks();
   }, [authRoute]);
 
   const fetchTasks = async () => {
@@ -81,6 +104,32 @@ const BrowseTasks: React.FC = () => {
     setSearchParams(prev => ({ ...prev, [key]: value, search_offset: 0 }));
   };
 
+  // Auto-search when filters change (debounced)
+  useEffect(() => {
+    if (!hasSearched || !searchParams.search_zip_code) return;
+    
+    const timeoutId = setTimeout(() => {
+      setIsLoading(true);
+      taskApi.getTasks(searchParams)
+        .then(response => {
+          setTasks(response.tasks);
+          setTotalCount(response.tasks.length < response.limit ? 
+            response.tasks.length : 
+            response.tasks.length + 1
+          );
+        })
+        .catch(error => {
+          toast.error('Failed to update search');
+          console.error('Error updating search:', error);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchParams.search_query, searchParams.search_location_type, searchParams.min_hourly_rate, searchParams.max_hourly_rate, hasSearched]);
+
   const loadMore = () => {
     setSearchParams(prev => ({ 
       ...prev, 
@@ -97,11 +146,37 @@ const BrowseTasks: React.FC = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Browse Opportunities</h1>
-          <p className="text-gray-300">Find posts that match your skills and interests</p>
+          <p className="text-gray-300">
+            {hasSearched 
+              ? `Showing opportunities near ${searchParams.search_zip_code} - modify filters below to refine your search`
+              : 'Find posts that match your skills and interests'
+            }
+          </p>
         </div>
 
         {/* Search and Filters */}
         <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-6 mb-8">
+          <div className="mb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-white mb-1">
+                  {hasSearched ? 'Refine Your Search' : 'Search Filters'}
+                </h2>
+                <p className="text-sm text-gray-300">
+                  {hasSearched 
+                    ? 'Adjust the filters below to find more specific opportunities'
+                    : 'Set your search criteria to find opportunities'
+                  }
+                </p>
+              </div>
+              {isLoading && hasSearched && (
+                <div className="flex items-center space-x-2 text-blue-400">
+                  <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+                  <span className="text-sm">Updating...</span>
+                </div>
+              )}
+            </div>
+          </div>
           <form onSubmit={handleSearch} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
@@ -196,7 +271,7 @@ const BrowseTasks: React.FC = () => {
                 type="submit"
                 className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all duration-300"
               >
-                Search
+                {hasSearched ? 'Update Search' : 'Search'}
               </button>
             </div>
           </form>
@@ -206,7 +281,7 @@ const BrowseTasks: React.FC = () => {
         {hasSearched && (
           <div className="mb-4">
             <p className="text-gray-300">
-              {totalCount} opportunity{totalCount !== 1 ? 'ies' : ''} found
+              {totalCount} opportunit{totalCount !== 1 ? 'ies' : 'y'} found
             </p>
           </div>
         )}
@@ -214,22 +289,39 @@ const BrowseTasks: React.FC = () => {
         {/* Task Cards */}
         {!hasSearched ? (
           <div className="text-center py-12">
-            <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+            <div className="relative w-20 h-20 mx-auto mb-6">
+              {/* Outer spinning ring */}
+              <div className="absolute inset-0 border-4 border-white/20 rounded-full"></div>
+              <div className="absolute inset-0 border-4 border-transparent border-t-blue-500 border-r-blue-500 rounded-full animate-spin"></div>
+              
+              {/* Inner pulsing circle */}
+              <div className="absolute inset-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center animate-pulse">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">Search for Opportunities</h3>
-            <p className="text-gray-300">Enter your ZIP code and click Search to find opportunities near you</p>
+            <h3 className="text-xl font-semibold text-white mb-2 animate-pulse">Loading Opportunities</h3>
+            <p className="text-gray-300">Finding opportunities near your location...</p>
+            <div className="flex justify-center mt-4 space-x-1">
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+            </div>
           </div>
         ) : isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-6 animate-pulse">
-                <div className="h-4 bg-white/20 rounded mb-4"></div>
-                <div className="h-3 bg-white/20 rounded mb-2"></div>
-                <div className="h-3 bg-white/20 rounded mb-4"></div>
-                <div className="h-8 bg-white/20 rounded"></div>
+              <div key={i} className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-6 relative overflow-hidden">
+                {/* Shimmer effect */}
+                <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+                
+                <div className="relative">
+                  <div className="h-4 bg-white/20 rounded mb-4 animate-pulse"></div>
+                  <div className="h-3 bg-white/20 rounded mb-2 animate-pulse" style={{animationDelay: `${i * 0.1}s`}}></div>
+                  <div className="h-3 bg-white/20 rounded mb-4 animate-pulse" style={{animationDelay: `${i * 0.1 + 0.1}s`}}></div>
+                  <div className="h-8 bg-white/20 rounded animate-pulse" style={{animationDelay: `${i * 0.1 + 0.2}s`}}></div>
+                </div>
               </div>
             ))}
           </div>
@@ -324,9 +416,21 @@ const BrowseTasks: React.FC = () => {
             <button
               onClick={loadMore}
               disabled={isLoading}
-              className="px-6 py-3 bg-white/20 text-white font-medium rounded-xl border border-white/30 hover:bg-white/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-3 bg-white/20 text-white font-medium rounded-xl border border-white/30 hover:bg-white/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 mx-auto"
             >
-              {isLoading ? 'Loading...' : 'Load More'}
+              {isLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  <span>Loading...</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  <span>Load More</span>
+                </>
+              )}
             </button>
           </div>
         )}

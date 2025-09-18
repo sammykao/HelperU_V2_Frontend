@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { aiApi, AIRequest, AIResponse } from '../../lib/api/ai';
 import { getAIChatThreadId } from '../../lib/utils/aiChatStorage';
+import { useAuth } from '../../lib/contexts/AuthContext';
 import toast from 'react-hot-toast';
 
 interface Message {
@@ -16,10 +18,98 @@ interface AIChatProps {
 }
 
 export const AIChat: React.FC<AIChatProps> = ({ isOpen, onClose }) => {
+  const { isAuthenticated, authRoute } = useAuth();
+  
+  // Create different welcome messages based on authentication status
+  const getWelcomeMessage = () => {
+    if (!isAuthenticated) {
+      return `# Welcome to HelperU AI Assistant! 🤖
+
+I'm your intelligent helper for the HelperU platform. Here's what I can help you with:
+
+## **For New Users:**
+- **Learn about HelperU**: Understand how our platform works
+- **Account Setup**: Get guidance on creating your account
+- **Platform Features**: Discover what HelperU offers
+- **General Support**: Answer any questions you have
+
+## **Get Started:**
+1. **Sign up** as a client or helper
+2. **Complete your profile** to get started
+3. **Ask me anything** about the platform
+
+*Ready to explore HelperU? Ask me anything!*`;
+    }
+
+    if (authRoute === 'client') {
+      return `# Welcome back! 👋
+
+I'm your personal HelperU AI assistant. Here's what I can help you with:
+
+## **Client Features:**
+- **📝 Task Management**: Create, update, and manage your tasks
+- **🔍 Helper Discovery**: Find qualified student helpers in your area
+- **💬 Communication**: Chat with helpers through secure messaging
+- **📋 Application Management**: Review and manage task applications
+- **👤 Profile Updates**: Update your account information
+- **❓ Platform Support**: Answer questions about HelperU
+
+## **Quick Actions:**
+1. Ask me to **create a task** for you
+2. **Search for helpers** in your area
+3. **Check your applications** status
+4. **Get help** with any platform questions
+
+*What would you like to do today?*`;
+    }
+
+    if (authRoute === 'helper') {
+      return `# Welcome back! 👋
+
+I'm your personal HelperU AI assistant. Here's what I can help you with:
+
+## **Helper Features:**
+- **🔍 Browse Tasks**: Find opportunities that match your skills
+- **📝 Applications**: Manage your task applications
+- **💬 Communication**: Chat with clients about tasks
+- **👤 Profile Updates**: Update your profile and skills
+- **📊 Dashboard**: Check your activity and earnings
+- **❓ Platform Support**: Answer questions about HelperU
+
+## **Quick Actions:**
+1. Ask me to **browse available tasks**
+2. **Check your applications** status
+3. **Update your profile** information
+4. **Get help** with any platform questions
+
+*What would you like to do today?*`;
+    }
+
+    // Fallback for unknown auth route
+    return `# Welcome to HelperU AI Assistant! 🤖
+
+I'm your intelligent helper for all HelperU tasks. Here's what I can help you with:
+
+## **Available Features:**
+- **Task Management**: Create, update, and manage your tasks
+- **Helper Discovery**: Find qualified student helpers in your area
+- **Communication**: Chat with helpers through secure messaging
+- **Application Management**: Review and manage task applications
+- **Profile Updates**: Update your account information
+- **Platform Support**: Answer questions about HelperU
+
+## **Quick Start:**
+1. Ask me to **create a task** for you
+2. **Search for helpers** in your area
+3. **Get help** with any platform questions
+
+*What would you like to do today?*`;
+  };
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      content: "Hi! I'm your HelperU AI assistant. I can help you create posts, find opportunities, or answer questions about the platform. What would you like to know?",
+      content: getWelcomeMessage(),
       isUser: false,
       timestamp: new Date(),
     },
@@ -30,6 +120,21 @@ export const AIChat: React.FC<AIChatProps> = ({ isOpen, onClose }) => {
     return getAIChatThreadId();
   });
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Update welcome message when authentication state changes
+  useEffect(() => {
+    setMessages(prevMessages => {
+      const newWelcomeMessage = {
+        id: '1',
+        content: getWelcomeMessage(),
+        isUser: false,
+        timestamp: new Date(),
+      };
+      
+      // Replace the first message (welcome message) with the new one
+      return [newWelcomeMessage, ...prevMessages.slice(1)];
+    });
+  }, [isAuthenticated, authRoute]);
 
   useEffect(() => {
     scrollToBottom();
@@ -131,7 +236,39 @@ export const AIChat: React.FC<AIChatProps> = ({ isOpen, onClose }) => {
                     : 'bg-white/10 text-gray-100 border border-white/20'
                 }`}
               >
-                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                <div className="text-sm prose prose-invert prose-sm max-w-none">
+                  <ReactMarkdown
+                    components={{
+                      // Custom styling for markdown elements
+                      p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                      h1: ({ children }) => <h1 className="text-lg font-bold mb-2">{children}</h1>,
+                      h2: ({ children }) => <h2 className="text-base font-bold mb-2">{children}</h2>,
+                      h3: ({ children }) => <h3 className="text-sm font-bold mb-1">{children}</h3>,
+                      ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
+                      ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
+                      li: ({ children }) => <li className="text-sm">{children}</li>,
+                      code: ({ children, className }) => {
+                        const isInline = !className;
+                        return isInline ? (
+                          <code className="bg-white/20 px-1 py-0.5 rounded text-xs font-mono">{children}</code>
+                        ) : (
+                          <code className="block bg-white/10 p-2 rounded text-xs font-mono overflow-x-auto">{children}</code>
+                        );
+                      },
+                      pre: ({ children }) => <pre className="bg-white/10 p-2 rounded text-xs font-mono overflow-x-auto mb-2">{children}</pre>,
+                      blockquote: ({ children }) => <blockquote className="border-l-2 border-white/30 pl-3 italic mb-2">{children}</blockquote>,
+                      strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                      em: ({ children }) => <em className="italic">{children}</em>,
+                      a: ({ children, href }) => (
+                        <a href={href} className="text-blue-400 hover:text-blue-300 underline" target="_blank" rel="noopener noreferrer">
+                          {children}
+                        </a>
+                      ),
+                    }}
+                  >
+                    {message.content}
+                  </ReactMarkdown>
+                </div>
                 <p className={`text-xs mt-1 ${
                   message.isUser ? 'text-blue-100' : 'text-gray-400'
                 }`}>
