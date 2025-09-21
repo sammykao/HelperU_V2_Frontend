@@ -4,6 +4,7 @@ import { authApi, HelperProfileUpdateRequest } from '../../lib/api/auth';
 import { validateRequired, validateZipCode, validateRange } from '../../lib/utils/validation';
 import { useAuth } from '../../lib/contexts/AuthContext';
 import { FileUpload } from '../../components/ui/FileUpload';
+import CollegeInput from '../../components/ui/CollegeInput';
 import toast from 'react-hot-toast';
 
 const HelperCompleteProfile: React.FC = () => {
@@ -180,23 +181,20 @@ const HelperCompleteProfile: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                College/University
-              </label>
-              <input
-                type="text"
-                name="college"
+              <CollegeInput
                 value={formData.college}
-                onChange={handleInputChange}
-                className={`w-full px-4 py-3 bg-white/10 border rounded-xl text-white placeholder-gray-400 transition-all duration-300 ${
-                  errors.college ? 'border-red-400 bg-red-500/10' : 'border-white/20 hover:bg-white/15'
-                } focus:outline-none focus:ring-2 focus:ring-blue-500/50`}
-                placeholder="Harvard University"
+                onChange={(value) => {
+                  setFormData(prev => ({ ...prev, college: value }));
+                  if (errors.college) {
+                    setErrors(prev => ({ ...prev, college: '' }));
+                  }
+                }}
+                placeholder="Search for your college..."
+                label="College/University"
+                required
+                error={errors.college}
                 disabled={isLoading}
               />
-              {errors.college && (
-                <p className="mt-1 text-sm text-red-400">{errors.college}</p>
-              )}
             </div>
 
             <div>

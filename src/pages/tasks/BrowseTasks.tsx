@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import { taskApi, TaskSearchResponse, TaskSearchRequest } from '../../lib/api/tasks';
 import { formatCurrency, formatDate, formatDistance } from '../../lib/utils/format';
@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 
 const BrowseTasks: React.FC = () => {
   const { authRoute } = useAuth();
+  const navigate = useNavigate();
   const [tasks, setTasks] = useState<TaskSearchResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchParams, setSearchParams] = useState<TaskSearchRequest>({
@@ -143,6 +144,32 @@ const BrowseTasks: React.FC = () => {
       <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* AI Assistant Blurb */}
+        <div className="mb-8 backdrop-blur-lg bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-2xl p-6">
+          <div className="flex items-start space-x-4">
+            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-white mb-2">Need Help Finding Opportunities?</h3>
+              <p className="text-gray-300 text-sm mb-4">
+                Our AI Assistant can help you find the right tasks for your skills, 
+                write compelling application messages, and provide tips for successful applications.
+              </p>
+              <button
+                onClick={() => navigate('/ai-assistant')}
+                className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg transition-all duration-200 flex items-center text-sm font-medium"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                Try AI Assistant
+              </button>
+            </div>
+          </div>
+        </div>
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Browse Opportunities</h1>
@@ -275,6 +302,8 @@ const BrowseTasks: React.FC = () => {
             </div>
           </form>
         </div>
+
+        
 
         {/* Results */}
         {hasSearched && (
@@ -441,3 +470,5 @@ const BrowseTasks: React.FC = () => {
 };
 
 export default BrowseTasks;
+
+

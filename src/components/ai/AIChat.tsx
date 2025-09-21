@@ -198,7 +198,7 @@ I'm your intelligent helper for all HelperU tasks. Here's what I can help you wi
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="w-full max-w-2xl h-[600px] bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900 rounded-2xl border border-white/20 shadow-2xl flex flex-col">
+      <div className="w-full max-w-4xl h-[700px] bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900 rounded-2xl border border-white/20 shadow-2xl flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-white/10">
           <div className="flex items-center space-x-3">

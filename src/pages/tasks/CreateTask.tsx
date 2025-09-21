@@ -45,16 +45,30 @@ const CreateTask: React.FC = () => {
     }
   };
 
-  const handleDateAdd = () => {
-    const dateInput = document.getElementById('date-input') as HTMLInputElement;
-    
-    if (dateInput.value) {
-      const rawDate = dateInput.value; // YYYY-MM-DD format
-      const timestampFormat = formatDate(rawDate); // Full timestamp for backend
+  const handleDateInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    console.log("date change value", value);
+    // Only auto-add if the date is complete and valid
+    if (value && value.length === 10) { // YYYY-MM-DD format is 10 characters
+      // Additional validation: check if it's a valid date
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (dateRegex.test(value)) {
+        const date = new Date(value);
+        // Check if the date is valid and not NaN
+        if (!isNaN(date.getTime())) {
+          // Additional check: ensure the date string matches what the Date object represents
+          // Use UTC methods to avoid timezone issues
+          const reconstructedDate = date.getUTCFullYear() + '-' + 
+            String(date.getUTCMonth() + 1).padStart(2, '0') + '-' + 
+            String(date.getUTCDate()).padStart(2, '0');
+          
+          if (reconstructedDate === value) {
+            const rawDate = value;
+            const timestampFormat = formatDate(rawDate);
       
       // Check if this timestamp already exists
       if (!selectedDates.some(dateObj => dateObj.timestamp === timestampFormat)) {
-        const displayFormat = formatDateForDisplay(rawDate); // Nice format for user
+              const displayFormat = formatDateForDisplay(rawDate);
         
         setSelectedDates(prev => {
           const updated = [...prev, { timestamp: timestampFormat, display: displayFormat }].sort((a, b) => a.timestamp.localeCompare(b.timestamp));
@@ -66,7 +80,11 @@ const CreateTask: React.FC = () => {
           return updated;
         });
         
-        dateInput.value = '';
+              // Clear the input after adding
+              e.target.value = '';
+            }
+          }
+        }
       }
     }
   };
@@ -158,9 +176,15 @@ const CreateTask: React.FC = () => {
     try {
       await taskApi.createTask(cleanedFormData);
       toast.success('Task created successfully!');
-      navigate('/dashboard');
+      navigate('/tasks/my-posts');
     } catch (err: any) {
+      // Check if the error is due to post limit reached
+      if (err.message && err.message.includes('post limit')) {
+        toast.error('You have reached your post limit. Please upgrade your plan to create more tasks.');
+        navigate('/subscription/upgrade');
+      } else {
       toast.error(err.message || 'Failed to create task');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -206,20 +230,15 @@ const CreateTask: React.FC = () => {
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Available Dates *
               </label>
-              <div className="flex space-x-2 mb-2">
+               <div className="mb-2">
                 <input
                   id="date-input"
                   type="date"
-                  className="px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                   onChange={handleDateInputChange}
+                   className="px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 w-auto min-w-[200px]"
                   min={new Date().toISOString().split('T')[0]}
-                />
-                <button
-                  type="button"
-                  onClick={handleDateAdd}
-                  className="px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
-                >
-                  Add Date
-                </button>
+                   onKeyDown={(e) => e.preventDefault()}  
+                 />
               </div>
               {selectedDates.length > 0 && (
                 <div className="flex flex-wrap gap-2">
@@ -382,7 +401,7 @@ const CreateTask: React.FC = () => {
             <div className="flex justify-end space-x-4">
               <button
                 type="button"
-                onClick={() => navigate('/dashboard')}
+                onClick={() => navigate('/tasks/my-posts')}
                 className="px-6 py-3 bg-white/20 text-white font-medium rounded-xl border border-white/30 hover:bg-white/30 transition-all duration-300"
                 disabled={isLoading}
               >

@@ -35,6 +35,21 @@ export interface HelperProfileData {
   updated_at?: string;
 }
 
+export interface SubscriptionStatus {
+  plan: string;
+  status: string;
+  post_limit: number;
+  posts_used: number;
+}
+
+export interface GetSubscriptionResponse {
+  success: boolean;
+  plan: string;
+  status: string;
+  post_limit: number;
+  posts_used: number;
+}
+
 export interface GetProfileResponse {
   success: boolean;
   profile_status: ProfileStatus;
@@ -43,6 +58,7 @@ export interface GetProfileResponse {
 
 export const profileApi = {
   getProfile: (): Promise<GetProfileResponse> => apiClient.get('/profile/'),
+  getSubscriptionStatus: (): Promise<SubscriptionStatus> => apiClient.get('/subscriptions/status'),
 };
 
 

@@ -31,10 +31,10 @@ const HomePage: React.FC = () => {
           <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-8 max-w-2xl mx-auto mb-12 animate-glow">
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/auth/client" className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25 font-display text-center">
-                Get Started Free
+                I Want to Post
               </Link>
-              <Link to="/tasks/browse" className="px-8 py-4 bg-white/20 text-white font-semibold rounded-xl border border-white/30 hover:bg-white/30 transition-all duration-300 backdrop-blur-sm font-display text-center">
-                Browse Posts
+              <Link to="/auth/helper" className="px-8 py-4 bg-white/20 text-white font-semibold rounded-xl border border-white/30 hover:bg-white/30 transition-all duration-300 backdrop-blur-sm font-display text-center">
+                I'm a Student
               </Link>
             </div>
             <p className="text-sm text-gray-400 mt-4 font-mono">No credit card required • Join 1,000+ users</p>
@@ -66,7 +66,7 @@ const HomePage: React.FC = () => {
               What is HelperU?
             </h2>
             <p className="text-xl text-blue-200 max-w-3xl mx-auto font-medium">
-             A platform to share opportunities with college students — from everyday help to company jobs to advertisements.
+             A platform to share opportunities with college students — from getting task help, to company jobs, to advertisements.
             </p>
           </div>
 
@@ -232,10 +232,10 @@ const HomePage: React.FC = () => {
           <div className="text-white text-lg font-semibold mb-4 font-display">HelperU</div>
           <p className="text-blue-200 mb-6 font-medium">The future of the college student market is here.</p>
           <div className="flex justify-center space-x-6 text-blue-300">
-            <a href="#" className="hover:text-white transition-colors font-medium">Privacy</a>
-            <a href="#" className="hover:text-white transition-colors font-medium">Terms</a>
-            <a href="#" className="hover:text-white transition-colors font-medium">Support</a>
-            <a href="#" className="hover:text-white transition-colors font-medium">Contact</a>
+            <Link to="/privacy-policy" className="hover:text-white transition-colors font-medium">Privacy</Link>
+            <Link to="/terms-of-use" className="hover:text-white transition-colors font-medium">Terms</Link>
+            <Link to="/faqs" className="hover:text-white transition-colors font-medium">Support</Link>
+            <Link to="/contact" className="hover:text-white transition-colors font-medium">Contact</Link>
           </div>
         </div>
       </footer>

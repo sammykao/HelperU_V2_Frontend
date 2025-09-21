@@ -36,6 +36,10 @@ const ChatPage: React.FC = () => {
   const [wsConnection, setWsConnection] = useState<ChatWebSocket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Message cache to avoid reloading messages when switching chats
+  const [messageCache, setMessageCache] = useState<Record<string, MessageResponse[]>>({});
+  const [chatCache, setChatCache] = useState<Record<string, ChatWithParticipantsResponse>>({});
+
   useEffect(() => {
     if (!isAuthenticated) {
       return;
@@ -45,7 +49,12 @@ const ChatPage: React.FC = () => {
 
   useEffect(() => {
     if (selectedChat) {
+      // Messages should already be loaded from batch loading
+      if (messageCache[selectedChat.id]) {
+        setMessages(messageCache[selectedChat.id]);
+      } else {
       loadMessages(selectedChat.id);
+      }
       connectWebSocket(selectedChat.id);
     }
     return () => {
@@ -54,6 +63,13 @@ const ChatPage: React.FC = () => {
       }
     };
   }, [selectedChat]);
+
+  // Add a function to refresh messages when needed
+  const refreshMessages = async () => {
+    if (selectedChat) {
+      await loadMessages(selectedChat.id, true); // Force reload
+    }
+  };
 
   useEffect(() => {
     scrollToBottom();
@@ -67,6 +83,7 @@ const ChatPage: React.FC = () => {
     try {
       setLoading(true);
       const response = await chatApi.getUserChats();
+      
       // Transform the response to basic chat list
       const chatList: ChatListItem[] = response.chats.map(chat => {
         // Find the other user ID (not the current user)
@@ -80,26 +97,138 @@ const ChatPage: React.FC = () => {
             college: otherUser?.college || '',
             pfp_url: otherUser?.pfp_url || '',
           },
-          last_message: undefined, // We'll need to fetch this separately
-          unread_count: 0, // We'll need to implement this
+          last_message: undefined, // We'll fetch this with detailed chat data
+          unread_count: 0, // We'll fetch this with detailed chat data
           updated_at: chat.updated_at,
         };
       });
       
       setChats(chatList);
+      setLoading(false); // Show chat list immediately
+      
+      // Now batch load all chat details first
+      await batchLoadAllChatData(chatList);
+      
     } catch (error) {
       console.error('Failed to load chats:', error);
       toast.error('Failed to load conversations');
-    } finally {
       setLoading(false);
     }
   };
 
-  const loadMessages = async (chatId: string) => {
+  const batchLoadAllChatData = async (chatList: ChatListItem[]) => {
+    try {
+      
+      // Batch load all chat details with participants
+      const chatDetailsPromises = chatList.map(chat => 
+        chatApi.getChatWithParticipants(chat.id).catch(error => {
+          console.error(`Failed to load chat details for ${chat.id}:`, error);
+          return null;
+        })
+      );
+      
+      const chatDetailsResults = await Promise.all(chatDetailsPromises);
+      const validChatDetails = chatDetailsResults.filter((detail): detail is ChatWithParticipantsResponse => detail !== null);
+      
+      // Cache all chat details
+      const newChatCache: Record<string, ChatWithParticipantsResponse> = {};
+      validChatDetails.forEach(chatDetail => {
+        if (chatDetail) {
+          newChatCache[chatDetail.id] = chatDetail;
+        }
+      });
+      setChatCache(newChatCache);
+      
+      // Update chat list with detailed information
+      setChats(prev => prev.map(chat => {
+        const chatDetail = newChatCache[chat.id];
+        if (chatDetail) {
+          console.log(`Setting unread count for chat ${chat.id}: ${chatDetail.unread_count || 0}`);
+          return {
+            ...chat,
+            last_message: chatDetail.last_message ? {
+              content: chatDetail.last_message,
+              created_at: chatDetail.last_message_at || chatDetail.updated_at,
+              sender_id: '' // We'll need to determine this from messages
+            } : undefined,
+            unread_count: chatDetail.unread_count || 0,
+          };
+        }
+        return chat;
+      }));
+      
+      
+      await batchLoadAllMessages(validChatDetails);
+      
+    } catch (error) {
+      console.error('Failed to batch load chat data:', error);
+    }
+  };
+
+  const batchLoadAllMessages = async (chatDetails: ChatWithParticipantsResponse[]) => {
+    try {
+      
+      // Batch load messages for all chats
+      const messagePromises = chatDetails.map(chat => 
+        chatApi.getChatMessages(chat.id, 50, 0).catch(error => {
+          console.error(`Failed to load messages for ${chat.id}:`, error);
+          return { messages: [], total_count: 0 };
+        })
+      );
+      
+      const messageResults = await Promise.all(messagePromises);
+      
+      // Cache all messages
+      const newMessageCache: Record<string, MessageResponse[]> = {};
+      messageResults.forEach((result, index) => {
+        if (result && result.messages) {
+          newMessageCache[chatDetails[index].id] = result.messages;
+        }
+      });
+      setMessageCache(newMessageCache);
+      
+      // Update chat list with last message info from actual messages
+      setChats(prev => prev.map(chat => {
+        const messages = newMessageCache[chat.id];
+        if (messages && messages.length > 0) {
+          const lastMessage = messages[messages.length - 1]; // Messages are in chronological order
+          return {
+            ...chat,
+            last_message: {
+              content: lastMessage.content,
+              created_at: lastMessage.created_at,
+              sender_id: lastMessage.sender_id
+            },
+          };
+        }
+        return chat;
+      }));
+      
+      
+    } catch (error) {
+      console.error('Failed to batch load messages:', error);
+    }
+  };
+
+  const loadMessages = async (chatId: string, forceReload = false) => {
+    // Check cache first
+    if (!forceReload && messageCache[chatId]) {
+      setMessages(messageCache[chatId]);
+      return;
+    }
+
     try {
       setLoadingMessages(true);
       const response = await chatApi.getChatMessages(chatId, 50, 0);
-      setMessages(response.messages); // Messages should be in chronological order (oldest to newest)
+      const messages = response.messages; // Messages should be in chronological order (oldest to newest)
+      
+      // Update cache
+      setMessageCache(prev => ({
+        ...prev,
+        [chatId]: messages
+      }));
+      
+      setMessages(messages);
     } catch (error) {
       console.error('Failed to load messages:', error);
       toast.error('Failed to load messages');
@@ -115,26 +244,52 @@ const ChatPage: React.FC = () => {
     
     // Replace http or httpswith ws
     const rawUrl = API_BASE_URL.replace('http', 'ws').replace('https', 'wss');
-    const ws = new ChatWebSocket(`${rawUrl}/chat/ws/${chatId}`);
+    const token = localStorage.getItem('access_token');
+    const ws = new ChatWebSocket(`${rawUrl}/chat/ws/${chatId}`, token);
     
     ws.onMessage((data) => {
       if (data.type === 'message') {
-        // Only add message if it's not already in the list (avoid duplicates)
+        const newMessage = data.message;
+        
+        // Update messages state
         setMessages(prev => {
-          const messageExists = prev.some(msg => msg.id === data.message.id);
+          const messageExists = prev.some(msg => msg.id === newMessage.id);
           if (messageExists) {
             return prev; // Don't add duplicate
           }
-          return [...prev, data.message];
+          return [...prev, newMessage];
         });
-      } else if (data.type === 'read_receipt') {
-        // Handle read receipts if needed
-        console.log('Read receipt received:', data);
+        
+        // Update message cache
+        setMessageCache(prev => ({
+          ...prev,
+          [chatId]: [...(prev[chatId] || []), newMessage]
+        }));
+        
+        // Update chat list with new last message
+        setChats(prev => prev.map(chat => {
+          if (chat.id === chatId) {
+            const isFromOtherUser = newMessage.sender_id !== user?.id;
+            const newUnreadCount = isFromOtherUser ? (chat.unread_count || 0) + 1 : chat.unread_count;
+            console.log(`WebSocket: Updating chat ${chatId}, isFromOtherUser: ${isFromOtherUser}, unread: ${chat.unread_count} -> ${newUnreadCount}`);
+            return {
+              ...chat,
+              last_message: {
+                content: newMessage.content,
+                created_at: newMessage.created_at,
+                sender_id: newMessage.sender_id
+              },
+              updated_at: newMessage.created_at,
+              // Increment unread count if message is from other user
+              unread_count: newUnreadCount
+            };
+          }
+          return chat;
+        }));
       }
     });
 
     ws.connect().then(() => {
-      console.log('WebSocket connected successfully for chat:', chatId);
       setWsConnection(ws);
     }).catch((error) => {
       console.error('WebSocket connection failed:', error);
@@ -161,6 +316,12 @@ const ChatPage: React.FC = () => {
     };
     
     setMessages(prev => [...prev, optimisticMessage]);
+    
+    // Update cache immediately
+    setMessageCache(prev => ({
+      ...prev,
+      [selectedChat.id]: [...(prev[selectedChat.id] || []), optimisticMessage]
+    }));
 
     try {
       setSendingMessage(true);
@@ -176,8 +337,31 @@ const ChatPage: React.FC = () => {
         )
       );
       
-      // Reload messages to ensure consistency
-      await loadMessages(selectedChat.id);
+      // Update cache with real message
+      setMessageCache(prev => ({
+        ...prev,
+        [selectedChat.id]: (prev[selectedChat.id] || []).map(msg => 
+          msg.id === optimisticMessage.id ? sentMessage : msg
+        )
+      }));
+      
+      // Update chat list with new last message
+      setChats(prev => prev.map(chat => {
+        if (chat.id === selectedChat.id) {
+          return {
+            ...chat,
+            last_message: {
+              content: sentMessage.content,
+              created_at: sentMessage.created_at,
+              sender_id: sentMessage.sender_id
+            },
+            updated_at: sentMessage.created_at,
+            // Don't increment unread count for our own messages
+            unread_count: chat.unread_count || 0
+          };
+        }
+        return chat;
+      }));
       
     } catch (error) {
       console.error('Failed to send message:', error);
@@ -185,6 +369,12 @@ const ChatPage: React.FC = () => {
       
       // Remove optimistic message on error
       setMessages(prev => prev.filter(msg => msg.id !== optimisticMessage.id));
+      
+      // Remove from cache
+      setMessageCache(prev => ({
+        ...prev,
+        [selectedChat.id]: (prev[selectedChat.id] || []).filter(msg => msg.id !== optimisticMessage.id)
+      }));
       
       // Restore message to input
       setNewMessage(messageContent);
@@ -196,18 +386,85 @@ const ChatPage: React.FC = () => {
   const selectChat = async (chatId: string) => {
     try {
       setSelectedChatId(chatId);
-      setLoadingMessages(true);
-      const chatData = await chatApi.getChatWithParticipants(chatId);
-      setSelectedChat(chatData);
       
-      // Load messages for the selected chat
-      await loadMessages(chatId);
+      // Everything should be preloaded, so this should be instant
+      if (chatCache[chatId] && messageCache[chatId]) {
+        setSelectedChat(chatCache[chatId]);
+        setMessages(messageCache[chatId]);
+        
+        // Mark messages as read and clear unread count
+        markChatAsRead(chatId);
+      } else {
+        // Fallback: if somehow not cached, load it
+        console.warn(`Chat ${chatId} not found in cache, loading...`);
+        setLoadingMessages(true);
+        const chatData = await chatApi.getChatWithParticipants(chatId);
+        
+        // Cache the chat data
+        setChatCache(prev => ({
+          ...prev,
+          [chatId]: chatData
+        }));
+        
+        setSelectedChat(chatData);
+        
+        // Load messages for the selected chat
+        await loadMessages(chatId);
+        
+        // Mark messages as read
+        markChatAsRead(chatId);
+      }
     } catch (error) {
       console.error('Failed to load chat:', error);
       toast.error('Failed to load conversation');
       setLoadingMessages(false);
     } finally {
       setSelectedChatId(null);
+    }
+  };
+
+  const markChatAsRead = async (chatId: string) => {
+    try {
+      // Get all message IDs from the current chat
+      const messages = messageCache[chatId] || [];
+      const messageIds = messages.map(msg => msg.id);
+      
+      console.log(`Marking chat ${chatId} as read with ${messageIds.length} messages`);
+      
+      if (messageIds.length > 0) {
+        // Call API to mark messages as read
+        await chatApi.markMessagesRead(chatId, { message_ids: messageIds });
+        console.log(`Successfully marked ${messageIds.length} messages as read`);
+      }
+      
+      // Clear unread count in chat list
+      setChats(prev => prev.map(chat => {
+        if (chat.id === chatId) {
+          console.log(`Clearing unread count for chat ${chatId} (was ${chat.unread_count})`);
+          return {
+            ...chat,
+            unread_count: 0
+          };
+        }
+        return chat;
+      }));
+      
+      // Also update the chat cache
+      setChatCache(prev => {
+        if (prev[chatId]) {
+          return {
+            ...prev,
+            [chatId]: {
+              ...prev[chatId],
+              unread_count: 0
+            }
+          };
+        }
+        return prev;
+      });
+      
+    } catch (error) {
+      console.error('Failed to mark chat as read:', error);
     }
   };
 
@@ -257,15 +514,22 @@ const ChatPage: React.FC = () => {
           <div className="w-1/3 border-r border-white/20 flex flex-col">
             {/* Header */}
             <div className="p-6 border-b border-white/20">
-              <h1 className="text-xl font-bold text-white">Messages</h1>
-              <p className="text-gray-300 text-sm mt-1">Your conversations</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-xl font-bold text-white">Messages</h1>
+                  <p className="text-gray-300 text-sm mt-1">Your conversations</p>
+                </div>
+              </div>
             </div>
 
             {/* Chat List */}
             <div className="flex-1 overflow-y-auto">
               {loading ? (
                 <div className="flex items-center justify-center h-full">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-4"></div>
+                    <p className="text-gray-300 text-sm">Loading conversations...</p>
+                  </div>
                 </div>
               ) : chats.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center p-6">
@@ -331,7 +595,7 @@ const ChatPage: React.FC = () => {
 
                         {/* Unread Count */}
                         {chat.unread_count > 0 && (
-                          <div className="bg-purple-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                          <div className="bg-purple-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
                             {chat.unread_count}
                           </div>
                         )}
@@ -349,7 +613,8 @@ const ChatPage: React.FC = () => {
               <>
                 {/* Chat Header */}
                 <div className="p-6 border-b border-white/20">
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
                     {(() => {
                       // Find the other participant (not the current user)
                       const otherParticipant = selectedChat.participants.find(p => p.id !== user?.id);
@@ -377,6 +642,19 @@ const ChatPage: React.FC = () => {
                         </>
                       );
                     })()}
+                    </div>
+                    
+                    {/* Refresh Button */}
+                    <button
+                      onClick={refreshMessages}
+                      disabled={loadingMessages}
+                      className="p-2 text-gray-400 hover:text-white transition-colors disabled:opacity-50"
+                      title="Refresh messages"
+                    >
+                      <svg className={`w-5 h-5 ${loadingMessages ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                    </button>
                   </div>
                 </div>
 

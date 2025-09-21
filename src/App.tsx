@@ -6,10 +6,15 @@ import { HomePage } from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
 import AIAssistantPage from './pages/AIAssistantPage';
 import ChatPage from './pages/ChatPage';
+import FAQPage from './pages/FAQPage';
+import ContactPage from './pages/ContactPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsOfUsePage from './pages/TermsOfUsePage';
 
 // Task Pages
 import BrowseTasks from './pages/tasks/BrowseTasks';
 import CreateTask from './pages/tasks/CreateTask';
+import EditTask from './pages/tasks/EditTask';
 import MyPosts from './pages/tasks/MyPosts';
 import MyApplications from './pages/tasks/MyApplications';
 import SingleTask from './pages/tasks/SingleTask';
@@ -41,6 +46,10 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
+          <Route path="/faqs" element={<FAQPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+          <Route path="/terms-of-use" element={<TermsOfUsePage />} />
           
           {/* Auth Routes */}
           <Route path="/auth/client" element={<ClientAuth />} />
@@ -48,6 +57,7 @@ function App() {
           <Route path="/auth/client/complete-profile" element={<ClientCompleteProfile />} />
           
           <Route path="/auth/helper" element={<HelperAuth />} />
+          <Route path="/become-helper" element={<HelperAuth />} />
           <Route path="/auth/helper/verify-otp" element={<HelperVerifyOTP />} />
           <Route path="/auth/helper/verify-email" element={<HelperVerifyEmail />} />
           <Route path="/auth/helper/complete-profile" element={<HelperCompleteProfile />} />
@@ -88,6 +98,11 @@ function App() {
           <Route path="/tasks/create" element={
             <ProtectedRoute requiredRole="client">
               <CreateTask />
+            </ProtectedRoute>
+          } />
+          <Route path="/tasks/edit/:id" element={
+            <ProtectedRoute requiredRole="client">
+              <EditTask />
             </ProtectedRoute>
           } />
           <Route path="/tasks/my-posts" element={

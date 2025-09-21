@@ -90,7 +90,7 @@ export const chatApi = {
 
   // Mark messages as read
   markMessagesRead: (chatId: string, data: ChatMarkReadRequest): Promise<{ success: boolean }> =>
-    apiClient.post(`/chat/${chatId}/mark-read`, data),
+    apiClient.post(`/chat/${chatId}/read`, data),
 
   // Get chat with participants
   getChatWithParticipants: (chatId: string): Promise<ChatWithParticipantsResponse> =>
