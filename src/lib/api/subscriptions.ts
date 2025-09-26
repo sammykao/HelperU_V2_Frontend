@@ -40,4 +40,8 @@ export const subscriptionApi = {
   // Cancel subscription
   cancelSubscription: (): Promise<CancelSubscriptionResponse> =>
     apiClient.post('/subscriptions/cancel'),
+
+  // Create portal session
+  createPortalSession: (): Promise<{ portal_url: string }> =>
+    apiClient.post('/subscriptions/create-portal-session'),
 };

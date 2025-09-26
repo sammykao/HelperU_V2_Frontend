@@ -31,7 +31,7 @@ const HomePage: React.FC = () => {
           <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-8 max-w-2xl mx-auto mb-12 animate-glow">
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/auth/client" className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25 font-display text-center">
-                I Want to Post
+                Create a Post
               </Link>
               <Link to="/auth/helper" className="px-8 py-4 bg-white/20 text-white font-semibold rounded-xl border border-white/30 hover:bg-white/30 transition-all duration-300 backdrop-blur-sm font-display text-center">
                 I'm a Student

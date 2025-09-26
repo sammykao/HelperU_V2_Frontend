@@ -121,6 +121,7 @@ const ClientAuth: React.FC = () => {
                 Go to Helper Sign in
               </Link>
             </p>
+            <p className="text-gray-400 text-xs mt-2">By continuing, you agree to our <Link to="/terms-of-use" className="text-gray-400 hover:text-cyan-300 transition-colors">Terms of Service</Link> and <Link to="/privacy-policy" className="text-gray-400 hover:text-cyan-300 transition-colors">Privacy Policy</Link></p>
           </div>
         </div>
       </div>
