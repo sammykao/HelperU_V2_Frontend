@@ -26,6 +26,7 @@ export interface TaskResponse {
   completed_at?: string;
   created_at: string;
   updated_at: string;
+  client?: ClientInfo;
 }
 
 export interface TaskSearchRequest {
@@ -42,6 +43,8 @@ export interface ClientInfo {
   id: string;
   first_name: string;
   last_name: string;
+  phone: string;
+  email: string;
   pfp_url?: string;
 }
 

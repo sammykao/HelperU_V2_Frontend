@@ -307,18 +307,62 @@ const SingleTask: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="min-w-0">
               <h1 className="text-3xl font-bold text-white mb-2">{task.title}</h1>
-              <p className="text-gray-300">Task Details and Applications</p>
+              <div className="flex items-center gap-3">
+                <p className="text-gray-300">Task Details and Applications</p>
+                {task.client && (
+                  <div className="flex items-center gap-3 sm:pl-3 sm:ml-3 sm:border-l border-white/20 flex-wrap">
+                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/10 flex items-center justify-center overflow-hidden">
+                      {task.client.pfp_url ? (
+                        <img src={task.client.pfp_url} alt="Client avatar" className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-xs text-white font-semibold">
+                          {task.client.first_name?.[0]}
+                          {task.client.last_name?.[0]}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:gap-3 gap-1 min-w-0">
+                      <span className="text-sm text-gray-300 whitespace-nowrap">
+                        Posted by <span className="text-white font-medium">{task.client.first_name} {task.client.last_name}</span>
+                      </span>
+                      <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm flex-wrap">
+                        {task.client.email && (
+                          <a
+                            href={`mailto:${task.client.email}`}
+                            className="text-blue-300 hover:text-blue-200 underline underline-offset-2 break-all sm:break-normal"
+                            title="Email client"
+                          >
+                            {task.client.email}
+                          </a>
+                        )}
+                        {task.client.phone && (
+                          <a
+                            href={`tel:${task.client.phone}`}
+                            className="text-blue-300 hover:text-blue-200 underline underline-offset-2 break-all sm:break-normal"
+                            title="Call client"
+                          >
+                            {task.client.phone}
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="flex items-center space-x-3">
-              {getStatusBadge(task.completed_at)}
+            <div className="flex items-center gap-2 sm:gap-3 self-start sm:self-auto">
+              <div className="shrink-0">
+                {getStatusBadge(task.completed_at)}
+              </div>
               <button
                 onClick={handleBack}
-                className="px-4 py-2 text-gray-300 hover:text-white transition-colors"
+                aria-label="Go back"
+                className="p-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
               </button>
