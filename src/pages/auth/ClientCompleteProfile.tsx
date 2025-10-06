@@ -22,7 +22,7 @@ const ClientCompleteProfile: React.FC = () => {
   useEffect(() => {
     // Check if profile is already complete
     if (profileStatus?.profile_completed) {
-      navigate('/dashboard');
+      navigate('/tasks/create');
     }
   }, [profileStatus, navigate]);
 
@@ -86,7 +86,7 @@ const ClientCompleteProfile: React.FC = () => {
       await authApi.clientCompleteProfile(request);
       toast.success('Profile completed successfully!');
       await refreshProfileStatus();
-      navigate('/dashboard');
+      navigate('/tasks/create');
     } catch (err: any) {
       toast.error(err.message || 'Failed to complete profile');
     } finally {
@@ -95,29 +95,29 @@ const ClientCompleteProfile: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900 flex items-center justify-center px-4">
-      {/* Background Effects */}
+    <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100 flex items-center justify-center px-4">
+      {/* Background Effects (subtle) */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/30 rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-500/30 rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-pulse animation-delay-2000"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-200/40 rounded-full mix-blend-multiply blur-2xl opacity-70 animate-pulse-blue"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-200/40 rounded-full mix-blend-multiply blur-2xl opacity-70 animate-pulse-blue animation-delay-2000"></div>
       </div>
 
       <div className="relative z-10 w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-display font-bold bg-gradient-to-r from-white via-blue-200 to-cyan-200 bg-clip-text text-transparent mb-2">
+          <h1 className="text-4xl font-display font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-300 bg-clip-text text-transparent drop-shadow-md mb-2">
             HelperU
           </h1>
-          <h2 className="text-2xl font-semibold text-white mb-2">Complete Your Profile</h2>
-          <p className="text-gray-300">Tell us a bit about yourself</p>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Complete Your Profile</h2>
+          <p className="text-gray-600">Tell us a bit about yourself</p>
         </div>
 
         {/* Form */}
-        <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-8">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-800 mb-2">
                   First Name
                 </label>
                 <input
@@ -125,19 +125,19 @@ const ClientCompleteProfile: React.FC = () => {
                   name="first_name"
                   value={formData.first_name}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 bg-white/10 border rounded-xl text-white placeholder-gray-400 transition-all duration-300 ${
-                    errors.first_name ? 'border-red-400 bg-red-500/10' : 'border-white/20 hover:bg-white/15'
-                  } focus:outline-none focus:ring-2 focus:ring-blue-500/50`}
+                  className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 ${
+                    errors.first_name ? 'border-red-400' : 'border-gray-400'
+                  } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
                   placeholder="John"
                   disabled={isLoading}
                 />
                 {errors.first_name && (
-                  <p className="mt-1 text-sm text-red-400">{errors.first_name}</p>
+                  <p className="mt-1 text-sm text-red-600">{errors.first_name}</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-800 mb-2">
                   Last Name
                 </label>
                 <input
@@ -145,20 +145,20 @@ const ClientCompleteProfile: React.FC = () => {
                   name="last_name"
                   value={formData.last_name}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 bg-white/10 border rounded-xl text-white placeholder-gray-400 transition-all duration-300 ${
-                    errors.last_name ? 'border-red-400 bg-red-500/10' : 'border-white/20 hover:bg-white/15'
-                  } focus:outline-none focus:ring-2 focus:ring-blue-500/50`}
+                  className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 ${
+                    errors.last_name ? 'border-red-400' : 'border-gray-400'
+                  } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
                   placeholder="Doe"
                   disabled={isLoading}
                 />
                 {errors.last_name && (
-                  <p className="mt-1 text-sm text-red-400">{errors.last_name}</p>
+                  <p className="mt-1 text-sm text-red-600">{errors.last_name}</p>
                 )}
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Email Address
               </label>
               <input
@@ -166,19 +166,19 @@ const ClientCompleteProfile: React.FC = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 bg-white/10 border rounded-xl text-white placeholder-gray-400 transition-all duration-300 ${
-                  errors.email ? 'border-red-400 bg-red-500/10' : 'border-white/20 hover:bg-white/15'
-                } focus:outline-none focus:ring-2 focus:ring-blue-500/50`}
+                className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 ${
+                  errors.email ? 'border-red-400' : 'border-gray-400'
+                } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
                 placeholder="john@example.com"
                 disabled={isLoading}
               />
               {errors.email && (
-                <p className="mt-1 text-sm text-red-400">{errors.email}</p>
+                <p className="mt-1 text-sm text-red-600">{errors.email}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Profile Picture (Optional)
               </label>
               <FileUpload

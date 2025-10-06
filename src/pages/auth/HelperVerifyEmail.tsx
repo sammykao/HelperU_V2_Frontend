@@ -210,7 +210,7 @@ const HelperVerifyEmail: React.FC = () => {
           {/* Footer */}
           <div className="mt-6 text-center">
             <button
-              onClick={() => navigate('/auth/helper/signup')}
+              onClick={() => navigate('/auth/helper')}
               className="text-gray-400 hover:text-gray-300 transition-colors text-sm"
             >
               ← Back to Sign Up

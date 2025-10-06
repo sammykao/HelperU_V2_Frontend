@@ -24,7 +24,7 @@ const SearchHelpers: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900">
+    <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100">
       <Navbar />
       <ModernHelperSearch onBack={handleBack} />
     </div>

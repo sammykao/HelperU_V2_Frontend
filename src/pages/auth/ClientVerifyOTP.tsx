@@ -53,7 +53,7 @@ const ClientVerifyOTP: React.FC = () => {
         try {
           const isClientCompleted = await authApi.clientCheckCompletion();
           if (isClientCompleted.does_exist) {
-            navigate('/dashboard');
+            navigate('/tasks/create');
           } else {
             navigate('/auth/client/complete-profile');
           }
@@ -99,28 +99,28 @@ const ClientVerifyOTP: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900 flex items-center justify-center px-4">
-      {/* Background Effects */}
+    <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100 flex items-center justify-center px-4">
+      {/* Background Effects (subtle) */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/30 rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-500/30 rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-pulse animation-delay-2000"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-200/40 rounded-full mix-blend-multiply blur-2xl opacity-70 animate-pulse-blue"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-200/40 rounded-full mix-blend-multiply blur-2xl opacity-70 animate-pulse-blue animation-delay-2000"></div>
       </div>
 
       <div className="relative z-10 w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-display font-bold bg-gradient-to-r from-white via-blue-200 to-cyan-200 bg-clip-text text-transparent mb-2">
+          <h1 className="text-4xl font-display font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-300 bg-clip-text text-transparent drop-shadow-md mb-2">
             HelperU
           </h1>
-          <h2 className="text-2xl font-semibold text-white mb-2">Verify Your Phone</h2>
-          <p className="text-gray-300">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Verify Your Phone</h2>
+          <p className="text-gray-600">
             Enter the 6-digit code sent to<br />
-            <span className="text-blue-400 font-medium">{phone}</span>
+            <span className="text-blue-700 font-medium">{phone}</span>
           </p>
         </div>
 
         {/* Form */}
-        <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-8">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
           <div className="space-y-6">
             <OTPInput
               onComplete={handleOTPComplete}
@@ -129,13 +129,13 @@ const ClientVerifyOTP: React.FC = () => {
             />
 
             <div className="text-center">
-              <p className="text-gray-300 mb-4">
+              <p className="text-gray-600 mb-4">
                 Didn't receive the code?
               </p>
               <button
                 onClick={handleResendOTP}
                 disabled={isLoading || resendCooldown > 0}
-                className="text-blue-400 hover:text-blue-300 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="text-blue-700 hover:text-blue-800 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {resendCooldown > 0 
                   ? `Resend in ${resendCooldown}s` 
@@ -149,7 +149,7 @@ const ClientVerifyOTP: React.FC = () => {
           <div className="mt-6 text-center">
             <button
               onClick={() => navigate(-1)}
-              className="text-gray-400 hover:text-gray-300 transition-colors text-sm"
+              className="text-gray-600 hover:text-gray-700 transition-colors text-sm"
             >
               ← Back to {isSignup ? 'Sign Up' : 'Sign In'}
             </button>

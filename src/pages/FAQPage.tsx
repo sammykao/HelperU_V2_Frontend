@@ -497,24 +497,24 @@ Prevention Tips:
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900">
+    <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100">
       <Navbar />
       
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/30 rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-pulse-blue"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-500/30 rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-pulse-blue animation-delay-2000"></div>
-        <div className="absolute top-40 left-40 w-60 h-60 bg-indigo-500/30 rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-pulse-blue animation-delay-4000"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-200/40 rounded-full mix-blend-multiply blur-2xl opacity-70 animate-pulse-blue"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-200/40 rounded-full mix-blend-multiply blur-2xl opacity-70 animate-pulse-blue animation-delay-2000"></div>
+        <div className="absolute top-40 left-40 w-60 h-60 bg-indigo-200/40 rounded-full mix-blend-multiply blur-2xl opacity-70 animate-pulse-blue animation-delay-4000"></div>
       </div>
 
       <div className="relative z-10 pt-20 pb-16 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-5xl md:text-6xl font-display font-bold bg-gradient-to-r from-white via-blue-200 to-cyan-200 bg-clip-text text-transparent mb-6">
+            <h1 className="text-5xl md:text-6xl font-display font-bold bg-gradient-to-r from-blue-700 via-gray-700 to-gray-600 bg-clip-text text-transparent drop-shadow-md mb-6">
               Frequently Asked Questions
             </h1>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-700 max-w-2xl mx-auto">
               Find answers to common questions about HelperU
             </p>
           </div>
@@ -532,7 +532,7 @@ Prevention Tips:
                 placeholder="Search FAQs..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent backdrop-blur-lg"
+                className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
               />
             </div>
           </div>
@@ -540,8 +540,8 @@ Prevention Tips:
           {/* FAQ Categories */}
           <div className="space-y-8">
             {Object.entries(filteredFAQs).map(([category, items]) => (
-              <div key={category} className="backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl p-6">
-                <h2 className="text-2xl font-bold text-white mb-6 font-display">
+              <div key={category} className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6 font-display">
                   {categoryTitles[category] || category.charAt(0).toUpperCase() + category.slice(1)}
                 </h2>
                 <div className="space-y-4">
@@ -550,14 +550,14 @@ Prevention Tips:
                     const isExpanded = expandedItems.has(itemKey);
                     
                     return (
-                      <div key={itemKey} className="border border-white/10 rounded-xl overflow-hidden">
+                      <div key={itemKey} className="border border-gray-200 rounded-xl overflow-hidden">
                         <button
                           onClick={() => toggleExpanded(itemKey)}
-                          className="w-full px-6 py-4 text-left bg-white/5 hover:bg-white/10 transition-colors duration-200 flex items-center justify-between"
+                          className="w-full px-6 py-4 text-left bg-white hover:bg-gray-50 transition-colors duration-200 flex items-center justify-between"
                         >
-                          <span className="text-white font-medium pr-4">{item.question}</span>
+                          <span className="text-gray-900 font-medium pr-4">{item.question}</span>
                           <svg
-                            className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${
+                            className={`h-5 w-5 text-gray-500 transition-transform duration-200 ${
                               isExpanded ? 'rotate-180' : ''
                             }`}
                             fill="none"
@@ -568,15 +568,15 @@ Prevention Tips:
                           </svg>
                         </button>
                         {isExpanded && (
-                          <div className="px-6 py-4 bg-white/5 border-t border-white/10">
-                            <div className="text-gray-300 leading-relaxed whitespace-pre-line">
+                          <div className="px-6 py-4 bg-white border-t border-gray-200">
+                            <div className="text-gray-700 leading-relaxed whitespace-pre-line">
                               {item.answer}
                             </div>
                             <div className="flex flex-wrap gap-2 mt-4">
                               {item.tags.map((tag, index) => (
                                 <span
                                   key={index}
-                                  className="px-2 py-1 bg-blue-500/20 text-blue-300 text-xs rounded-full"
+                                  className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-full border border-blue-200"
                                 >
                                   {tag}
                                 </span>
@@ -607,11 +607,11 @@ Prevention Tips:
 
           {/* Contact Support CTA */}
           <div className="mt-16 text-center">
-            <div className="backdrop-blur-lg bg-gradient-to-r from-blue-600/20 to-cyan-600/20 border border-blue-300/20 rounded-2xl p-8">
-              <h3 className="text-2xl font-bold text-white mb-4 font-display">
+            <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-2xl p-8">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4 font-display">
                 Still have questions?
               </h3>
-              <p className="text-gray-300 mb-6">
+              <p className="text-gray-700 mb-6">
                 Can't find what you're looking for? Our support team is here to help.
               </p>
               <a

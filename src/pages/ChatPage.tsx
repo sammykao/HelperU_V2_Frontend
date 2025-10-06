@@ -458,7 +458,7 @@ const ChatPage: React.FC = () => {
               ...prev[chatId],
               unread_count: 0
             }
-          };
+          } as any;
         }
         return prev;
       });
@@ -496,28 +496,28 @@ const ChatPage: React.FC = () => {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Please log in to access chat</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Please log in to access chat</h1>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900">
+    <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100">
       <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex h-[calc(100vh-200px)] bg-white/5 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden">
+        <div className="flex h-[calc(100vh-200px)] bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
           {/* Chat List Sidebar */}
-          <div className="w-1/3 border-r border-white/20 flex flex-col">
+          <div className="w-1/3 border-r border-gray-200 flex flex-col">
             {/* Header */}
-            <div className="p-6 border-b border-white/20">
+            <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-xl font-bold text-white">Messages</h1>
-                  <p className="text-gray-300 text-sm mt-1">Your conversations</p>
+                  <h1 className="text-xl font-bold text-gray-900">Messages</h1>
+                  <p className="text-gray-700 text-sm mt-1">Your conversations</p>
                 </div>
               </div>
             </div>
@@ -527,19 +527,19 @@ const ChatPage: React.FC = () => {
               {loading ? (
                 <div className="flex items-center justify-center h-full">
                   <div className="text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-4"></div>
-                    <p className="text-gray-300 text-sm">Loading conversations...</p>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-gray-700 text-sm">Loading conversations...</p>
                   </div>
                 </div>
               ) : chats.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center p-6">
-                  <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mb-4">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                     <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-medium text-white mb-2">No conversations yet</h3>
-                  <p className="text-gray-400 text-sm">Start chatting with helpers or clients</p>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No conversations yet</h3>
+                  <p className="text-gray-600 text-sm">Start chatting with helpers or clients</p>
                 </div>
               ) : (
                 <div className="space-y-1">
@@ -548,8 +548,8 @@ const ChatPage: React.FC = () => {
                       key={chat.id}
                       onClick={() => selectChat(chat.id)}
                       disabled={selectedChatId === chat.id}
-                      className={`w-full p-4 text-left hover:bg-white/10 transition-colors ${
-                        selectedChat?.id === chat.id ? 'bg-white/10 border-r-2 border-purple-500' : ''
+                      className={`w-full p-4 text-left hover:bg-gray-50 transition-colors ${
+                        selectedChat?.id === chat.id ? 'bg-gray-50 border-r-2 border-blue-600' : ''
                       } ${selectedChatId === chat.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                       <div className="flex items-center space-x-3">
@@ -558,7 +558,7 @@ const ChatPage: React.FC = () => {
                           <img
                             src={chat.participant.pfp_url}
                             alt={`${chat.participant.first_name || 'Unknown'} ${chat.participant.last_name || 'User'}`}
-                            className="w-12 h-12 rounded-full object-cover border-2 border-white/20"
+                            className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
                           />
                         ) : (
                           <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">
@@ -569,25 +569,25 @@ const ChatPage: React.FC = () => {
                         {/* Chat Info */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
-                            <h3 className="text-white font-medium truncate">
+                            <h3 className="text-gray-900 font-medium truncate">
                               {chat.participant.first_name || 'Unknown'} {chat.participant.last_name || 'User'}
                             </h3>
                             <div className="flex items-center space-x-2">
                               {selectedChatId === chat.id && (
-                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-500"></div>
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
                               )}
                               {chat.last_message && (
-                                <span className="text-gray-400 text-xs">
+                                <span className="text-gray-500 text-xs">
                                   {formatLastMessageTime(chat.last_message.created_at)}
                                 </span>
                               )}
                             </div>
                           </div>
                           {chat.participant.college && (
-                            <p className="text-gray-400 text-xs truncate">{chat.participant.college}</p>
+                            <p className="text-gray-500 text-xs truncate">{chat.participant.college}</p>
                           )}
                           {chat.last_message && (
-                            <p className="text-gray-300 text-sm truncate mt-1">
+                            <p className="text-gray-700 text-sm truncate mt-1">
                               {chat.last_message.content}
                             </p>
                           )}
@@ -595,7 +595,7 @@ const ChatPage: React.FC = () => {
 
                         {/* Unread Count */}
                         {chat.unread_count > 0 && (
-                          <div className="bg-purple-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
+                          <div className="bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                             {chat.unread_count}
                           </div>
                         )}
@@ -612,7 +612,7 @@ const ChatPage: React.FC = () => {
             {selectedChat ? (
               <>
                 {/* Chat Header */}
-                <div className="p-6 border-b border-white/20">
+                <div className="p-6 border-b border-gray-200">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                     {(() => {
@@ -626,7 +626,7 @@ const ChatPage: React.FC = () => {
                             <img
                               src={otherParticipant.pfp_url}
                               alt={`${otherParticipant.first_name} ${otherParticipant.last_name}`}
-                              className="w-10 h-10 rounded-full object-cover border-2 border-white/20"
+                              className="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
                             />
                           ) : (
                             <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
@@ -634,10 +634,10 @@ const ChatPage: React.FC = () => {
                             </div>
                           )}
                           <div>
-                            <h2 className="text-lg font-semibold text-white">
+                            <h2 className="text-lg font-semibold text-gray-900">
                               {otherParticipant.first_name || 'Unknown'} {otherParticipant.last_name || 'User'}
                             </h2>
-                            <p className="text-gray-300 text-sm">{otherParticipant.college || 'No college info'}</p>
+                            <p className="text-gray-600 text-sm">{otherParticipant.college || 'No college info'}</p>
                           </div>
                         </>
                       );
@@ -648,7 +648,7 @@ const ChatPage: React.FC = () => {
                     <button
                       onClick={refreshMessages}
                       disabled={loadingMessages}
-                      className="p-2 text-gray-400 hover:text-white transition-colors disabled:opacity-50"
+                      className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
                       title="Refresh messages"
                     >
                       <svg className={`w-5 h-5 ${loadingMessages ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -663,23 +663,23 @@ const ChatPage: React.FC = () => {
                   {loadingMessages ? (
                     <div className="flex items-center justify-center h-full">
                       <div className="text-center">
-                        <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                         </div>
-                        <h3 className="text-lg font-medium text-white mb-2">Loading messages...</h3>
-                        <p className="text-gray-400 text-sm">Please wait while we fetch the conversation</p>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">Loading messages...</h3>
+                        <p className="text-gray-600 text-sm">Please wait while we fetch the conversation</p>
                       </div>
                     </div>
                   ) : messages.length === 0 ? (
                     <div className="flex items-center justify-center h-full">
                       <div className="text-center">
-                        <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                           <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                           </svg>
                         </div>
-                        <h3 className="text-lg font-medium text-white mb-2">No messages yet</h3>
-                        <p className="text-gray-400 text-sm">Start the conversation!</p>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">No messages yet</h3>
+                        <p className="text-gray-600 text-sm">Start the conversation!</p>
                       </div>
                     </div>
                   ) : (
@@ -691,13 +691,13 @@ const ChatPage: React.FC = () => {
                         <div
                           className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
                             message.sender_id === user?.id
-                              ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
-                              : 'bg-white/10 text-white'
+                              ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white'
+                              : 'bg-gray-100 text-gray-900 border border-gray-200'
                           }`}
                         >
                           <p className="text-sm">{message.content}</p>
                           <p className={`text-xs mt-1 ${
-                            message.sender_id === user?.id ? 'text-purple-100' : 'text-gray-400'
+                            message.sender_id === user?.id ? 'text-blue-100' : 'text-gray-500'
                           }`}>
                             {formatTime(message.created_at)}
                           </p>
@@ -709,19 +709,19 @@ const ChatPage: React.FC = () => {
                 </div>
 
                 {/* Message Input */}
-                <div className="p-6 border-t border-white/20">
+                <div className="p-6 border-t border-gray-200">
                   <form onSubmit={sendMessage} className="flex space-x-4">
                     <input
                       type="text"
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       placeholder="Type a message..."
-                      className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="flex-1 px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <button
                       type="submit"
                       disabled={!newMessage.trim() || sendingMessage}
-                      className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-medium rounded-xl transition-all duration-200 flex items-center"
+                      className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-medium rounded-xl transition-all duration-200 flex items-center"
                     >
                       {sendingMessage ? (
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -737,13 +737,13 @@ const ChatPage: React.FC = () => {
             ) : (
               <div className="flex-1 flex items-center justify-center">
                 <div className="text-center">
-                  <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
                     <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">Select a conversation</h3>
-                  <p className="text-gray-400">Choose a chat from the sidebar to start messaging</p>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Select a conversation</h3>
+                  <p className="text-gray-600">Choose a chat from the sidebar to start messaging</p>
                 </div>
               </div>
             )}

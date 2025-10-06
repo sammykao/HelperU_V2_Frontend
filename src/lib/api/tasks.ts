@@ -37,6 +37,7 @@ export interface TaskSearchRequest {
   max_hourly_rate?: number;
   search_limit?: number;
   search_offset?: number;
+  sort_by: 'distance' | 'post_date';
 }
 
 export interface ClientInfo {
@@ -124,6 +125,9 @@ export const taskApi = {
     }
     if (searchRequest.search_offset !== undefined) {
       params.append('search_offset', searchRequest.search_offset.toString());
+    }
+    if (searchRequest.sort_by) {
+      params.append('sort_by', searchRequest.sort_by);
     }
     
     return apiClient.get(`/tasks/?${params.toString()}`);

@@ -191,22 +191,22 @@ const CreateTask: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900">
+    <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100">
       <Navbar />
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Create New Post</h1>
-          <p className="text-gray-300">Post an opportunity for students to help with</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Create New Post</h1>
+          <p className="text-gray-700">Post an opportunity for students to help with</p>
         </div>
 
         {/* Form */}
-        <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-8">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Title */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Title *
               </label>
               <input
@@ -214,9 +214,9 @@ const CreateTask: React.FC = () => {
                 name="title"
                 value={formData.title}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 bg-white/10 border rounded-xl text-white placeholder-gray-400 transition-all duration-300 ${
-                  errors.title ? 'border-red-400 bg-red-500/10' : 'border-white/20 hover:bg-white/15'
-                } focus:outline-none focus:ring-2 focus:ring-blue-500/50`}
+                className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 ${
+                  errors.title ? 'border-red-400' : 'border-gray-300'
+                } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
                 placeholder="What do you need help with?"
                 disabled={isLoading}
               />
@@ -227,7 +227,7 @@ const CreateTask: React.FC = () => {
 
             {/* Dates */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Available Dates *
               </label>
                <div className="mb-2">
@@ -235,7 +235,7 @@ const CreateTask: React.FC = () => {
                   id="date-input"
                   type="date"
                    onChange={handleDateInputChange}
-                   className="px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 w-auto min-w-[200px]"
+                   className="px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 w-auto min-w-[200px]"
                   min={new Date().toISOString().split('T')[0]}
                    onKeyDown={(e) => e.preventDefault()}  
                  />
@@ -245,13 +245,13 @@ const CreateTask: React.FC = () => {
                   {selectedDates.map((dateObj) => (
                     <span
                       key={dateObj.timestamp}
-                      className="inline-flex items-center px-3 py-1 bg-blue-500/20 text-blue-300 rounded-lg text-sm"
+                      className="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-sm border border-blue-200"
                     >
                       {dateObj.display}
                       <button
                         type="button"
                         onClick={() => handleDateRemove(dateObj.timestamp)}
-                        className="ml-2 text-blue-400 hover:text-blue-200"
+                        className="ml-2 text-blue-700 hover:text-blue-800"
                       >
                         ×
                       </button>
@@ -267,16 +267,16 @@ const CreateTask: React.FC = () => {
             {/* Location and Rate */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                   Location Type *
                 </label>
                 <select
                   name="location_type"
                   value={formData.location_type}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 pr-10 bg-white/10 border rounded-xl text-white transition-all duration-300 appearance-none cursor-pointer ${
-                    errors.location_type ? 'border-red-400 bg-red-500/10' : 'border-white/20 hover:bg-white/15'
-                  } focus:outline-none focus:ring-2 focus:ring-blue-500/50`}
+                  className={`w-full px-4 py-3 pr-10 bg-white border rounded-xl text-gray-900 transition-all duration-300 appearance-none cursor-pointer ${
+                    errors.location_type ? 'border-red-400' : 'border-gray-300'
+                  } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
                   style={{
                     backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
                     backgroundPosition: 'right 0.75rem center',
@@ -285,8 +285,8 @@ const CreateTask: React.FC = () => {
                   }}
                   disabled={isLoading}
                 >
-                  <option value="in-person" className="bg-slate-800 text-white">In-Person</option>
-                  <option value="remote" className="bg-slate-800 text-white">Remote</option>
+                  <option value="in-person" className="bg-white text-gray-900">In-Person</option>
+                  <option value="remote" className="bg-white text-gray-900">Remote</option>
                 </select>
                 {errors.location_type && (
                   <p className="mt-1 text-sm text-red-400">{errors.location_type}</p>
@@ -295,7 +295,7 @@ const CreateTask: React.FC = () => {
 
               {formData.location_type === 'in-person' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
                     ZIP Code *
                   </label>
                   <input
@@ -304,9 +304,9 @@ const CreateTask: React.FC = () => {
                     value={formData.zip_code}
                     onChange={handleInputChange}
                     maxLength={5}
-                    className={`w-full px-4 py-3 bg-white/10 border rounded-xl text-white placeholder-gray-400 transition-all duration-300 ${
-                      errors.zip_code ? 'border-red-400 bg-red-500/10' : 'border-white/20 hover:bg-white/15'
-                    } focus:outline-none focus:ring-2 focus:ring-blue-500/50`}
+                    className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 ${
+                      errors.zip_code ? 'border-red-400' : 'border-gray-300'
+                    } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
                     placeholder="02138"
                     disabled={isLoading}
                   />
@@ -317,7 +317,7 @@ const CreateTask: React.FC = () => {
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                   Hourly Rate ($) *
                 </label>
                 <input
@@ -327,9 +327,9 @@ const CreateTask: React.FC = () => {
                   onChange={handleInputChange}
                   min="0"
                   step="0.01"
-                  className={`w-full px-4 py-3 bg-white/10 border rounded-xl text-white placeholder-gray-400 transition-all duration-300 ${
-                    errors.hourly_rate ? 'border-red-400 bg-red-500/10' : 'border-white/20 hover:bg-white/15'
-                  } focus:outline-none focus:ring-2 focus:ring-blue-500/50`}
+                  className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 ${
+                    errors.hourly_rate ? 'border-red-400' : 'border-gray-300'
+                  } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
                   placeholder="25.00"
                   disabled={isLoading}
                 />
@@ -341,7 +341,7 @@ const CreateTask: React.FC = () => {
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Description *
               </label>
               <textarea
@@ -349,9 +349,9 @@ const CreateTask: React.FC = () => {
                 value={formData.description}
                 onChange={handleInputChange}
                 rows={4}
-                className={`w-full px-4 py-3 bg-white/10 border rounded-xl text-white placeholder-gray-400 transition-all duration-300 resize-none ${
-                  errors.description ? 'border-red-400 bg-red-500/10' : 'border-white/20 hover:bg-white/15'
-                } focus:outline-none focus:ring-2 focus:ring-blue-500/50`}
+                className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 resize-none ${
+                  errors.description ? 'border-red-400' : 'border-gray-300'
+                } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
                 placeholder="Describe what you need help with, what skills are required, and any other important details..."
                 disabled={isLoading}
               />
@@ -359,7 +359,7 @@ const CreateTask: React.FC = () => {
                 {errors.description && (
                   <p className="text-sm text-red-400">{errors.description}</p>
                 )}
-                <p className="text-sm text-gray-400 ml-auto">
+                <p className="text-sm text-gray-600 ml-auto">
                   {formData.description.length}/2000 characters
                 </p>
               </div>
@@ -367,7 +367,7 @@ const CreateTask: React.FC = () => {
 
             {/* Tools Info */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Any Tools/Equipment Needed? (Optional)
               </label>
               <textarea
@@ -375,7 +375,7 @@ const CreateTask: React.FC = () => {
                 value={formData.tools_info}
                 onChange={handleInputChange}
                 rows={2}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 transition-all duration-300 resize-none hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/30"
                 placeholder="List any tools, equipment, or software the helper will need..."
                 disabled={isLoading}
               />
@@ -383,7 +383,7 @@ const CreateTask: React.FC = () => {
 
             {/* Public Transport Info */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Public Transportation Info (Optional)
               </label>
               <textarea
@@ -391,7 +391,7 @@ const CreateTask: React.FC = () => {
                 value={formData.public_transport_info}
                 onChange={handleInputChange}
                 rows={2}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 transition-all duration-300 resize-none hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/30"
                 placeholder="Provide information about nearby public transportation options..."
                 disabled={isLoading}
               />
@@ -402,7 +402,7 @@ const CreateTask: React.FC = () => {
               <button
                 type="button"
                 onClick={() => navigate('/tasks/my-posts')}
-                className="px-6 py-3 bg-white/20 text-white font-medium rounded-xl border border-white/30 hover:bg-white/30 transition-all duration-300"
+                className="px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl border border-gray-300 hover:bg-gray-200 transition-all duration-300"
                 disabled={isLoading}
               >
                 Cancel

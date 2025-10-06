@@ -16,9 +16,11 @@ const BrowseTasks: React.FC = () => {
     search_zip_code: '', // Will be set from user profile
     search_limit: 20,
     search_offset: 0,
+    sort_by: 'post_date',
   });
   const [totalCount, setTotalCount] = useState(0);
   const [hasSearched, setHasSearched] = useState(false);
+  const [sortBy, setSortBy] = useState<'distance' | 'post_date'>('post_date');
 
   // Fetch user profile and set zip code on mount, then automatically load tasks
   useEffect(() => {
@@ -40,6 +42,7 @@ const BrowseTasks: React.FC = () => {
                 search_zip_code: zipCode,
                 search_limit: 20,
                 search_offset: 0,
+                sort_by: 'post_date',
               });
               
               setTasks(response.tasks);
@@ -105,31 +108,30 @@ const BrowseTasks: React.FC = () => {
     setSearchParams(prev => ({ ...prev, [key]: value, search_offset: 0 }));
   };
 
-  // Auto-search when filters change (debounced)
+  // On sort change, push to server-side sort and reset pagination
+  useEffect(() => {
+    setSearchParams(prev => ({ ...prev, sort_by: sortBy, search_offset: 0 } as any));
+  }, [sortBy]);
+
+  // Auto-search when filters or pagination change (debounced)
   useEffect(() => {
     if (!hasSearched || !searchParams.search_zip_code) return;
-    
+
     const timeoutId = setTimeout(() => {
-      setIsLoading(true);
-      taskApi.getTasks(searchParams)
-        .then(response => {
-          setTasks(response.tasks);
-          setTotalCount(response.tasks.length < response.limit ? 
-            response.tasks.length : 
-            response.tasks.length + 1
-          );
-        })
-        .catch(error => {
-          toast.error('Failed to update search');
-          console.error('Error updating search:', error);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    }, 500);
+      fetchTasks();
+    }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [searchParams.search_query, searchParams.search_location_type, searchParams.min_hourly_rate, searchParams.max_hourly_rate, hasSearched]);
+  }, [
+    searchParams.search_query,
+    searchParams.search_location_type,
+    searchParams.min_hourly_rate,
+    searchParams.max_hourly_rate,
+    searchParams.search_offset,
+    searchParams.search_limit,
+    searchParams.search_zip_code,
+    hasSearched
+  ]);
 
   const loadMore = () => {
     setSearchParams(prev => ({ 
@@ -140,40 +142,14 @@ const BrowseTasks: React.FC = () => {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900">
+    <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100">
       <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* AI Assistant Blurb */}
-        <div className="mb-8 backdrop-blur-lg bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-2xl p-6">
-          <div className="flex items-start space-x-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-              </svg>
-            </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold text-white mb-2">Need Help Finding Opportunities?</h3>
-              <p className="text-gray-300 text-sm mb-4">
-                Our AI Assistant can help you find the right tasks for your skills, 
-                write compelling application messages, and provide tips for successful applications.
-              </p>
-              <button
-                onClick={() => navigate('/ai-assistant')}
-                className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg transition-all duration-200 flex items-center text-sm font-medium"
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-                Try AI Assistant
-              </button>
-            </div>
-          </div>
-        </div>
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Browse Opportunities</h1>
-          <p className="text-gray-300">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Browse Opportunities</h1>
+          <p className="text-gray-700">
             {hasSearched 
               ? `Showing opportunities near ${searchParams.search_zip_code} - modify filters below to refine your search`
               : 'Find posts that match your skills and interests'
@@ -182,14 +158,14 @@ const BrowseTasks: React.FC = () => {
         </div>
 
         {/* Search and Filters */}
-        <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-6 mb-8">
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-8 shadow-sm">
           <div className="mb-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-white mb-1">
+                <h2 className="text-lg font-semibold text-gray-900 mb-1">
                   {hasSearched ? 'Refine Your Search' : 'Search Filters'}
                 </h2>
-                <p className="text-sm text-gray-300">
+                <p className="text-sm text-gray-700">
                   {hasSearched 
                     ? 'Adjust the filters below to find more specific opportunities'
                     : 'Set your search criteria to find opportunities'
@@ -197,50 +173,69 @@ const BrowseTasks: React.FC = () => {
                 </p>
               </div>
               {isLoading && hasSearched && (
-                <div className="flex items-center space-x-2 text-blue-400">
-                  <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+                <div className="flex items-center space-x-2 text-blue-700">
+                  <div className="w-4 h-4 border-2 border-blue-700 border-t-transparent rounded-full animate-spin"></div>
                   <span className="text-sm">Updating...</span>  
                 </div>
               )}
             </div>
           </div>
           <form onSubmit={handleSearch} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-800 mb-2">
                   Search
                 </label>
                 <input
                   type="text"
                   value={searchParams.search_query || ''}
                   onChange={(e) => handleFilterChange('search_query', e.target.value)}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Search posts..."
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-800 mb-2">
                   Location Type
                 </label>
                 <select
                   value={searchParams.search_location_type || ''}
                   onChange={(e) => handleFilterChange('search_location_type', e.target.value)}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none bg-no-repeat bg-right pr-10"
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-no-repeat bg-right pr-10"
                   style={{
-                    backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
+                    backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23637489' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
                     backgroundPosition: 'right 0.75rem center',
                     backgroundSize: '1.25rem 1.25rem'
                   }}
                 >
-                  <option value="" className="bg-gray-800 text-white">All Locations</option>
-                  <option value="remote" className="bg-gray-800 text-white">Remote</option>
-                  <option value="in-person" className="bg-gray-800 text-white">In-Person</option>
+                  <option value="" className="bg-white text-gray-900">All Locations</option>
+                  <option value="remote" className="bg-white text-gray-900">Remote</option>
+                  <option value="in_person" className="bg-white text-gray-900">In-Person</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-800 mb-2">
+                  Sort By
+                </label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as 'distance' | 'post_date')}
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-no-repeat bg-right pr-10"
+                  style={{
+                    backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23637489' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
+                    backgroundPosition: 'right 0.75rem center',
+                    backgroundSize: '1.25rem 1.25rem'
+                  }}
+                >
+                  <option value="distance" className="bg-white text-gray-900">Distance (default)</option>
+                  <option value="post_date" className="bg-white text-gray-900">Post Date</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-800 mb-2">
                   Min Rate ($/hr)
                 </label>
                 <input
@@ -253,13 +248,13 @@ const BrowseTasks: React.FC = () => {
                     if (value !== undefined && value < 0) return; // Prevent negative values
                     handleFilterChange('min_hourly_rate', value);
                   }}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="0"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-800 mb-2">
                   Max Rate ($/hr)
                 </label>
                 <input
@@ -272,7 +267,7 @@ const BrowseTasks: React.FC = () => {
                     if (value !== undefined && value < 0) return; // Prevent negative values
                     handleFilterChange('max_hourly_rate', value);
                   }}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="100"
                 />
               </div>
@@ -280,14 +275,14 @@ const BrowseTasks: React.FC = () => {
 
             <div className="flex justify-between items-center">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Your ZIP Code <span className="text-red-400">*</span>
+                <label className="block text-sm font-medium text-gray-800 mb-2">
+                  Your ZIP Code <span className="text-red-600">*</span>
                 </label>
                 <input
                   type="text"
                   value={searchParams.search_zip_code}
                   onChange={(e) => handleFilterChange('search_zip_code', e.target.value)}
-                  className="w-32 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                  className="w-32 px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="02138"
                   maxLength={5}
                   required
@@ -295,7 +290,7 @@ const BrowseTasks: React.FC = () => {
               </div>
               <button
                 type="submit"
-                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all duration-300"
+                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300"
               >
                 {hasSearched ? 'Update Search' : 'Search'}
               </button>
@@ -308,7 +303,7 @@ const BrowseTasks: React.FC = () => {
         {/* Results */}
         {hasSearched && (
           <div className="mb-4">
-            <p className="text-gray-300">
+            <p className="text-gray-700">
               {totalCount} opportunit{totalCount !== 1 ? 'ies' : 'y'} found
             </p>
           </div>
@@ -319,49 +314,49 @@ const BrowseTasks: React.FC = () => {
           <div className="text-center py-12">
             <div className="relative w-20 h-20 mx-auto mb-6">
               {/* Outer spinning ring */}
-              <div className="absolute inset-0 border-4 border-white/20 rounded-full"></div>
+              <div className="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
               <div className="absolute inset-0 border-4 border-transparent border-t-blue-500 border-r-blue-500 rounded-full animate-spin"></div>
               
               {/* Inner pulsing circle */}
-              <div className="absolute inset-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center animate-pulse">
+              <div className="absolute inset-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center animate-pulse">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2 animate-pulse">Loading Opportunities</h3>
-            <p className="text-gray-300">Finding opportunities near your location...</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2 animate-pulse">Loading Opportunities</h3>
+            <p className="text-gray-700">Finding opportunities near your location...</p>
             <div className="flex justify-center mt-4 space-x-1">
               <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
-              <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+              <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
               <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
             </div>
           </div>
         ) : isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-6 relative overflow-hidden">
+              <div key={i} className="bg-white border border-gray-200 rounded-2xl p-6 relative overflow-hidden shadow-sm">
                 {/* Shimmer effect */}
-                <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+                <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-gray-100 to-transparent"></div>
                 
                 <div className="relative">
-                  <div className="h-4 bg-white/20 rounded mb-4 animate-pulse"></div>
-                  <div className="h-3 bg-white/20 rounded mb-2 animate-pulse" style={{animationDelay: `${i * 0.1}s`}}></div>
-                  <div className="h-3 bg-white/20 rounded mb-4 animate-pulse" style={{animationDelay: `${i * 0.1 + 0.1}s`}}></div>
-                  <div className="h-8 bg-white/20 rounded animate-pulse" style={{animationDelay: `${i * 0.1 + 0.2}s`}}></div>
+                  <div className="h-4 bg-gray-100 rounded mb-4 animate-pulse"></div>
+                  <div className="h-3 bg-gray-100 rounded mb-2 animate-pulse" style={{animationDelay: `${i * 0.1}s`}}></div>
+                  <div className="h-3 bg-gray-100 rounded mb-4 animate-pulse" style={{animationDelay: `${i * 0.1 + 0.1}s`}}></div>
+                  <div className="h-8 bg-gray-100 rounded animate-pulse" style={{animationDelay: `${i * 0.1 + 0.2}s`}}></div>
                 </div>
               </div>
             ))}
           </div>
         ) : tasks.length === 0 ? (
           <div className="text-center py-12">
-            <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">No opportunities found</h3>
-            <p className="text-gray-300">Try adjusting your search criteria</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No opportunities found</h3>
+            <p className="text-gray-700">Try adjusting your search criteria</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -369,51 +364,51 @@ const BrowseTasks: React.FC = () => {
               <Link
                 key={task.id}
                 to={`/tasks/browse/${task.id}`}
-                className="block backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 cursor-pointer"
+                className="block bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-md transition-all duration-300 cursor-pointer"
               >
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-white line-clamp-2 mb-2">{task.title}</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 mb-2">{task.title}</h3>
                     <div className="flex items-center space-x-2">
                       {task.client.pfp_url && (
                         <img 
                           src={task.client.pfp_url} 
-                          alt={`${task.client.first_name} ${task.client.last_name}`}
-                          className="w-6 h-6 rounded-full object-cover"
+                          alt={`${task.client.first_name} {task.client.last_name}`}
+                          className="w-6 h-6 rounded-full object-cover border border-gray-200"
                         />
                       )}
-                      <span className="text-sm text-gray-300">
+                      <span className="text-sm text-gray-700">
                         Posted by {task.client.first_name} {task.client.last_name}
                       </span>
                     </div>
                   </div>
-                  <span className="text-lg font-bold text-blue-400">{formatCurrency(task.hourly_rate)}/hr</span>
+                  <span className="text-lg font-bold text-blue-700">{formatCurrency(task.hourly_rate)}/hr</span>
                 </div>
 
-                <p className="text-gray-300 text-sm mb-4 line-clamp-3">{task.description}</p>
+                <p className="text-gray-700 text-sm mb-4 line-clamp-3">{task.description}</p>
 
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center space-x-2">
-                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <span className="text-sm text-gray-300 capitalize">{task.location_type}</span>
+                    <span className="text-sm text-gray-700 capitalize">{task.location_type === 'in_person' ? 'In Person' : 'Remote'}</span>
                     {task.location_type !== 'remote' && task.zip_code && (
-                      <span className="text-sm text-blue-400">• {task.zip_code}</span>
+                      <span className="text-sm text-blue-700">• {task.zip_code}</span>
                     )}
                     {task.location_type !== 'remote' && task.distance !== undefined && task.distance !== null && (
-                      <span className="text-sm text-blue-400">• {formatDistance(task.distance)}</span>
+                      <span className="text-sm text-blue-700">• {formatDistance(task.distance)}</span>
                     )}
                   </div>
                   
                   <div className="flex items-center space-x-2">
-                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <span className="text-sm text-gray-300">{task.dates.length} date{task.dates.length !== 1 ? 's' : ''}</span>
+                    <span className="text-sm text-gray-700">{task.dates.length} date{task.dates.length !== 1 ? 's' : ''}</span>
                     {task.dates.length > 0 && (
-                      <span className="text-sm text-blue-400">
+                      <span className="text-sm text-blue-700">
                         • {task.dates.slice(0, 2).map(date => {
                           const d = new Date(date);
                           return d.toLocaleDateString('en-US', { 
@@ -427,8 +422,8 @@ const BrowseTasks: React.FC = () => {
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-400">{formatDate(task.created_at)}</span>
-                  <div className="flex items-center space-x-1 text-gray-400">
+                  <span className="text-xs text-gray-500">{formatDate(task.created_at)}</span>
+                  <div className="flex items-center space-x-1 text-gray-500">
                     <span className="text-xs">Click to view</span>
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -446,11 +441,11 @@ const BrowseTasks: React.FC = () => {
             <button
               onClick={loadMore}
               disabled={isLoading}
-              className="px-6 py-3 bg-white/20 text-white font-medium rounded-xl border border-white/30 hover:bg-white/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 mx-auto"
+              className="px-6 py-3 bg-white text-gray-900 font-medium rounded-xl border border-gray-200 hover:bg-gray-100 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 mx-auto shadow-sm"
             >
               {isLoading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
                   <span>Loading...</span>
                 </>
               ) : (

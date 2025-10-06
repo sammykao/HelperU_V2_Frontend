@@ -57,13 +57,13 @@ const Profile: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900">
+    <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100">
       <Navbar />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-white">My Profile</h1>
-            <p className="text-gray-300 mt-1">Manage your account information and preferences</p>
+            <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
+            <p className="text-gray-700 mt-1">Manage your account information and preferences</p>
           </div>
           {!isEditing ? (
             <button 
@@ -76,7 +76,7 @@ const Profile: React.FC = () => {
             <div className="flex items-center space-x-3">
               <button 
                 onClick={() => setIsEditing(false)} 
-                className="px-6 py-3 text-gray-300 hover:text-white border border-gray-600 hover:border-gray-500 rounded-lg transition-colors"
+                className="px-6 py-3 text-gray-700 hover:text-gray-900 border border-gray-300 hover:border-gray-400 rounded-lg transition-colors"
               >
                 Cancel
               </button>
@@ -122,37 +122,11 @@ const Profile: React.FC = () => {
           )}
         </div>
 
-        {/* AI Assistant Blurb */}
-        <div className="mb-8 backdrop-blur-lg bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-2xl p-6">
-          <div className="flex items-start space-x-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-              </svg>
-            </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold text-white mb-2">Need Help Optimizing Your Profile?</h3>
-              <p className="text-gray-300 text-sm mb-4">
-                Our AI Assistant can help you improve your profile, suggest better descriptions, 
-                optimize your bio for better visibility, and provide personalized tips to attract 
-                more opportunities. Get expert advice to make your profile stand out.
-              </p>
-              <button
-                onClick={() => navigate('/ai-assistant')}
-                className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg transition-all duration-200 flex items-center text-sm font-medium"
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-                Try AI Assistant
-              </button>
-            </div>
-          </div>
-        </div>
+        
 
         {/* Subscription Information for Clients */}
         {authRoute === 'client' && subscription && (
-          <div className="mb-8 backdrop-blur-lg bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-2xl p-6">
+          <div className="mb-8 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
             <div className="flex items-start justify-between">
               <div className="flex items-start space-x-4">
                 <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -161,27 +135,27 @@ const Profile: React.FC = () => {
                   </svg>
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-white mb-2">Subscription Plan</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Subscription Plan</h3>
                   <div className="space-y-2">
                     <div className="flex items-center space-x-2">
-                      <span className="text-gray-300 text-sm">Plan:</span>
-                      <span className="px-2 py-1 bg-blue-500/30 text-blue-200 rounded-md text-sm font-medium capitalize">
+                      <span className="text-gray-700 text-sm">Plan:</span>
+                      <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-md text-sm font-medium capitalize border border-blue-200">
                         {subscription.plan}
                       </span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span className="text-gray-300 text-sm">Status:</span>
+                      <span className="text-gray-700 text-sm">Status:</span>
                       <span className={`px-2 py-1 rounded-md text-sm font-medium ${
                         subscription.status === 'active' 
-                          ? 'bg-green-500/30 text-green-200' 
-                          : 'bg-yellow-500/30 text-yellow-200'
+                          ? 'bg-green-100 text-green-700' 
+                          : 'bg-yellow-100 text-yellow-700'
                       }`}>
                         {subscription.status}
                       </span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span className="text-gray-300 text-sm">Posts:</span>
-                      <span className="text-white text-sm">
+                      <span className="text-gray-700 text-sm">Posts:</span>
+                      <span className="text-gray-900 text-sm">
                         {subscription.posts_used} / {subscription.post_limit === -1 ? '∞' : subscription.post_limit} this month
                       </span>
                     </div>
@@ -223,24 +197,24 @@ const Profile: React.FC = () => {
           </div>
         ) : !profile ? (
           <div className="text-center py-20">
-            <div className="text-gray-400 text-6xl mb-4">👤</div>
-            <h3 className="text-xl font-semibold text-white mb-2">No Profile Found</h3>
-            <p className="text-gray-300">Please complete your profile first.</p>
+            <div className="text-gray-500 text-6xl mb-4">👤</div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No Profile Found</h3>
+            <p className="text-gray-700">Please complete your profile first.</p>
           </div>
         ) : (
           <div className="space-y-8">
             {/* Profile Header with Picture */}
-            <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-8">
+            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
               <div className="flex flex-col items-center text-center">
                 <div className="relative mb-6">
                   {profile.pfp_url ? (
                     <img 
                       src={profile.pfp_url} 
                       alt="Profile" 
-                      className="w-32 h-32 rounded-full object-cover border-4 border-white/20 shadow-2xl" 
+                      className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-md" 
                     />
                   ) : (
-                    <div className="w-32 h-32 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center border-4 border-white/20 shadow-2xl">
+                    <div className="w-32 h-32 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center border-4 border-white shadow-md">
                       <span className="text-4xl text-white">👤</span>
                     </div>
                   )}
@@ -258,13 +232,13 @@ const Profile: React.FC = () => {
                     </div>
                   )}
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-2">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
                   {profile.first_name} {profile.last_name}
                 </h2>
-                <p className="text-gray-300 mb-4">
+                <p className="text-gray-700 mb-4">
                   Your Account
                 </p>
-                <div className="flex items-center space-x-6 text-sm text-gray-400">
+                <div className="flex items-center space-x-6 text-sm text-gray-600">
                   {profile.created_at && (
                     <div className="flex items-center">
                       <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -287,30 +261,30 @@ const Profile: React.FC = () => {
 
 
             {/* Profile Details */}
-            <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-6">
-              <h3 className="text-xl font-semibold text-white mb-6">Profile Information</h3>
+            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+              <h3 className="text-xl font-semibold text-gray-900 mb-6">Profile Information</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Contact Information */}
                 <div className="space-y-4">
-                  <h4 className="text-lg font-medium text-white border-b border-white/20 pb-2">Contact Information</h4>
+                  <h4 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">Contact Information</h4>
                   
                   {'email' in profile && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">Email Address</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
                       <div className="flex items-center space-x-2">
-                        <p className="text-white">{profile.email || 'Not provided'}</p>
-                        <span className="text-xs text-gray-500 bg-gray-700 px-2 py-1 rounded">Read-only</span>
+                        <p className="text-gray-900">{profile.email || 'Not provided'}</p>
+                        <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded border border-gray-200">Read-only</span>
                       </div>
                     </div>
                   )}
                   
                   {'phone' in profile && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">Phone Number</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
                       <div className="flex items-center space-x-2">
-                        <p className="text-white">{profile.phone || 'Not provided'}</p>
-                        <span className="text-xs text-gray-500 bg-gray-700 px-2 py-1 rounded">Read-only</span>
+                        <p className="text-gray-900">{profile.phone || 'Not provided'}</p>
+                        <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded border border-gray-200">Read-only</span>
                       </div>
                     </div>
                   )}
@@ -318,18 +292,18 @@ const Profile: React.FC = () => {
 
                 {/* Personal Information */}
                 <div className="space-y-4">
-                  <h4 className="text-lg font-medium text-white border-b border-white/20 pb-2">Personal Information</h4>
+                  <h4 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">Personal Information</h4>
                   
                   {!isEditing ? (
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">First Name</label>
-                      <p className="text-white">{profile.first_name || 'Not provided'}</p>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                      <p className="text-gray-900">{profile.first_name || 'Not provided'}</p>
                     </div>
                   ) : (
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">First Name</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
                       <input 
-                        className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
+                        className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30" 
                         value={profile.first_name || ''} 
                         onChange={(e) => setProfile({ ...(profile as ClientProfileData & HelperProfileData), first_name: e.target.value })}
                         placeholder="Enter your first name"
@@ -339,14 +313,14 @@ const Profile: React.FC = () => {
                   
                   {!isEditing ? (
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">Last Name</label>
-                      <p className="text-white">{profile.last_name || 'Not provided'}</p>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                      <p className="text-gray-900">{profile.last_name || 'Not provided'}</p>
                     </div>
                   ) : (
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">Last Name</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
                       <input 
-                        className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
+                        className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30" 
                         value={profile.last_name || ''} 
                         onChange={(e) => setProfile({ ...(profile as ClientProfileData & HelperProfileData), last_name: e.target.value })}
                         placeholder="Enter your last name"
@@ -359,12 +333,12 @@ const Profile: React.FC = () => {
               {/* Helper-specific fields */}
               {'college' in profile && (
                 <div className="mt-8">
-                  <h4 className="text-lg font-medium text-white border-b border-white/20 pb-2 mb-4">Helper Information</h4>
+                  <h4 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-4">Helper Information</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {!isEditing ? (
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">College</label>
-                        <p className="text-white">{(profile as HelperProfileData).college || 'Not provided'}</p>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">College</label>
+                        <p className="text-gray-900">{(profile as HelperProfileData).college || 'Not provided'}</p>
                       </div>
                     ) : (
                       <div>
@@ -378,15 +352,15 @@ const Profile: React.FC = () => {
                     
                     {!isEditing ? (
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">Graduation Year</label>
-                        <p className="text-white">{(profile as HelperProfileData).graduation_year || 'Not provided'}</p>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Graduation Year</label>
+                        <p className="text-gray-900">{(profile as HelperProfileData).graduation_year || 'Not provided'}</p>
                       </div>
                     ) : (
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">Graduation Year</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Graduation Year</label>
                         <input 
                           type="number" 
-                          className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
+                          className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30" 
                           value={(profile as HelperProfileData).graduation_year || new Date().getFullYear()} 
                           onChange={(e) => setProfile({ ...(profile as HelperProfileData), graduation_year: parseInt(e.target.value || String(new Date().getFullYear()), 10) })}
                           placeholder="2024"
@@ -396,14 +370,14 @@ const Profile: React.FC = () => {
                     
                     {!isEditing ? (
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">ZIP Code</label>
-                        <p className="text-white">{(profile as HelperProfileData).zip_code || 'Not provided'}</p>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">ZIP Code</label>
+                        <p className="text-gray-900">{(profile as HelperProfileData).zip_code || 'Not provided'}</p>
                       </div>
                     ) : (
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">ZIP Code</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">ZIP Code</label>
                         <input 
-                          className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
+                          className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30" 
                           value={(profile as HelperProfileData).zip_code || ''} 
                           onChange={(e) => setProfile({ ...(profile as HelperProfileData), zip_code: e.target.value })}
                           placeholder="12345"
@@ -412,22 +386,22 @@ const Profile: React.FC = () => {
                     )}
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">Applications Submitted</label>
-                      <p className="text-white">{(profile as HelperProfileData).number_of_applications || 0}</p>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Applications Submitted</label>
+                      <p className="text-gray-900">{(profile as HelperProfileData).number_of_applications || 0}</p>
                     </div>
                   </div>
                   
                   {!isEditing ? (
                     <div className="mt-6">
-                      <label className="block text-sm font-medium text-gray-300 mb-1">Bio</label>
-                      <p className="text-white whitespace-pre-wrap">{(profile as HelperProfileData).bio || 'Not provided'}</p>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                      <p className="text-gray-900 whitespace-pre-wrap">{(profile as HelperProfileData).bio || 'Not provided'}</p>
                     </div>
                   ) : (
                     <div className="mt-6">
-                      <label className="block text-sm font-medium text-gray-300 mb-1">Bio</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
                       <textarea 
                         rows={4} 
-                        className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
+                        className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30" 
                         value={(profile as HelperProfileData).bio || ''} 
                         onChange={(e) => setProfile({ ...(profile as HelperProfileData), bio: e.target.value })}
                         placeholder="Tell us about yourself..."
@@ -440,10 +414,10 @@ const Profile: React.FC = () => {
               {/* Client-specific fields */}
               {'number_of_posts' in profile && (
                 <div className="mt-8">
-                  <h4 className="text-lg font-medium text-white border-b border-white/20 pb-2 mb-4">Your Stats</h4>
+                  <h4 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-4">Your Stats</h4>
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Posts Created</label>
-                    <p className="text-white">{(profile as ClientProfileData).number_of_posts || 0}</p>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Posts Created</label>
+                    <p className="text-gray-900">{(profile as ClientProfileData).number_of_posts || 0}</p>
                   </div>
                 </div>
               )}

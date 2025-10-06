@@ -97,25 +97,25 @@ const HelperAuth: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900 flex items-center justify-center px-4">
-      {/* Background Effects */}
+    <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100 flex items-center justify-center px-4">
+      {/* Background Effects (subtle) */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/30 rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-500/30 rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-pulse animation-delay-2000"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-200/40 rounded-full mix-blend-multiply blur-2xl opacity-70 animate-pulse-blue"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-200/40 rounded-full mix-blend-multiply blur-2xl opacity-70 animate-pulse-blue animation-delay-2000"></div>
       </div>
 
       <div className="relative z-10 w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-display font-bold bg-gradient-to-r from-white via-blue-200 to-cyan-200 bg-clip-text text-transparent mb-2">
+          <h1 className="text-4xl font-display font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-300 bg-clip-text text-transparent drop-shadow-md mb-2">
             HelperU
           </h1>
-          <h2 className="text-2xl font-semibold text-white mb-2">Join or Sign in as a Helper</h2>
-          <p className="text-gray-300">Enter your phone number to continue</p>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Join or Sign in as a Helper</h2>
+          <p className="text-gray-600">Enter your phone number to continue</p>
         </div>
 
         {/* Form */}
-        <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-8">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
           <form onSubmit={showEmailInput ? handleSignup : handleSubmit} className="space-y-6">
             <PhoneInput
               value={phone}
@@ -127,7 +127,7 @@ const HelperAuth: React.FC = () => {
             
             {showEmailInput && (
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Email Address
                 </label>
                 <input
@@ -136,7 +136,7 @@ const HelperAuth: React.FC = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email address"
                   disabled={isLoading}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 transition-all duration-300 hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
               </div>
             )}
@@ -159,16 +159,16 @@ const HelperAuth: React.FC = () => {
 
           {/* Footer */}
           <div className="mt-6 text-center">
-            <p className="text-gray-400 text-sm mt-2">
+            <p className="text-gray-500 text-sm mt-2">
               Need help instead?{' '}
               <Link 
                 to="/auth/client" 
-                className="text-cyan-400 hover:text-cyan-300 transition-colors"
+                className="text-blue-700 hover:text-blue-800 transition-colors"
               >
                 Go to Client Sign in
               </Link>
             </p>
-            <p className="text-gray-400 text-xs mt-2">By continuing, you agree to our <Link to="/terms-of-use" className="text-gray-400 hover:text-cyan-300 transition-colors">Terms of Service</Link> and <Link to="/privacy-policy" className="text-gray-400 hover:text-cyan-300 transition-colors">Privacy Policy</Link></p>
+            <p className="text-gray-500 text-xs mt-2">By continuing, you agree to our <Link to="/terms-of-use" className="hover:text-blue-800 transition-colors">Terms of Service</Link> and <Link to="/privacy-policy" className="hover:text-blue-800 transition-colors">Privacy Policy</Link></p>
 
           </div>
         </div>

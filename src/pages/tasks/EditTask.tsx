@@ -206,11 +206,11 @@ const EditTask: React.FC = () => {
 
   if (loadingTask) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900">
+      <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100">
         <Navbar />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-center min-h-[400px]">
-            <div className="animate-spin rounded-full h-12 w-12 border-2 border-white/30 border-t-white"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-2 border-gray-300 border-t-blue-600"></div>
           </div>
         </div>
       </div>
@@ -219,11 +219,11 @@ const EditTask: React.FC = () => {
 
   if (!task) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900">
+      <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100">
         <Navbar />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-white mb-4">Task not found</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Task not found</h1>
             <button
               onClick={() => navigate('/tasks/my-posts')}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -237,22 +237,22 @@ const EditTask: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900">
+    <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100">
       <Navbar />
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Edit Task</h1>
-          <p className="text-gray-300">Update your task details</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Edit Task</h1>
+          <p className="text-gray-700">Update your task details</p>
         </div>
 
         {/* Form */}
-        <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-8">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Title */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Title *
               </label>
               <input
@@ -260,20 +260,20 @@ const EditTask: React.FC = () => {
                 name="title"
                 value={formData.title}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 bg-white/10 border rounded-xl text-white placeholder-gray-400 transition-all duration-300 ${
-                  errors.title ? 'border-red-400 bg-red-500/10' : 'border-white/20 hover:bg-white/15'
+                className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 ${
+                  errors.title ? 'border-red-400 bg-red-50' : 'border-gray-300 hover:border-gray-400'
                 } focus:outline-none focus:ring-2 focus:ring-blue-500/50`}
                 placeholder="What do you need help with?"
                 disabled={isLoading}
               />
               {errors.title && (
-                <p className="mt-1 text-sm text-red-400">{errors.title}</p>
+                <p className="mt-1 text-sm text-red-600">{errors.title}</p>
               )}
             </div>
 
             {/* Dates */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Available Dates *
               </label>
               <div className="space-y-3">
@@ -281,7 +281,7 @@ const EditTask: React.FC = () => {
                   <input
                     type="date"
                     onChange={handleDateInputChange}
-                    className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 transition-all duration-300 hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    className="flex-1 px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                     disabled={isLoading}
                   />
                 </div>
@@ -290,13 +290,13 @@ const EditTask: React.FC = () => {
                     {selectedDates.map((date, index) => (
                       <div
                         key={index}
-                        className="flex items-center gap-2 px-3 py-2 bg-blue-500/20 text-blue-300 rounded-lg border border-blue-500/30"
+                        className="flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg border border-blue-200"
                       >
                         <span className="text-sm">{date.display}</span>
                         <button
                           type="button"
                           onClick={() => removeDate(date.timestamp)}
-                          className="text-blue-400 hover:text-blue-200 transition-colors"
+                          className="text-blue-600 hover:text-blue-800 transition-colors"
                           disabled={isLoading}
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -309,20 +309,20 @@ const EditTask: React.FC = () => {
                 )}
               </div>
               {errors.dates && (
-                <p className="mt-1 text-sm text-red-400">{errors.dates}</p>
+                <p className="mt-1 text-sm text-red-600">{errors.dates}</p>
               )}
             </div>
 
             {/* Location Type */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Location Type *
               </label>
               <select
                 name="location_type"
                 value={formData.location_type}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white transition-all duration-300 hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 transition-all duration-300 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                 disabled={isLoading}
               >
                 <option value="in-person">In-Person</option>
@@ -333,7 +333,7 @@ const EditTask: React.FC = () => {
             {/* ZIP Code */}
             {formData.location_type === 'in-person' && (
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-800 mb-2">
                   ZIP Code *
                 </label>
                 <input
@@ -341,21 +341,21 @@ const EditTask: React.FC = () => {
                   name="zip_code"
                   value={formData.zip_code}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 bg-white/10 border rounded-xl text-white placeholder-gray-400 transition-all duration-300 ${
-                    errors.zip_code ? 'border-red-400 bg-red-500/10' : 'border-white/20 hover:bg-white/15'
+                  className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 ${
+                    errors.zip_code ? 'border-red-400 bg-red-50' : 'border-gray-300 hover:border-gray-400'
                   } focus:outline-none focus:ring-2 focus:ring-blue-500/50`}
                   placeholder="Enter ZIP code"
                   disabled={isLoading}
                 />
                 {errors.zip_code && (
-                  <p className="mt-1 text-sm text-red-400">{errors.zip_code}</p>
+                  <p className="mt-1 text-sm text-red-600">{errors.zip_code}</p>
                 )}
               </div>
             )}
 
             {/* Hourly Rate */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Hourly Rate ($) *
               </label>
               <input
@@ -365,20 +365,20 @@ const EditTask: React.FC = () => {
                 onChange={handleInputChange}
                 min="0"
                 step="0.01"
-                className={`w-full px-4 py-3 bg-white/10 border rounded-xl text-white placeholder-gray-400 transition-all duration-300 ${
-                  errors.hourly_rate ? 'border-red-400 bg-red-500/10' : 'border-white/20 hover:bg-white/15'
+                className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 ${
+                  errors.hourly_rate ? 'border-red-400 bg-red-50' : 'border-gray-300 hover:border-gray-400'
                 } focus:outline-none focus:ring-2 focus:ring-blue-500/50`}
                 placeholder="Enter hourly rate"
                 disabled={isLoading}
               />
               {errors.hourly_rate && (
-                <p className="mt-1 text-sm text-red-400">{errors.hourly_rate}</p>
+                <p className="mt-1 text-sm text-red-600">{errors.hourly_rate}</p>
               )}
             </div>
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Description *
               </label>
               <textarea
@@ -386,20 +386,20 @@ const EditTask: React.FC = () => {
                 value={formData.description}
                 onChange={handleInputChange}
                 rows={6}
-                className={`w-full px-4 py-3 bg-white/10 border rounded-xl text-white placeholder-gray-400 transition-all duration-300 resize-none ${
-                  errors.description ? 'border-red-400 bg-red-500/10' : 'border-white/20 hover:bg-white/15'
+                className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 resize-none ${
+                  errors.description ? 'border-red-400 bg-red-50' : 'border-gray-300 hover:border-gray-400'
                 } focus:outline-none focus:ring-2 focus:ring-blue-500/50`}
                 placeholder="Describe what you need help with in detail..."
                 disabled={isLoading}
               />
               {errors.description && (
-                <p className="mt-1 text-sm text-red-400">{errors.description}</p>
+                <p className="mt-1 text-sm text-red-600">{errors.description}</p>
               )}
             </div>
 
             {/* Tools Info */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Tools/Equipment Required
               </label>
               <textarea
@@ -407,7 +407,7 @@ const EditTask: React.FC = () => {
                 value={formData.tools_info}
                 onChange={handleInputChange}
                 rows={3}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 transition-all duration-300 resize-none hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 resize-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                 placeholder="List any tools or equipment needed..."
                 disabled={isLoading}
               />
@@ -415,7 +415,7 @@ const EditTask: React.FC = () => {
 
             {/* Public Transport Info */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Public Transportation Info
               </label>
               <textarea
@@ -423,7 +423,7 @@ const EditTask: React.FC = () => {
                 value={formData.public_transport_info}
                 onChange={handleInputChange}
                 rows={3}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 transition-all duration-300 resize-none hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 resize-none hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                 placeholder="Provide information about public transportation options..."
                 disabled={isLoading}
               />
@@ -434,7 +434,7 @@ const EditTask: React.FC = () => {
               <button
                 type="button"
                 onClick={() => navigate(`/tasks/browse/${id}`)}
-                className="flex-1 px-6 py-3 bg-gray-600/20 text-gray-300 rounded-xl border border-gray-500/30 hover:bg-gray-600/30 hover:text-white transition-all duration-300"
+                className="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-xl border border-gray-300 hover:bg-gray-200 hover:text-gray-900 transition-all duration-300"
                 disabled={isLoading}
               >
                 Cancel

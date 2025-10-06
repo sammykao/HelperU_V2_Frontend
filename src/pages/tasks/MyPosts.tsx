@@ -112,11 +112,11 @@ const MyPosts: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900">
+      <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100">
         <Navbar />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
           </div>
         </div>
       </div>
@@ -124,53 +124,26 @@ const MyPosts: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900">
+    <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100">
       <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">My Posts</h1>
-          <p className="text-gray-300">Manage your posted opportunities</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">My Posts</h1>
+          <p className="text-gray-700">Manage your posted opportunities</p>
         </div>
 
-        {/* AI Assistant Blurb */}
-        <div className="mb-8 backdrop-blur-lg bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-2xl p-6">
-          <div className="flex items-start space-x-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-              </svg>
-            </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold text-white mb-2">Need Help Managing Your Posts?</h3>
-              <p className="text-gray-300 text-sm mb-4">
-                Our AI Assistant can help you create better posts, optimize your descriptions, 
-                manage applications, and answer any questions about HelperU. Get personalized 
-                suggestions to improve your opportunities and attract more qualified helpers.
-              </p>
-              <button
-                onClick={() => navigate('/ai-assistant')}
-                className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg transition-all duration-200 flex items-center text-sm font-medium"
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-                Try AI Assistant
-              </button>
-            </div>
-          </div>
-        </div>
 
         {error && (
-          <div className="mb-6 bg-red-500/20 border border-red-500/50 rounded-lg p-4">
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
             <div className="flex">
-              <svg className="w-5 h-5 text-red-400 mt-0.5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-5 h-5 text-red-500 mt-0.5 mr-3" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
               </svg>
               <div>
-                <h3 className="text-sm font-medium text-red-400">Error</h3>
-                <p className="text-sm text-red-300 mt-1">{error}</p>
+                <h3 className="text-sm font-medium text-red-700">Error</h3>
+                <p className="text-sm text-red-600 mt-1">{error}</p>
               </div>
             </div>
           </div>
@@ -178,9 +151,9 @@ const MyPosts: React.FC = () => {
 
         {/* Subscription Status & Post Limit */}
         {subscriptionStatus && (
-          <div className="mb-8 backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-4 sm:p-6">
+          <div className="mb-8 bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4">
-              <h2 className="text-xl font-semibold text-white">Subscription Status</h2>
+              <h2 className="text-xl font-semibold text-gray-900">Subscription Status</h2>
               <div className="flex items-center gap-3">
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                   subscriptionStatus.status === 'active' 
@@ -204,26 +177,26 @@ const MyPosts: React.FC = () => {
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-              <div className="bg-white/5 rounded-lg p-3 sm:p-4">
-                <div className="text-sm text-gray-300 mb-1">Plan</div>
-                <div className="text-lg font-semibold text-white capitalize">{subscriptionStatus.plan}</div>
+              <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
+                <div className="text-sm text-gray-700 mb-1">Plan</div>
+                <div className="text-lg font-semibold text-gray-900 capitalize">{subscriptionStatus.plan}</div>
               </div>
               
-              <div className="bg-white/5 rounded-lg p-3 sm:p-4">
-                <div className="text-sm text-gray-300 mb-1">Posts Used This Month</div>
-                <div className="text-lg font-semibold text-white">
+              <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
+                <div className="text-sm text-gray-700 mb-1">Posts Used This Month</div>
+                <div className="text-lg font-semibold text-gray-900">
                   {subscriptionStatus.posts_used} / {subscriptionStatus.plan === "free" ? '1' : '∞'}
                 </div>
               </div>
               
-              <div className="bg-white/5 rounded-lg p-3 sm:p-4 sm:col-span-2 lg:col-span-1">
-                <div className="text-sm text-gray-300 mb-1">Remaining Posts This Month</div>
+              <div className="bg-white rounded-lg p-3 sm:p-4 sm:col-span-2 lg:col-span-1 border border-gray-200">
+                <div className="text-sm text-gray-700 mb-1">Remaining Posts This Month</div>
                 <div className={`text-lg font-semibold ${
                   subscriptionStatus.post_limit === -1 
-                    ? 'text-green-400' 
+                    ? 'text-green-700' 
                     : subscriptionStatus.post_limit - subscriptionStatus.posts_used > 0 
-                      ? 'text-white' 
-                      : 'text-red-400'
+                      ? 'text-gray-900' 
+                      : 'text-red-600'
                 }`}>
                   {subscriptionStatus.post_limit === -1 
                     ? 'Unlimited' 
@@ -237,21 +210,21 @@ const MyPosts: React.FC = () => {
 
         {/* Post Statistics */}
         <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-xl p-4 sm:p-6">
+          <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-6 shadow-sm">
             <div className="flex items-center">
               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mr-3 sm:mr-4">
                 <svg className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
                 </svg>
               </div>
               <div>
-                <div className="text-xl sm:text-2xl font-bold text-white">{stats.total}</div>
-                <div className="text-sm text-gray-300">Total Posts</div>
+                <div className="text-xl sm:text-2xl font-bold text-gray-900">{stats.total}</div>
+                <div className="text-sm text-gray-700">Total Posts</div>
               </div>
             </div>
           </div>
 
-          <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-xl p-4 sm:p-6">
+          <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-6 shadow-sm">
             <div className="flex items-center">
               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500/20 rounded-lg flex items-center justify-center mr-3 sm:mr-4">
                 <svg className="w-5 h-5 sm:w-6 sm:h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -259,13 +232,13 @@ const MyPosts: React.FC = () => {
                 </svg>
               </div>
               <div>
-                <div className="text-xl sm:text-2xl font-bold text-white">{stats.completed}</div>
-                <div className="text-sm text-gray-300">Completed</div>
+                <div className="text-xl sm:text-2xl font-bold text-gray-900">{stats.completed}</div>
+                <div className="text-sm text-gray-700">Completed</div>
               </div>
             </div>
           </div>
 
-          <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-xl p-4 sm:p-6 sm:col-span-2 lg:col-span-1">
+          <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-6 sm:col-span-2 lg:col-span-1 shadow-sm">
             <div className="flex items-center">
               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-500/20 rounded-lg flex items-center justify-center mr-3 sm:mr-4">
                 <svg className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -273,26 +246,17 @@ const MyPosts: React.FC = () => {
                 </svg>
               </div>
               <div>
-                <div className="text-xl sm:text-2xl font-bold text-white">{stats.active}</div>
-                <div className="text-sm text-gray-300">Active</div>
+                <div className="text-xl sm:text-2xl font-bold text-gray-900">{stats.active}</div>
+                <div className="text-sm text-gray-700">Active</div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Posts List */}
-        <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-4 sm:p-6">
+        <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-6">
-            <h2 className="text-xl font-semibold text-white">Your Posts</h2>
-            <button
-              onClick={loadData}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 flex items-center self-start sm:self-auto"
-            >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              Refresh
-            </button>
+            <h2 className="text-xl font-semibold text-gray-900">Your Posts</h2>
           </div>
 
           {posts.length === 0 ? (
@@ -302,8 +266,8 @@ const MyPosts: React.FC = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
             </div>
-              <h3 className="text-lg font-semibold text-white mb-2">No Posts Yet</h3>
-            <p className="text-gray-300 mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Posts Yet</h3>
+            <p className="text-gray-700 mb-6">
                 You haven't created any posts yet. Create your first opportunity to get started!
               </p>
               <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-lg transition-all duration-200">
@@ -313,7 +277,7 @@ const MyPosts: React.FC = () => {
           ) : (
             <div className="space-y-4">
               {posts.map((post) => (
-                <div key={post.id} className="group bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6 hover:bg-white/10 transition-colors duration-200">
+                <div key={post.id} className="group bg-white border border-gray-200 rounded-xl p-4 sm:p-6 hover:shadow-sm transition-colors duration-200">
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                     <div 
                       className="flex-1 cursor-pointer"
@@ -321,7 +285,7 @@ const MyPosts: React.FC = () => {
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-3">
                         <div className="flex items-center gap-2">
-                          <h3 className="text-lg font-semibold text-white hover:text-blue-300 transition-colors">{post.title}</h3>
+                          <h3 className="text-lg font-semibold text-gray-900 hover:text-blue-700 transition-colors">{post.title}</h3>
                           <svg className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                           </svg>
@@ -329,30 +293,30 @@ const MyPosts: React.FC = () => {
                         {getStatusBadge(post)}
                       </div>
                       
-                      <p className="text-gray-300 mb-4 line-clamp-2">{post.description}</p>
+                      <p className="text-gray-700 mb-4 line-clamp-2">{post.description}</p>
                       <p className="text-xs text-gray-500 mb-2">Click to view details</p>
                       
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 text-sm">
                         <div>
-                          <span className="text-gray-400">Rate:</span>
-                          <span className="text-white ml-2 font-medium">{formatCurrency(post.hourly_rate)}/hr</span>
+                          <span className="text-gray-600">Rate:</span>
+                          <span className="text-gray-900 ml-2 font-medium">{formatCurrency(post.hourly_rate)}/hr</span>
                         </div>
                         <div>
-                          <span className="text-gray-400">Location:</span>
-                          <span className="text-white ml-2 font-medium capitalize">{post.location_type}</span>
+                          <span className="text-gray-600">Location:</span>
+                          <span className="text-gray-900 ml-2 font-medium capitalize">{post.location_type}</span>
                         </div>
                         <div className="sm:col-span-2 lg:col-span-1">
-                          <span className="text-gray-400">Created:</span>
-                          <span className="text-white ml-2 font-medium">{formatDate(post.created_at)}</span>
+                          <span className="text-gray-600">Created:</span>
+                          <span className="text-gray-900 ml-2 font-medium">{formatDate(post.created_at)}</span>
                         </div>
                       </div>
                       
                       {post.dates && post.dates.length > 0 && (
                         <div className="mt-3">
-                          <span className="text-gray-400 text-sm">Dates:</span>
+                          <span className="text-gray-600 text-sm">Dates:</span>
                           <div className="flex flex-wrap gap-2 mt-1">
                             {post.dates.map((date, index) => (
-                              <span key={index} className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded text-xs">
+                              <span key={index} className="px-2 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded text-xs">
                                 {formatDate(date)}
                               </span>
                             ))}
@@ -362,15 +326,15 @@ const MyPosts: React.FC = () => {
                       
                       {post.tools_info && (
                         <div className="mt-3">
-                          <span className="text-gray-400 text-sm">Tools Required:</span>
-                          <p className="text-gray-300 text-sm mt-1">{post.tools_info}</p>
+                          <span className="text-gray-600 text-sm">Tools Required:</span>
+                          <p className="text-gray-700 text-sm mt-1">{post.tools_info}</p>
                         </div>
                       )}
                       
                       {post.public_transport_info && (
                         <div className="mt-3">
-                          <span className="text-gray-400 text-sm">Public Transport:</span>
-                          <p className="text-gray-300 text-sm mt-1">{post.public_transport_info}</p>
+                          <span className="text-gray-600 text-sm">Public Transport:</span>
+                          <p className="text-gray-700 text-sm mt-1">{post.public_transport_info}</p>
                         </div>
                       )}
                     </div>
@@ -383,7 +347,7 @@ const MyPosts: React.FC = () => {
                         <button
                           onClick={() => handleCompletePost(post.id)}
                           disabled={completingPost === post.id}
-                          className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-green-600/50 text-white rounded-lg transition-colors duration-200 flex items-center text-sm"
+                          className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-green-500 disabled:to-emerald-500 text-white rounded-lg transition-all duration-200 flex items-center text-sm font-medium shadow-sm hover:shadow-md"
                         >
                           {completingPost === post.id ? (
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -396,30 +360,18 @@ const MyPosts: React.FC = () => {
                         </button>
                       )}
                       
-                      {!post.completed_at && (
-                        <button
-                          onClick={() => navigate(`/tasks/edit/${post.id}`)}
-                          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 flex items-center text-sm"
-                        >
-                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
-                          Edit
-                        </button>
-                      )}
-                      
                       <button
                         onClick={() => handleDeletePost(post.id)}
                         disabled={deletingPost === post.id || !!post.completed_at}
-                        className={`px-4 py-2 rounded-lg transition-colors duration-200 flex items-center text-sm ${
+                        className={`px-4 py-2 rounded-lg transition-all duration-200 flex items-center text-sm font-medium shadow-sm hover:shadow-md ${
                           post.completed_at 
-                            ? 'bg-gray-600 text-gray-400 cursor-not-allowed' 
-                            : 'bg-red-600 hover:bg-red-700 disabled:bg-red-600/50 text-white'
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                            : 'bg-gray-100 hover:bg-gray-200 text-red-600 hover:text-red-700 disabled:bg-gray-100 disabled:text-red-400'
                         }`}
                         title={post.completed_at ? 'Cannot delete completed posts' : 'Delete post'}
                       >
                         {deletingPost === post.id ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600 mr-2"></div>
                         ) : (
                           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

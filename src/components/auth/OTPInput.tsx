@@ -94,9 +94,9 @@ export const OTPInput: React.FC<OTPInputProps> = ({
             className={`
               w-12 h-12 text-center text-lg font-semibold
               bg-white/10 border rounded-xl
-              text-white placeholder-gray-400
+              text-gray-700 placeholder-gray-400
               transition-all duration-300
-              ${activeIndex === index ? 'border-blue-400 bg-white/20' : 'border-white/20'}
+              ${activeIndex === index ? 'border-blue-400 bg-white/20' : 'border-gray-700'}
               ${error ? 'border-red-400 bg-red-500/10' : ''}
               ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/15'}
               focus:outline-none focus:ring-2 focus:ring-blue-500/50
