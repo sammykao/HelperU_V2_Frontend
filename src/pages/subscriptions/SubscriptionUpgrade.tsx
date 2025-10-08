@@ -86,7 +86,7 @@ const SubscriptionUpgrade: React.FC = () => {
     },
     {
       name: 'Premium',
-      price: '$9.99',
+      price: '$10',
       period: 'month',
       description: 'Best for regular users',
       features: [

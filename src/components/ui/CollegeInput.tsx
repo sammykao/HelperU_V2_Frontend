@@ -95,7 +95,7 @@ const CollegeInput: React.FC<CollegeInputProps> = ({
   return (
     <div className={`relative ${className}`}>
       {label && (
-        <label className="block text-sm font-medium text-gray-300 mb-2">
+        <label className="block text-sm font-medium text-gray-800 mb-2">
           {label}
           {required && <span className="text-red-400 ml-1">*</span>}
         </label>
@@ -111,7 +111,7 @@ const CollegeInput: React.FC<CollegeInputProps> = ({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled}
-          className={`w-full px-4 py-3 bg-white/10 border rounded-xl text-white placeholder-gray-400 transition-all duration-300 ${
+          className={`w-full px-4 py-3 bg-white/10 border rounded-xl text-gray-900 placeholder-gray-400 transition-all duration-300 ${
             error 
               ? 'border-red-400 bg-red-500/10' 
               : 'border-white/20 hover:bg-white/15'

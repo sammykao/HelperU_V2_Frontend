@@ -6,7 +6,7 @@ export interface TaskCreate {
   dates: string[];
   location_type: string;
   zip_code?: string;
-  hourly_rate: number;
+  hourly_rate?: number | null; // Not really optional, but we need to allow for empty string
   description: string;
   tools_info?: string;
   public_transport_info?: string;

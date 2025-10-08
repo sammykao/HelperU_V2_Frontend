@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import { taskApi, TaskCreate } from '../../lib/api/tasks';
 import { useAuth } from '../../lib/contexts/AuthContext';
@@ -9,19 +9,44 @@ import toast from 'react-hot-toast';
 const CreateTask: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const [searchParams] = useSearchParams();
   const [formData, setFormData] = useState<TaskCreate>({
     title: '',
     dates: [],
-    location_type: 'in-person',
+    location_type: 'in_person',
     zip_code: '',
-    hourly_rate: 0,
     description: '',
     tools_info: '',
     public_transport_info: '',
+    hourly_rate: null,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [selectedDates, setSelectedDates] = useState<{timestamp: string, display: string}[]>([]);
+
+  // Handle pre-filling form data from URL parameters
+  useEffect(() => {
+    const title = searchParams.get('title');
+    const description = searchParams.get('description');
+    const locationType = searchParams.get('location_type');
+    const zipCode = searchParams.get('zip_code');
+    const toolsInfo = searchParams.get('tools_info');
+    const publicTransportInfo = searchParams.get('public_transport_info');
+    const hourlyRate = searchParams.get('hourly_rate');
+
+    if (title || description || locationType || zipCode || toolsInfo || publicTransportInfo || hourlyRate) {
+      setFormData(prev => ({
+        ...prev,
+        title: title || prev.title,
+        description: description || prev.description,
+        location_type: locationType || prev.location_type,
+        zip_code: zipCode || prev.zip_code,
+        tools_info: toolsInfo || prev.tools_info,
+        public_transport_info: publicTransportInfo || prev.public_transport_info,
+        hourly_rate: hourlyRate ? parseFloat(hourlyRate) : prev.hourly_rate,
+      }));
+    }
+  }, [searchParams]);
 
 
   if (!isAuthenticated) {
@@ -32,8 +57,8 @@ const CreateTask: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     
-    // Clear ZIP code when switching away from in-person
-    if (name === 'location_type' && value !== 'in-person') {
+    // Clear ZIP code when switching away from in_person
+    if (name === 'location_type' && value !== 'in_person') {
       setFormData(prev => ({ ...prev, [name]: value, zip_code: '' }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
@@ -138,13 +163,13 @@ const CreateTask: React.FC = () => {
       newErrors.location_type = 'Location type is required';
     }
 
-    if (formData.location_type === 'in-person' && !validateRequired(formData.zip_code)) {
-      newErrors.zip_code = 'ZIP code is required for in-person tasks';
+    if (formData.location_type === 'in_person' && !validateRequired(formData.zip_code)) {
+      newErrors.zip_code = 'ZIP code is required for In Person tasks';
     } else if (formData.zip_code && !validateZipCode(formData.zip_code)) {
       newErrors.zip_code = 'Please enter a valid 5-digit ZIP code';
     }
 
-    if (formData.hourly_rate <= 0) {
+    if (formData.hourly_rate == null || formData.hourly_rate <= 0) {
       newErrors.hourly_rate = 'Hourly rate must be greater than 0';
     }
 
@@ -168,7 +193,7 @@ const CreateTask: React.FC = () => {
     // Clean up the data before sending
     const cleanedFormData = {
       ...formData,
-      zip_code: formData.location_type === 'in-person' && formData.zip_code ? formData.zip_code : undefined
+      zip_code: formData.location_type === 'in_person' && formData.zip_code ? formData.zip_code : undefined
     };
 
     setIsLoading(true);
@@ -237,7 +262,6 @@ const CreateTask: React.FC = () => {
                    onChange={handleDateInputChange}
                    className="px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 w-auto min-w-[200px]"
                   min={new Date().toISOString().split('T')[0]}
-                   onKeyDown={(e) => e.preventDefault()}  
                  />
               </div>
               {selectedDates.length > 0 && (
@@ -285,7 +309,7 @@ const CreateTask: React.FC = () => {
                   }}
                   disabled={isLoading}
                 >
-                  <option value="in-person" className="bg-white text-gray-900">In-Person</option>
+                  <option value="in_person" className="bg-white text-gray-900">In-Person</option>
                   <option value="remote" className="bg-white text-gray-900">Remote</option>
                 </select>
                 {errors.location_type && (
@@ -293,7 +317,7 @@ const CreateTask: React.FC = () => {
                 )}
               </div>
 
-              {formData.location_type === 'in-person' && (
+              {formData.location_type === 'in_person' && (
                 <div>
                   <label className="block text-sm font-medium text-gray-800 mb-2">
                     ZIP Code *
@@ -304,7 +328,7 @@ const CreateTask: React.FC = () => {
                     value={formData.zip_code}
                     onChange={handleInputChange}
                     maxLength={5}
-                    className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 ${
+                    className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-400 transition-all duration-300 ${
                       errors.zip_code ? 'border-red-400' : 'border-gray-300'
                     } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
                     placeholder="02138"
@@ -323,11 +347,11 @@ const CreateTask: React.FC = () => {
                 <input
                   type="number"
                   name="hourly_rate"
-                  value={formData.hourly_rate}
+                  value={formData.hourly_rate ?? ''}
                   onChange={handleInputChange}
                   min="0"
                   step="0.01"
-                  className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 ${
+                  className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-400 transition-all duration-300 ${
                     errors.hourly_rate ? 'border-red-400' : 'border-gray-300'
                   } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
                   placeholder="25.00"

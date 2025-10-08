@@ -61,6 +61,9 @@ function App() {
           <Route path="/auth/helper/verify-otp" element={<HelperVerifyOTP />} />
           <Route path="/auth/helper/verify-email" element={<HelperVerifyEmail />} />
           <Route path="/auth/helper/complete-profile" element={<HelperCompleteProfile />} />
+
+          {/* Task Routes */}
+          <Route path="/tasks/browse/:id" element={<SingleTask />} />
           
           {/* General Protected Routes (Any authenticated user) */}
           <Route path="/dashboard" element={
@@ -88,11 +91,7 @@ function App() {
               <BrowseTasks />
             </ProtectedRoute>
           } />
-          <Route path="/tasks/browse/:id" element={
-            <ProtectedRoute>
-              <SingleTask />
-            </ProtectedRoute>
-          } />
+          
           
           {/* Client-Only Routes */}
           <Route path="/tasks/create" element={

@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
+import Tooltip from '../../components/ui/Tooltip';
+import ApplicationsPreview from '../../components/tasks/ApplicationsPreview';
 import { taskApi, TaskResponse } from '../../lib/api/tasks';
+import { applicationApi, ApplicationResponse } from '../../lib/api/applications';
 import { subscriptionApi, SubscriptionStatus } from '../../lib/api/subscriptions';
 import { formatCurrency } from '../../lib/utils/format';
 
@@ -14,17 +17,19 @@ interface PostStats {
 const MyPosts: React.FC = () => {
   const navigate = useNavigate();
   const [posts, setPosts] = useState<TaskResponse[]>([]);
+  const [applications, setApplications] = useState<ApplicationResponse[]>([]);
   const [subscriptionStatus, setSubscriptionStatus] = useState<SubscriptionStatus | null>(null);
   const [loading, setLoading] = useState(true);
+  const [applicationsLoading, setApplicationsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [completingPost, setCompletingPost] = useState<string | null>(null);
   const [deletingPost, setDeletingPost] = useState<string | null>(null);
 
   useEffect(() => {
-    loadData();
+    loadPostsAndSubscription();
   }, []);
 
-  const loadData = async () => {
+  const loadPostsAndSubscription = async () => {
     try {
       setLoading(true);
       const [postsResponse, subscriptionResponse] = await Promise.all([
@@ -34,6 +39,9 @@ const MyPosts: React.FC = () => {
       
       setPosts(postsResponse.tasks);
       setSubscriptionStatus(subscriptionResponse);
+      
+      // Load applications after posts are loaded
+      loadApplications();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load data');
     } finally {
@@ -41,11 +49,24 @@ const MyPosts: React.FC = () => {
     }
   };
 
+  const loadApplications = async () => {
+    try {
+      setApplicationsLoading(true);
+      const applicationsResponse = await applicationApi.getApplicationsByClient(100, 0);
+      setApplications(applicationsResponse.applications);
+    } catch (err) {
+      console.error('Failed to load applications:', err);
+      // Don't set error state for applications - posts are more important
+    } finally {
+      setApplicationsLoading(false);
+    }
+  };
+
   const handleCompletePost = async (postId: string) => {
     try {
       setCompletingPost(postId);
       await taskApi.completeTask(postId);
-      await loadData(); // Reload to get updated data
+      await loadPostsAndSubscription(); // Reload to get updated data
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to complete post');
     } finally {
@@ -61,12 +82,27 @@ const MyPosts: React.FC = () => {
     try {
       setDeletingPost(postId);
       await taskApi.deleteTask(postId);
-      await loadData(); // Reload to get updated data
+      await loadPostsAndSubscription(); // Reload to get updated data
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete post');
     } finally {
       setDeletingPost(null);
     }
+  };
+
+  const handlePostAgain = (post: TaskResponse) => {
+    const params = new URLSearchParams();
+    
+    // Pre-fill all fields except dates
+    if (post.title) params.append('title', post.title);
+    if (post.description) params.append('description', post.description);
+    if (post.location_type) params.append('location_type', post.location_type);
+    if (post.zip_code) params.append('zip_code', post.zip_code);
+    if (post.tools_info) params.append('tools_info', post.tools_info);
+    if (post.public_transport_info) params.append('public_transport_info', post.public_transport_info);
+    if (post.hourly_rate) params.append('hourly_rate', post.hourly_rate.toString());
+    
+    navigate(`/tasks/create?${params.toString()}`);
   };
 
   const handlePostClick = (postId: string) => {
@@ -78,6 +114,10 @@ const MyPosts: React.FC = () => {
     const completed = posts.filter(post => post.completed_at).length;
     const active = total - completed;
     return { total, completed, active };
+  };
+
+  const getApplicationsForPost = (postId: string): ApplicationResponse[] => {
+    return applications.filter(app => app.application.task_id === postId);
   };
 
   const formatDate = (dateString: string) => {
@@ -303,7 +343,7 @@ const MyPosts: React.FC = () => {
                         </div>
                         <div>
                           <span className="text-gray-600">Location:</span>
-                          <span className="text-gray-900 ml-2 font-medium capitalize">{post.location_type}</span>
+                          <span className="text-gray-900 ml-2 font-medium capitalize">{post.location_type === 'in_person' ? 'In Person' : 'Remote'}</span>
                         </div>
                         <div className="sm:col-span-2 lg:col-span-1">
                           <span className="text-gray-600">Created:</span>
@@ -337,27 +377,49 @@ const MyPosts: React.FC = () => {
                           <p className="text-gray-700 text-sm mt-1">{post.public_transport_info}</p>
                         </div>
                       )}
+                      
+                      {/* Applications Preview */}
+                      <ApplicationsPreview 
+                        postId={post.id} 
+                        applications={applications}
+                        applicationsLoading={applicationsLoading}
+                        onViewAll={handlePostClick}
+                      />
                     </div>
                     
                     <div 
                       className="flex flex-row lg:flex-col gap-2 lg:ml-4"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      {!post.completed_at && (
+                      {post.completed_at ? (
+                        // Show "Post Again" button for completed posts
                         <button
-                          onClick={() => handleCompletePost(post.id)}
-                          disabled={completingPost === post.id}
-                          className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-green-500 disabled:to-emerald-500 text-white rounded-lg transition-all duration-200 flex items-center text-sm font-medium shadow-sm hover:shadow-md"
+                          onClick={() => handlePostAgain(post)}
+                          className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg transition-all duration-200 flex items-center text-sm font-medium shadow-sm hover:shadow-md"
                         >
-                          {completingPost === post.id ? (
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          ) : (
-                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                          )}
-                          Complete
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                          Post Again
                         </button>
+                      ) : (
+                        // Show "Complete" button for active posts
+                        <Tooltip content="Pressing this marks the job as complete and removes it from the Helper job board.">
+                          <button
+                            onClick={() => handleCompletePost(post.id)}
+                            disabled={completingPost === post.id}
+                            className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-green-500 disabled:to-emerald-500 text-white rounded-lg transition-all duration-200 flex items-center text-sm font-medium shadow-sm hover:shadow-md"
+                          >
+                            {completingPost === post.id ? (
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            ) : (
+                              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            )}
+                            Complete
+                          </button>
+                        </Tooltip>
                       )}
                       
                       <button
@@ -379,7 +441,7 @@ const MyPosts: React.FC = () => {
                         )}
                         Delete
                       </button>
-            </div>
+                    </div>
           </div>
                 </div>
               ))}

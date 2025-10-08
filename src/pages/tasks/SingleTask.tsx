@@ -209,6 +209,43 @@ const SingleTask: React.FC = () => {
     }
   };
 
+  const handleShare = async () => {
+    const url = window.location.href;
+    
+    if (navigator.share) {
+      // Use native share API if available (mobile)
+      try {
+        await navigator.share({
+          title: task?.title || 'Task Post',
+          text: `Check out this task: ${task?.title}`,
+          url: url,
+        });
+      } catch (err) {
+        // User cancelled or error occurred, fall back to clipboard
+        await copyToClipboard(url);
+      }
+    } else {
+      // Fall back to clipboard copy
+      await copyToClipboard(url);
+    }
+  };
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success('Link copied to clipboard!');
+    } catch (err) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      toast.success('Link copied to clipboard!');
+    }
+  };
+
   const handleMyApplicationChatAction = async () => {
     if (!task) return;
     
@@ -308,8 +345,20 @@ const SingleTask: React.FC = () => {
         {/* Header */}
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div className="min-w-0">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{task.title}</h1>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-3xl font-bold text-gray-900">{task.title}</h1>
+                <button
+                  onClick={handleShare}
+                  className="flex-shrink-0 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200 flex items-center gap-2"
+                  title="Share this task"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                  </svg>
+                  <span className="text-sm font-medium">Share Task</span>
+                </button>
+              </div>
               <div className="flex items-center gap-3">
                 <p className="text-gray-700">Task Details and Applications</p>
                 {task.client && (
@@ -731,7 +780,7 @@ const SingleTask: React.FC = () => {
                 </div>
                 <div>
                   <span className="text-gray-700 text-sm">Location Type</span>
-                  <p className="text-gray-900 capitalize">{task.location_type.replace('-', ' ')}</p>
+                  <p className="text-gray-900 capitalize">{task.location_type.replace('_', ' ')}</p>
                 </div>
                 {task.zip_code && (
                   <div>
