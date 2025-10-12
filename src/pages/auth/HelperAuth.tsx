@@ -108,7 +108,9 @@ const HelperAuth: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-display font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-300 bg-clip-text text-transparent drop-shadow-md mb-2">
-            HelperU
+            <a href="/">
+              HelperU
+            </a>
           </h1>
           <h2 className="text-2xl font-semibold text-gray-900 mb-2">Join or Sign in as a Helper</h2>
           <p className="text-gray-600">Enter your phone number to continue</p>
