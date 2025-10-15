@@ -883,6 +883,22 @@ const SingleTask: React.FC = () => {
               </div>
             )}
 
+            {/* Not Authenticated Blurb */}
+            {!isAuthenticated && (
+              <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">Apply for This Task</h2>
+                <p className="text-gray-700">
+                  To apply, you must be logged in.
+                </p>
+                <button
+                  onClick={() => navigate('/auth/helper')}
+                  className="mt-4 w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg transition-all duration-200"
+                >
+                  Sign in to Apply
+                </button>
+              </div>
+            )}
+
           </div>
         </div>
       </div>
