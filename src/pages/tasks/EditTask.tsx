@@ -14,7 +14,7 @@ const EditTask: React.FC = () => {
   const [formData, setFormData] = useState<TaskUpdate>({
     title: '',
     dates: [],
-    location_type: 'in-person',
+    location_type: 'in_person',
     zip_code: '',
     hourly_rate: 0,
     description: '',
@@ -92,8 +92,8 @@ const EditTask: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     
-    // Clear ZIP code when switching away from in-person
-    if (name === 'location_type' && value !== 'in-person') {
+    // Clear ZIP code when switching away from in_person
+    if (name === 'location_type' && value !== 'in_person') {
       setFormData(prev => ({ ...prev, [name]: value, zip_code: '' }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
@@ -162,9 +162,9 @@ const EditTask: React.FC = () => {
       newErrors.dates = 'At least one date is required';
     }
 
-    if (formData.location_type === 'in-person') {
+    if (formData.location_type === 'in_person') {
       if (!validateRequired(formData.zip_code || '')) {
-        newErrors.zip_code = 'ZIP code is required for in-person tasks';
+        newErrors.zip_code = 'ZIP code is required for in_person tasks';
       } else if (!validateZipCode(formData.zip_code || '')) {
         newErrors.zip_code = 'Please enter a valid ZIP code';
       }
@@ -188,7 +188,7 @@ const EditTask: React.FC = () => {
     // Clean up the data before sending
     const cleanedFormData = {
       ...formData,
-      zip_code: formData.location_type === 'in-person' && formData.zip_code ? formData.zip_code : undefined
+      zip_code: formData.location_type === 'in_person' && formData.zip_code ? formData.zip_code : undefined
     };
 
     setIsLoading(true);
@@ -325,13 +325,13 @@ const EditTask: React.FC = () => {
                 className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 transition-all duration-300 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                 disabled={isLoading}
               >
-                <option value="in-person">In-Person</option>
+                <option value="in_person">In-Person</option>
                 <option value="remote">Remote</option>
               </select>
             </div>
 
             {/* ZIP Code */}
-            {formData.location_type === 'in-person' && (
+            {formData.location_type === 'in_person' && (
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-2">
                   ZIP Code *
