@@ -10,7 +10,8 @@ interface AuthContextType {
   isAuthenticated: boolean;
   token: string | null;
   authRoute: 'client' | 'helper' | null;
-  login: (token: string, user: CurrentUser, authRoute: 'client' | 'helper', refreshToken?: string) => void;
+  login: (token: string, user: CurrentUser, authRoute: 'client' | 'helper' | null, refreshToken?: string) => void;
+  setAuthRoute: (authRoute: 'client' | 'helper') => void;
   logout: () => Promise<void>;
   updateProfileStatus: (status: ProfileStatusResponse) => void;
   refreshProfileStatus: () => Promise<void>;
@@ -84,19 +85,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initializeAuth();
   }, []);
 
-  const login = (accessToken: string, userData: CurrentUser, authRoute: 'client' | 'helper', refreshToken?: string) => {
+  const login = (accessToken: string, userData: CurrentUser, authRoute: 'client' | 'helper' | null, refreshToken?: string) => {
     setToken(accessToken);
     apiClient.setToken(accessToken);
     setUser(userData);
     setAuthRoute(authRoute);
     localStorage.setItem('access_token', accessToken);
-    localStorage.setItem('auth_route', authRoute);
+    localStorage.setItem('auth_route', authRoute || '');
     localStorage.setItem('user_data', JSON.stringify(userData));
     
     // Store refresh token if provided
     if (refreshToken) {
       localStorage.setItem('refresh_token', refreshToken);
     }
+  };
+
+  const setAuthRouteValue = (authRoute: 'client' | 'helper') => {
+    setAuthRoute(authRoute);
+    localStorage.setItem('auth_route', authRoute);
   };
 
   const logout = async () => {
@@ -138,6 +144,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     token,
     authRoute,
     login,
+    setAuthRoute: setAuthRouteValue,
     logout,
     updateProfileStatus,
     refreshProfileStatus,

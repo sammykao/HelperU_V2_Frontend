@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 const ClientVerifyOTP: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, setAuthRoute } = useAuth();
   const [, setOtp] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -46,15 +46,18 @@ const ClientVerifyOTP: React.FC = () => {
       const response = await authApi.clientVerifyOTP(request);
       
       if (response.success && response.access_token) {
-        login(response.access_token, { id: response.user_id || '' } as any, 'client', response.refresh_token);
+        login(response.access_token, { id: response.user_id || '' } as any, null, response.refresh_token);
         toast.success(isSignup ? 'Successfully verified!' : 'Successfully signed in!');
         
         // Check profile status to determine next step
         try {
           const isClientCompleted = await authApi.clientCheckCompletion();
           if (isClientCompleted.does_exist) {
+            // Profile already exists, set auth route immediately
+            setAuthRoute('client');
             navigate('/tasks/create');
           } else {
+            // Profile doesn't exist, go to profile completion
             navigate('/auth/client/complete-profile');
           }
         } catch (clientError) {

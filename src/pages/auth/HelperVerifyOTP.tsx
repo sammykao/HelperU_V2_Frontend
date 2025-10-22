@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 const HelperVerifyOTP: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, setAuthRoute } = useAuth();
   const [, setOtp] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -45,38 +45,34 @@ const HelperVerifyOTP: React.FC = () => {
       const response = await authApi.helperVerifyOTP(request);
       
       if (response.success && response.access_token) {
-        login(response.access_token, { id: response.user_id || '' } as any, 'helper', response.refresh_token);
+        login(response.access_token, { id: response.user_id || '' } as any, null, response.refresh_token);
         toast.success('Successfully signed in!');
         
-        // Check profile status to determine next step
+        // Check email verification status first
         try {
-          const profileStatus = await authApi.getProfileStatus();
-          // If email verified AND profile complete -> dashboard
-          if (!profileStatus.email_verified) {
-            // Check email verification status
-            try {
-              navigate('/auth/helper/verify-email', { 
-                state: { 
-                  user_id: response.user_id 
-                } 
-              });
-            } catch (emailError) {
-              navigate('/auth/helper/verify-email', { 
-                state: { 
-                  user_id: response.user_id 
-                }
-              });
-            }
+          const emailStatus = await authApi.checkHelperEmailVerification(response.user_id || '');
+          
+          if (!emailStatus.email_verified) {
+            // Email not verified, go to email verification
+            navigate('/auth/helper/verify-email', { 
+              state: { 
+                user_id: response.user_id 
+              } 
+            });
           } else {
+            // Email verified, check if profile is completed
             const isHelperCompleted = await authApi.checkHelperCompletion();
             if (isHelperCompleted) {
+              // Profile already exists, set auth route immediately
+              setAuthRoute('helper');
               navigate('/tasks/browse');
             } else {
-              navigate('/auth/helper/complete-profile');
+              // Profile doesn't exist, go to profile completion
+              navigate('/auth/helper/complete-profile');  
             }
           }
-        } catch (profileError) {
-          // If we can't check profile status, go to email verification
+        } catch (emailError) {
+          // If we can't check email status, go to email verification
           navigate('/auth/helper/verify-email', { 
             state: { 
               user_id: response.user_id 

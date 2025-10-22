@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 
 const ClientCompleteProfile: React.FC = () => {
   const navigate = useNavigate();
-  const { profileStatus, refreshProfileStatus } = useAuth();
+  const { profileStatus, refreshProfileStatus, setAuthRoute } = useAuth();
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -85,6 +85,7 @@ const ClientCompleteProfile: React.FC = () => {
 
       await authApi.clientCompleteProfile(request);
       toast.success('Profile completed successfully!');
+      setAuthRoute('client');
       await refreshProfileStatus();
       navigate('/tasks/create');
     } catch (err: any) {

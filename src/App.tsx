@@ -67,27 +67,27 @@ function App() {
           
           {/* General Protected Routes (Any authenticated user) */}
           <Route path="/dashboard" element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredRoles={['client', 'helper']}>
               <Dashboard />
             </ProtectedRoute>
           } />
           <Route path="/profile" element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredRoles={['client', 'helper']}>
               <Profile />
             </ProtectedRoute>
           } />
           <Route path="/ai-assistant" element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredRoles={['client', 'helper']}>
               <AIAssistantPage />
             </ProtectedRoute>
           } />
           <Route path="/chat" element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredRoles={['client', 'helper']}>
               <ChatPage />
             </ProtectedRoute>
           } />
           <Route path="/tasks/browse" element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredRoles={['client', 'helper']}>
               <BrowseTasks />
             </ProtectedRoute>
           } />

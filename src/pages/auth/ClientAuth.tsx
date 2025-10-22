@@ -8,16 +8,16 @@ import toast from 'react-hot-toast';
 
 const ClientAuth: React.FC = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, authRoute } = useAuth();
   const [phone, setPhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && authRoute) {
       navigate('/dashboard');
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, authRoute, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

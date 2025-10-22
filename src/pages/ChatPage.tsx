@@ -35,10 +35,24 @@ const ChatPage: React.FC = () => {
   const [sendingMessage, setSendingMessage] = useState(false);
   const [wsConnection, setWsConnection] = useState<ChatWebSocket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Message cache to avoid reloading messages when switching chats
   const [messageCache, setMessageCache] = useState<Record<string, MessageResponse[]>>({});
   const [chatCache, setChatCache] = useState<Record<string, ChatWithParticipantsResponse>>({});
+
+  // Filter chats based on search query
+  const filteredChats = chats.filter(chat => {
+    if (!searchQuery.trim()) return true;
+    const searchLower = searchQuery.toLowerCase();
+    const participantName = `${chat.participant.first_name} ${chat.participant.last_name}`.toLowerCase();
+    const college = chat.participant.college?.toLowerCase() || '';
+    const lastMessage = chat.last_message?.content.toLowerCase() || '';
+    
+    return participantName.includes(searchLower) || 
+           college.includes(searchLower) || 
+           lastMessage.includes(searchLower);
+  });
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -511,19 +525,45 @@ const ChatPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex h-[calc(100vh-200px)] bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
           {/* Chat List Sidebar */}
-          <div className="w-1/3 border-r border-gray-200 flex flex-col">
+          <div className="w-full md:w-1/3 border-r border-gray-200 flex flex-col">
             {/* Header */}
             <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-4">
                 <div>
                   <h1 className="text-xl font-bold text-gray-900">Messages</h1>
                   <p className="text-gray-700 text-sm mt-1">Your conversations</p>
                 </div>
               </div>
+              
+              {/* Search Input */}
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search conversations..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full px-4 py-2 pl-10 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  >
+                    <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Chat List */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto max-h-[calc(100vh-300px)]">
               {loading ? (
                 <div className="flex items-center justify-center h-full">
                   <div className="text-center">
@@ -541,9 +581,19 @@ const ChatPage: React.FC = () => {
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No conversations yet</h3>
                   <p className="text-gray-600 text-sm">Start chatting with helpers or clients</p>
                 </div>
+              ) : filteredChats.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-center p-6">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No conversations found</h3>
+                  <p className="text-gray-600 text-sm">Try adjusting your search terms</p>
+                </div>
               ) : (
                 <div className="space-y-1">
-                  {chats.map((chat) => (
+                  {filteredChats.map((chat) => (
                     <button
                       key={chat.id}
                       onClick={() => selectChat(chat.id)}
@@ -608,7 +658,7 @@ const ChatPage: React.FC = () => {
           </div>
 
           {/* Chat Interface */}
-          <div className="flex-1 flex flex-col">
+          <div className="hidden md:flex flex-1 flex flex-col">
             {selectedChat ? (
               <>
                 {/* Chat Header */}
@@ -749,6 +799,105 @@ const ChatPage: React.FC = () => {
             )}
           </div>
         </div>
+
+        {/* Mobile Chat View */}
+        {selectedChat && (
+          <div className="md:hidden fixed inset-0 bg-white z-50">
+            {/* Mobile Chat Header */}
+            <div className="p-4 border-b border-gray-200 bg-white">
+              <div className="flex items-center justify-between">
+                <button
+                  onClick={() => setSelectedChat(null)}
+                  className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <div className="flex items-center space-x-3">
+                  {(() => {
+                    const otherParticipant = selectedChat.participants.find(p => p.id !== user?.id);
+                    if (!otherParticipant) return null;
+                    
+                    return (
+                      <>
+                        {otherParticipant.pfp_url ? (
+                          <img
+                            src={otherParticipant.pfp_url}
+                            alt={`${otherParticipant.first_name} ${otherParticipant.last_name}`}
+                            className="w-8 h-8 rounded-full object-cover border-2 border-gray-200"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                            {otherParticipant.first_name?.[0] || 'U'}{otherParticipant.last_name?.[0] || 'U'}
+                          </div>
+                        )}
+                        <div>
+                          <h2 className="text-lg font-semibold text-gray-900">
+                            {otherParticipant.first_name || 'Unknown'} {otherParticipant.last_name || 'User'}
+                          </h2>
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
+                <div className="w-10"></div> {/* Spacer for centering */}
+              </div>
+            </div>
+
+            {/* Mobile Messages */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 h-[calc(100vh-140px)]">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`max-w-xs px-4 py-2 rounded-2xl ${
+                      message.sender_id === user?.id
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white'
+                        : 'bg-gray-100 text-gray-900 border border-gray-200'
+                    }`}
+                  >
+                    <p className="text-sm">{message.content}</p>
+                    <p className={`text-xs mt-1 ${
+                      message.sender_id === user?.id ? 'text-blue-100' : 'text-gray-500'
+                    }`}>
+                      {formatTime(message.created_at)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Mobile Message Input */}
+            <div className="p-4 border-t border-gray-200 bg-white">
+              <form onSubmit={sendMessage} className="flex space-x-2">
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder="Type a message..."
+                  className="flex-1 px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  type="submit"
+                  disabled={!newMessage.trim() || sendingMessage}
+                  className="px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-medium rounded-xl transition-all duration-200 flex items-center"
+                >
+                  {sendingMessage ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  ) : (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                  )}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

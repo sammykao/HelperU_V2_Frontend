@@ -304,7 +304,15 @@ const MyPosts: React.FC = () => {
                 </svg>
               </div>
               <div>
-                <div className="text-xl sm:text-2xl font-bold text-gray-900">{applicationsLoading ? '...' : getTotalApplications()}</div>
+                <div className="text-xl sm:text-2xl font-bold text-gray-900">
+                  {applicationsLoading ? (
+                    <div className="flex items-center">
+                      <div className="animate-pulse bg-purple-300 rounded h-8 w-16"></div>
+                    </div>
+                  ) : (
+                    getTotalApplications()
+                  )}
+                </div>
                 <div className="text-sm text-gray-700">Total Applications</div>
               </div>
             </div>

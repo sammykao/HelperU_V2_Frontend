@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 
 const HelperAuth: React.FC = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, authRoute } = useAuth();
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState(''); // Email state for new accounts
   const [showEmailInput, setShowEmailInput] = useState(false);
@@ -16,10 +16,10 @@ const HelperAuth: React.FC = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && authRoute) {
       navigate('/dashboard');
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, authRoute, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

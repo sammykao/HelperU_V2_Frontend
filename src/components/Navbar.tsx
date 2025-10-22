@@ -7,6 +7,9 @@ const Navbar: React.FC = () => {
   const { isAuthenticated, logout, authRoute } = useAuth();
   const navigate = useNavigate();
 
+  // Only show logged-in state if both authenticated AND authRoute is set
+  const isFullyLoggedIn = isAuthenticated && authRoute;
+
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
@@ -26,7 +29,7 @@ const Navbar: React.FC = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <Link to={isAuthenticated ? "/dashboard" : "/"}>
+            <Link to={isFullyLoggedIn ? "/dashboard" : "/"}>
               <h1 className="text-2xl font-display font-extrabold bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-300 bg-clip-text text-transparent drop-shadow-md">
                 HelperU
               </h1>
@@ -36,7 +39,7 @@ const Navbar: React.FC = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-8">
-              {isAuthenticated ? (
+              {isFullyLoggedIn ? (
                 <>
                   {authRoute === 'client' ? (
                     // Client navbar
@@ -83,7 +86,7 @@ const Navbar: React.FC = () => {
           {/* Auth Buttons */}
           <div className="hidden md:block">
             <div className="ml-4 flex items-center space-x-4">
-              {isAuthenticated ? (
+              {isFullyLoggedIn ? (
                 <div className="flex items-center space-x-3">
                   <Link 
                     to="/profile" 
@@ -141,7 +144,7 @@ const Navbar: React.FC = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white/5 backdrop-blur-lg border-t border-white/10">
-            {isAuthenticated ? (
+            {isFullyLoggedIn ? (
               <>
                 {authRoute === 'client' ? (
                   // Client mobile navbar
@@ -216,7 +219,7 @@ const Navbar: React.FC = () => {
             )}
             <div className="pt-4 pb-3 border-t border-white/10">
               <div className="flex items-center px-3 space-x-3">
-                {isAuthenticated ? (
+                {isFullyLoggedIn ? (
                   <div className="flex items-center space-x-3 w-full">
                     <Link 
                       to="/profile" 

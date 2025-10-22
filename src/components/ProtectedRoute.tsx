@@ -5,6 +5,7 @@ import { useAuth } from '../lib/contexts/AuthContext';
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredRole?: 'client' | 'helper';
+  requiredRoles?: ('client' | 'helper')[];
 }
 
 const LoadingSpinner: React.FC = () => {
@@ -18,7 +19,7 @@ const LoadingSpinner: React.FC = () => {
   );
 };
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole, requiredRoles }) => {
   const { isAuthenticated, isLoading, authRoute } = useAuth();
 
   // Show loading spinner while checking authentication
@@ -31,10 +32,22 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole 
     return <Navigate to="/auth/client" replace />;
   }
 
+  // Determine which roles are required
+  const rolesToCheck = requiredRoles || (requiredRole ? [requiredRole] : []);
+
   // Check role-based access if required
-  if (requiredRole && authRoute !== requiredRole) {
-    // Redirect to dashboard if user has wrong role
-    return <Navigate to="/dashboard" replace />;
+  if (rolesToCheck.length > 0) {
+    // If no authRoute is set (null), redirect to appropriate auth page
+    if (!authRoute) {
+      // Default to client auth if no specific role is determined
+      return <Navigate to="/auth/client" replace />;
+    }
+    
+    // Check if user has the required role
+    if (!rolesToCheck.includes(authRoute)) {
+      // Redirect to dashboard if user has wrong role
+      return <Navigate to="/auth/client" replace />;
+    }
   }
 
   // User is authenticated and has correct role (if required)

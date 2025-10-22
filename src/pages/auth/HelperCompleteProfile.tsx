@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 
 const HelperCompleteProfile: React.FC = () => {
   const navigate = useNavigate();
-  const { profileStatus, refreshProfileStatus } = useAuth();
+  const { profileStatus, refreshProfileStatus, setAuthRoute } = useAuth();
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -108,6 +108,7 @@ const HelperCompleteProfile: React.FC = () => {
 
       await authApi.helperCompleteProfile(request);
       toast.success('Profile completed successfully!');
+      setAuthRoute('helper');
       await refreshProfileStatus();
       navigate('/tasks/browse');
     } catch (err: any) {
