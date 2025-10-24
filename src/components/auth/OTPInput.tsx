@@ -232,7 +232,6 @@ export const OTPInput: React.FC<OTPInputProps> = ({
             autoComplete="one-time-code"
             value={digit}
             onChange={(e) => handleChange(index, e.target.value)}
-            onInput={(e) => handleInput(index, e)}
             onKeyDown={(e) => handleKeyDown(index, e)}
             onKeyPress={handleKeyPress}
             onPaste={handlePaste}
