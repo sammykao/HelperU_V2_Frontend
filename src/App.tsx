@@ -87,7 +87,7 @@ function App() {
             </ProtectedRoute>
           } />
           <Route path="/tasks/browse" element={
-            <ProtectedRoute requiredRoles={['client', 'helper']}>
+            <ProtectedRoute requiredRole="helper">
               <BrowseTasks />
             </ProtectedRoute>
           } />

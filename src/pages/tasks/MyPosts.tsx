@@ -64,6 +64,9 @@ const MyPosts: React.FC = () => {
 
   const handleCompletePost = async (postId: string) => {
     try {
+      if (!window.confirm('Are you sure you want to mark this job as done? This action cannot be undone and will remove it from the Helper job board.')) {
+        return;
+      }
       setCompletingPost(postId);
       await taskApi.completeTask(postId);
       await loadPostsAndSubscription(); // Reload to get updated data
@@ -443,7 +446,7 @@ const MyPosts: React.FC = () => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                               </svg>
                             )}
-                            Complete
+                            Job Done?
                           </button>
                         </Tooltip>
                       )}

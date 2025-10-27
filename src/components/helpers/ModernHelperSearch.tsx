@@ -49,6 +49,14 @@ const ModernHelperSearch: React.FC<ModernHelperSearchProps> = ({ onBack }) => {
     loadUserTasks();
   }, [isAuthenticated, authRoute, navigate]);
 
+  // Auto-search on component mount
+  useEffect(() => {
+    if (isAuthenticated && authRoute === 'client' && !hasSearched) {
+      searchHelpers();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, authRoute]);
+
   const loadUserTasks = async () => {
     try {
       const response = await taskApi.getMyTasks(100, 0);
@@ -71,11 +79,6 @@ const ModernHelperSearch: React.FC<ModernHelperSearchProps> = ({ onBack }) => {
   };
 
   const searchHelpers = async () => {
-    if (!searchQuery.trim() && !collegeFilter && !graduationYearFilter && !zipCodeFilter) {
-      toast.error('Please enter a search query or apply filters');
-      return;
-    }
-
     try {
       setLoading(true);
       setError(null);
@@ -399,7 +402,7 @@ const ModernHelperSearch: React.FC<ModernHelperSearchProps> = ({ onBack }) => {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">Invite {selectedHelper.first_name} {selectedHelper.last_name}</h2>
-                <p className="text-gray-700 text-sm">Select which tasks to invite this helper to</p>
+                <p className="text-gray-900 text-md">This helper will be notified by text message when you invite them to a task.</p>
               </div>
               <button
                 onClick={() => {

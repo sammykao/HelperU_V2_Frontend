@@ -38,6 +38,7 @@ export interface TaskSearchRequest {
   search_limit?: number;
   search_offset?: number;
   sort_by: 'distance' | 'post_date';
+  distance_radius?: number;
 }
 
 export interface ClientInfo {
@@ -128,6 +129,9 @@ export const taskApi = {
     }
     if (searchRequest.sort_by) {
       params.append('sort_by', searchRequest.sort_by);
+    }
+    if (searchRequest.distance_radius !== undefined && searchRequest.distance_radius !== null) {
+      params.append('distance_radius', searchRequest.distance_radius.toString());
     }
     
     return apiClient.get(`/tasks/?${params.toString()}`);

@@ -199,9 +199,9 @@ const CreateTask: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await taskApi.createTask(cleanedFormData);
+      const resp = await taskApi.createTask(cleanedFormData);
       toast.success('Task created successfully!');
-      navigate('/tasks/my-posts');
+      navigate('/helpers/search?task_id=' + resp.id);
     } catch (err: any) {
       // Check if the error is due to post limit reached
       if (err.message && err.message.includes('post limit')) {

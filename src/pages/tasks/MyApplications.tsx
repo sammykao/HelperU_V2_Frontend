@@ -217,7 +217,7 @@ const InfoBlurb: React.FC<{ type: 'applications' | 'invitations' }> = ({ type })
           <div className="bg-white/10 backdrop-blur-sm border border-gray-200 rounded-2xl p-4">
             <p className="text-gray-800 leading-relaxed">
               <span className="font-semibold text-blue-700">Important:</span> Clients don't accept applications directly. 
-              Instead, they will reach out to you if they're interested, or you can proactively reach out to them through chat. 
+              Instead, they will reach out to you if they're interested, or you can proactively reach out to them through their listed phone number. 
               This creates a more personal connection and allows for better communication about the opportunity.
             </p>
           </div>

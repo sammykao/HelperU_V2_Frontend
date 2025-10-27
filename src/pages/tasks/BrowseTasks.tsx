@@ -4,6 +4,7 @@ import Navbar from '../../components/Navbar';
 import { taskApi, TaskSearchResponse, TaskSearchRequest } from '../../lib/api/tasks';
 import { formatCurrency, formatDate, formatDistance } from '../../lib/utils/format';
 import { profileApi } from '../../lib/api/profile';
+import { applicationApi, ApplicationInfo } from '../../lib/api/applications';
 import { useAuth } from '../../lib/contexts/AuthContext';
 import toast from 'react-hot-toast';
 
@@ -11,6 +12,8 @@ const BrowseTasks: React.FC = () => {
   const { authRoute } = useAuth();
   const navigate = useNavigate();
   const [tasks, setTasks] = useState<TaskSearchResponse[]>([]);
+  const [filteredTasks, setFilteredTasks] = useState<TaskSearchResponse[]>([]);
+  const [applications, setApplications] = useState<ApplicationInfo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchParams, setSearchParams] = useState<TaskSearchRequest>({
     search_zip_code: '', // Will be set from user profile
@@ -22,11 +25,27 @@ const BrowseTasks: React.FC = () => {
   const [hasSearched, setHasSearched] = useState(false);
   const [sortBy, setSortBy] = useState<'distance' | 'post_date'>('post_date');
   const [showFilters, setShowFilters] = useState(false);
+  const [distanceRadius, setDistanceRadius] = useState<number | undefined>(100);
+
+  // Load applications for helper
+  const loadApplications = async () => {
+    if (authRoute !== 'helper') return;
+    
+    try {
+      const response = await applicationApi.getApplicationsByHelper();
+      setApplications(response.applications.map(app => app.application));
+    } catch (error) {
+      console.error('Failed to load applications:', error);
+    }
+  };
 
   // Fetch user profile and set zip code on mount, then automatically load tasks
   useEffect(() => {
     const initializeZipCodeAndLoadTasks = async () => {
       if (authRoute === 'helper') {
+        // Load applications first
+        await loadApplications();
+        
         try {
           const profileResponse = await profileApi.getProfile();
           if (profileResponse.profile?.helper?.zip_code) {
@@ -44,6 +63,7 @@ const BrowseTasks: React.FC = () => {
                 search_limit: 20,
                 search_offset: 0,
                 sort_by: 'post_date',
+                distance_radius: distanceRadius,
               });
               
               setTasks(response.tasks);
@@ -68,10 +88,30 @@ const BrowseTasks: React.FC = () => {
     initializeZipCodeAndLoadTasks();
   }, [authRoute]);
 
+  // Filter tasks to remove those already applied to (for helpers)
+  useEffect(() => {
+    if (authRoute === 'helper' && applications.length > 0) {
+      const appliedTaskIds = new Set(applications.map(app => app.task_id));
+      const filtered = tasks.filter(task => !appliedTaskIds.has(task.id));
+      setFilteredTasks(filtered);
+    } else {
+      setFilteredTasks(tasks);
+    }
+  }, [tasks, applications, authRoute]);
+
   const fetchTasks = async () => {
     setIsLoading(true);
+    
+    // Reload applications for helpers
+    if (authRoute === 'helper') {
+      await loadApplications();
+    }
+    
     try {
-      const response = await taskApi.getTasks(searchParams);
+      const response = await taskApi.getTasks({
+        ...searchParams,
+        distance_radius: distanceRadius,
+      });
       
       if ((searchParams.search_offset || 0) === 0) {
         // First page or new search - replace tasks
@@ -131,6 +171,7 @@ const BrowseTasks: React.FC = () => {
     searchParams.search_offset,
     searchParams.search_limit,
     searchParams.search_zip_code,
+    distanceRadius,
     hasSearched
   ]);
 
@@ -209,7 +250,7 @@ const BrowseTasks: React.FC = () => {
             </div>
           </div>
           <form onSubmit={handleSearch} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-2">
                   Search
@@ -299,6 +340,27 @@ const BrowseTasks: React.FC = () => {
                   placeholder="100"
                 />
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-800 mb-2">
+                  Distance (miles)
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="500"
+                  step="1"
+                  value={distanceRadius || ''}
+                  onChange={(e) => {
+                    const value = e.target.value ? parseInt(e.target.value) : undefined;
+                    if (value !== undefined && value < 1) return;
+                    if (value !== undefined && value > 500) return;
+                    setDistanceRadius(value);
+                  }}
+                  className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                  placeholder="100"
+                />
+              </div>
             </div>
 
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
@@ -332,7 +394,7 @@ const BrowseTasks: React.FC = () => {
         {hasSearched && (
           <div className="mb-4">
             <p className="text-sm sm:text-base text-gray-700">
-              {totalCount} opportunit{totalCount !== 1 ? 'ies' : 'y'} found
+              {filteredTasks.length} opportunit{filteredTasks.length !== 1 ? 'ies' : 'y'} found
             </p>
           </div>
         )}
@@ -376,7 +438,7 @@ const BrowseTasks: React.FC = () => {
               </div>
             ))}
           </div>
-        ) : tasks.length === 0 ? (
+        ) : filteredTasks.length === 0 ? (
           <div className="text-center py-12">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -388,7 +450,7 @@ const BrowseTasks: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {tasks.map((task) => (
+            {filteredTasks.map((task) => (
               <Link
                 key={task.id}
                 to={`/tasks/browse/${task.id}`}
