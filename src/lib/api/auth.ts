@@ -72,6 +72,7 @@ export interface ProfileStatusResponse {
   email_verified: boolean;
   phone_verified: boolean;
   user_type: string;
+  profile_type: string;
 }
 
 export interface LogoutResponse {

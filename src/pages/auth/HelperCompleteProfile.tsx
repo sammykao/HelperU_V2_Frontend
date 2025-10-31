@@ -25,7 +25,7 @@ const HelperCompleteProfile: React.FC = () => {
 
   useEffect(() => {
     // Check if profile is already complete
-    if (profileStatus?.profile_completed) {
+    if (profileStatus?.profile_completed && (profileStatus?.profile_type === 'helper' || profileStatus?.profile_type === 'both')) {
       navigate('/tasks/browse');
     }
   }, [profileStatus, navigate]);
