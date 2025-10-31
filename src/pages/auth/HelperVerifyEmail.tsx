@@ -136,8 +136,13 @@ const HelperVerifyEmail: React.FC = () => {
               'Please enter your .edu email address to receive a verification code'
             ) : (
               <>
+                {/* Mention to check spam folder if they don't receive the code */}
                 Enter the 6-digit code sent to<br />
                 <span className="text-blue-400 font-medium">{email}</span>
+                <br />
+                <span className="text-gray-300">
+                  Check your spam folder if you don't receive the code, it may have been sent to spam or promotions.
+                </span>
               </>
             )}
           </p>
