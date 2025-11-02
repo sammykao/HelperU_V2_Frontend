@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Navbar from '../../components/Navbar';
 import { applicationApi, ApplicationResponse, InvitationResponse } from '../../lib/api/applications';
 import { taskApi, TaskResponse } from '../../lib/api/tasks';
-import { chatApi } from '../../lib/api/chat';
 import { useAuth } from '../../lib/contexts/AuthContext';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
@@ -24,8 +23,6 @@ const TabButton: React.FC<{ active: boolean; onClick: () => void; children: Reac
 
 const TaskCard: React.FC<{ task: TaskResponse; subtitle?: string; type: 'application' | 'invitation' }> = ({ task, subtitle, type }) => {
   const navigate = useNavigate();
-  const [isCreatingChat, setIsCreatingChat] = useState(false);
-  const [chatExists, setChatExists] = useState<boolean | null>(null);
   
   const getCardGradient = () => {
     if (type === 'application') {
@@ -56,45 +53,7 @@ const TaskCard: React.FC<{ task: TaskResponse; subtitle?: string; type: 'applica
     );
   };
 
-  // Check if chat exists with the client
-  useEffect(() => {
-    const checkChatExists = async () => {
-      try {
-        const response = await chatApi.getChatWithParticipant(task.client_id);
-        setChatExists(response.chat_id !== null);
-      } catch (error) {
-        console.error('Failed to check chat existence:', error);
-        setChatExists(false);
-      }
-    };
 
-    if (type === 'application') {
-      checkChatExists();
-    }
-  }, [task.client_id, type]);
-
-  const handleChatAction = async () => {
-    if (chatExists) {
-      // Navigate to existing chat
-      navigate('/chat');
-      toast.success('Opening chat with client');
-    } else {
-      // Create new chat
-      try {
-        setIsCreatingChat(true);
-        await chatApi.createChat({
-          participant_id: task.client_id
-        });
-        navigate('/chat');
-        toast.success('Chat created with client!');
-      } catch (error) {
-        console.error('Failed to create chat:', error);
-        toast.error('Failed to create chat. Please try again.');
-      } finally {
-        setIsCreatingChat(false);
-      }
-    }
-  };
 
   return (
     <div className="group relative overflow-hidden bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm hover:shadow-md transition-all duration-300">
@@ -162,31 +121,7 @@ const TaskCard: React.FC<{ task: TaskResponse; subtitle?: string; type: 'applica
               <span className="sm:hidden">View</span>
             </button>
             
-            {type === 'application' && (
-              <button
-                onClick={handleChatAction}
-                disabled={isCreatingChat || chatExists === null}
-                className="px-3 py-2 sm:px-4 sm:py-2 bg-blue-100 hover:bg-blue-200 disabled:bg-gray-100 text-blue-700 hover:text-blue-800 disabled:text-gray-500 font-medium rounded-lg transition-all duration-200 flex items-center justify-center text-xs sm:text-sm disabled:cursor-not-allowed"
-              >
-                <div className="flex items-center">
-                  {isCreatingChat ? (
-                    <>
-                      <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-blue-600 mr-1 sm:mr-2"></div>
-                      <span className="hidden sm:inline">Creating...</span>
-                      <span className="sm:hidden">...</span>
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                      </svg>
-                      <span className="hidden sm:inline">{chatExists ? 'Open Chat' : 'Start Chat'}</span>
-                      <span className="sm:hidden">{chatExists ? 'Open' : 'Chat'}</span>
-                    </>
-                  )}
-                </div>
-              </button>
-            )}
+            
           </div>
         </div>
       </div>

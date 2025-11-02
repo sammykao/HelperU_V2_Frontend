@@ -4,7 +4,6 @@ import { helperApi, HelperResponse, HelperSearchRequest } from '../../lib/api/he
 import { applicationApi, InvitationResponse } from '../../lib/api/applications';
 import { taskApi, TaskResponse } from '../../lib/api/tasks';
 import { useAuth } from '../../lib/contexts/AuthContext';
-import CreateChatButton from '../chat/CreateChatButton';
 import CollegeInput from '../ui/CollegeInput';
 import toast from 'react-hot-toast';
 import collegesData from '../../data/colleges.json';
@@ -462,11 +461,9 @@ const ModernHelperSearch: React.FC<ModernHelperSearchProps> = ({ onBack }) => {
                           </button>
                         )}
                         {isInvited && (
-                          <CreateChatButton 
-                            helperId={selectedHelper.id}
-                            helperName={`${selectedHelper.first_name} ${selectedHelper.last_name}`}
-                            size="sm"
-                          />
+                          <span className="px-3 py-1.5 text-xs bg-green-100 text-green-700 font-medium rounded-lg border border-green-200">
+                            Invited
+                          </span>
                         )}
                       </div>
                     </div>

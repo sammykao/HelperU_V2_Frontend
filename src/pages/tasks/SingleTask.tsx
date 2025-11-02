@@ -4,8 +4,7 @@ import Navbar from '../../components/Navbar';
 import { taskApi, TaskResponse } from '../../lib/api/tasks';
 import { applicationApi, ApplicationResponse, InvitationResponse, ApplicationCreateData } from '../../lib/api/applications';
 import { useAuth } from '../../lib/contexts/AuthContext';
-import CreateChatButton from '../../components/chat/CreateChatButton';
-import { chatApi } from '../../lib/api/chat';
+import ShowContactDetails from '../../components/helpers/ShowContactDetails';
 import { formatCurrency } from '../../lib/utils/format';
 import toast from 'react-hot-toast';
 
@@ -504,7 +503,7 @@ const SingleTask: React.FC = () => {
                       {applicants.map(({ application, helper }, index) => (
                         <div 
                           key={application.id} 
-                          className="group relative overflow-hidden bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-md transition-all duration-300"
+                          className="group relative overflow-hidden bg-gray-50 border border-gray-200 rounded-2xl p-6 hover:shadow-md transition-all duration-300 shadow-sm"
                           style={{ animationDelay: `${index * 100}ms` }}
                         >
                           <div className="relative z-10">
@@ -558,20 +557,10 @@ const SingleTask: React.FC = () => {
                                     <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-gray-300 border-t-blue-600"></div>
                                     <span className="text-gray-600 text-xs sm:text-sm">Checking...</span>
                                   </div>
-                                ) : helperChatMap[helper.id] ? (
-                                  <button
-                                    onClick={() => navigate('/chat')}
-                                    className="inline-flex items-center px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium rounded-xl shadow-lg transition-all duration-300 w-full sm:w-auto justify-center text-xs sm:text-sm"
-                                  >
-                                    <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                                    </svg>
-                                    <span className="hidden sm:inline">Open Chat</span>
-                                    <span className="sm:hidden">Chat</span>
-                                  </button>
                                 ) : (
-                                  <CreateChatButton 
-                                    helperId={helper.id}
+                                  <ShowContactDetails 
+                                    phone={helper.phone}
+                                    email={helper.email}
                                     helperName={`${helper.first_name} ${helper.last_name}`}
                                     size="lg"
                                     className="w-full sm:w-auto"
@@ -583,6 +572,20 @@ const SingleTask: React.FC = () => {
                         </div>
                     ))}
                     </div>
+                )}
+
+                {/* Info message about reaching out */}
+                {(!applicantsLoading && applicants && applicants.length > 0) && (
+                  <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                    <div className="flex items-start space-x-3">
+                      <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <p className="text-sm text-blue-800">
+                        <span className="font-semibold">Tip:</span> Reach out to students directly using their contact details above to discuss the task and arrange details.
+                      </p>
+                    </div>
+                  </div>
                 )}
                 </div>
               </div>
@@ -644,7 +647,7 @@ const SingleTask: React.FC = () => {
                       {invitations.map((invitation, index) => (
                         <div 
                           key={invitation.id} 
-                          className="group relative overflow-hidden bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-md transition-all duration-300"
+                          className="group relative overflow-hidden bg-gray-50 border border-gray-200 rounded-2xl p-6 hover:shadow-md transition-all duration-300 shadow-sm"
                           style={{ animationDelay: `${index * 100}ms` }}
                         >
                           <div className="relative z-10">
@@ -720,25 +723,7 @@ const SingleTask: React.FC = () => {
                                         <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-gray-300 border-t-purple-600"></div>
                                         <span className="text-gray-600 text-xs sm:text-sm">Checking...</span>
                                       </div>
-                                    ) : invitedHelperChatMap[invitation.helpers.id] ? (
-                                      <button
-                                        onClick={() => navigate('/chat')}
-                                        className="inline-flex items-center px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium rounded-xl shadow-lg transition-all duration-300 w-full sm:w-auto justify-center text-xs sm:text-sm"
-                                      >
-                                        <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                                        </svg>
-                                        <span className="hidden sm:inline">Open Chat</span>
-                                        <span className="sm:hidden">Chat</span>
-                                      </button>
-                                    ) : (
-                                      <CreateChatButton 
-                                        helperId={invitation.helpers.id}
-                                        helperName={`${invitation.helpers.first_name} ${invitation.helpers.last_name}`}
-                                        size="lg"
-                                        className="w-full sm:w-auto"
-                                      />
-                                    )}
+                                    ) : null}
                                   </>
                                 )}
                               </div>

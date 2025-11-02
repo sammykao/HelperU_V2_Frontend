@@ -5,7 +5,6 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { HomePage } from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
 import AIAssistantPage from './pages/AIAssistantPage';
-import ChatPage from './pages/ChatPage';
 import FAQPage from './pages/FAQPage';
 import ContactPage from './pages/ContactPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
@@ -79,11 +78,6 @@ function App() {
           <Route path="/ai-assistant" element={
             <ProtectedRoute requiredRoles={['client', 'helper']}>
               <AIAssistantPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/chat" element={
-            <ProtectedRoute requiredRoles={['client', 'helper']}>
-              <ChatPage />
             </ProtectedRoute>
           } />
           <Route path="/tasks/browse" element={

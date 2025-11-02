@@ -50,8 +50,8 @@ const Navbar: React.FC = () => {
                       <Link to="/tasks/create" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                         Create Post
                       </Link>
-                      <Link to="/chat" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                        My Chats
+                      <Link to="/helpers/search" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                        Search Helpers
                       </Link>
                     </>
                   ) : (
@@ -59,9 +59,6 @@ const Navbar: React.FC = () => {
                     <>
                       <Link to="/tasks/browse" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                         Browse Posts
-                      </Link>
-                      <Link to="/chat" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                        Chats
                       </Link>
                       <Link to="/applications" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                         Applications
@@ -164,11 +161,11 @@ const Navbar: React.FC = () => {
                       Create Post
                     </Link>
                     <Link 
-                      to="/chats" 
+                      to="/helpers/search" 
                       onClick={closeMobileMenu}
                       className="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium transition-colors"
                     >
-                      My Chats
+                      Search Helpers
                     </Link>
                   </>
                 ) : (
@@ -180,13 +177,6 @@ const Navbar: React.FC = () => {
                       className="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium transition-colors"
                     >
                       Browse Posts
-                    </Link>
-                    <Link 
-                      to="/chats" 
-                      onClick={closeMobileMenu}
-                      className="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium transition-colors"
-                    >
-                      Chats
                     </Link>
                     <Link 
                       to="/applications" 
