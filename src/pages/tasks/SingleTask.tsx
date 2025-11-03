@@ -779,26 +779,7 @@ const SingleTask: React.FC = () => {
                 </div>
               </div>
             </div>
-
-            {/* Payment Disclaimer */}
-            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
-              <div className="flex items-start space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Payment Information</h3>
-                  <p className="text-gray-800 text-sm leading-relaxed">
-                    <span className="font-semibold text-amber-700">Important:</span> Clients and helpers manage all payment transactions directly between themselves. 
-                    HelperU does not process, handle, or manage any payment transactions. 
-                    Please discuss payment methods and schedules directly with your client/helper.
-                  </p>
-                </div>
-              </div>
-            </div>
-
+            
             {/* Helper Application/Apply Card */}
             {authRoute === 'helper' && !task.completed_at && myApplication && (
               <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
@@ -875,6 +856,26 @@ const SingleTask: React.FC = () => {
                 </button>
               </div>
             )}
+            
+            {/* Payment Disclaimer */}
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
+              <div className="flex items-start space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Payment Information</h3>
+                  <p className="text-gray-800 text-sm leading-relaxed">
+                    <span className="font-semibold text-amber-700">Important:</span> Clients and helpers manage all payment transactions directly between themselves. 
+                    HelperU does not process, handle, or manage any payment transactions. 
+                    Please discuss payment methods and schedules directly with your client/helper.
+                  </p>
+                </div>
+              </div>
+            </div>
+
 
           </div>
         </div>
