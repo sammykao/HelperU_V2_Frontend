@@ -815,26 +815,18 @@ const SingleTask: React.FC = () => {
                 </div>
                 <div className="mt-4 text-sm text-gray-700 mb-4">You have already applied to this task.</div>
                 
-                {/* Chat Button */}
-                <div className="mt-4">
-                  {myApplicationChatLoading ? (
-                    <div className="flex items-center justify-center px-4 py-3 bg-gray-50 rounded-xl border border-gray-200">
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-blue-600 mr-2"></div>
-                      <span className="text-gray-600 text-sm">Checking chat...</span>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={handleMyApplicationChatAction}
-                      className="w-full px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium rounded-xl transition-all duration-300 flex items-center justify-center text-sm sm:text-base"
-                    >
-                      <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                      </svg>
-                      <span className="hidden sm:inline">{myApplicationChatExists ? 'Open Chat with Client' : 'Start Chat with Client'}</span>
-                      <span className="sm:hidden">{myApplicationChatExists ? 'Open Chat' : 'Start Chat'}</span>
-                    </button>
-                  )}
-                </div>
+                {/* Client Contact Details Button */}
+                {task.client?.phone && task.client?.email && (
+                  <div className="mt-4">
+                    <ShowContactDetails 
+                      phone={task.client.phone}
+                      email={task.client.email}
+                      helperName={`${task.client.first_name} ${task.client.last_name}`}
+                      size="lg"
+                      className="w-full"
+                    />
+                  </div>
+                )}
               </div>
             )}
 
