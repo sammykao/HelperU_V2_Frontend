@@ -24,12 +24,6 @@ const SingleTask: React.FC = () => {
   const [applicationMessage, setApplicationMessage] = useState('');
   const [myApplication, setMyApplication] = useState<ApplicationResponse | null>(null);
   const [myApplicationLoading, setMyApplicationLoading] = useState(false);
-  const [helperChatMap, setHelperChatMap] = useState<Record<string, string | null>>({});
-  const [helperChatLoading, setHelperChatLoading] = useState(false);
-  const [invitedHelperChatMap, setInvitedHelperChatMap] = useState<Record<string, string | null>>({});
-  const [invitedHelperChatLoading, setInvitedHelperChatLoading] = useState(false);
-  const [myApplicationChatExists, setMyApplicationChatExists] = useState<boolean | null>(null);
-  const [myApplicationChatLoading, setMyApplicationChatLoading] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -54,24 +48,12 @@ const SingleTask: React.FC = () => {
           if (existing) {
             setMyApplication(existing || null);
             
-            // Check if chat exists with the client
-            setMyApplicationChatLoading(true);
-            try {
-              const response = await chatApi.getChatWithParticipant(taskData.client_id);
-              setMyApplicationChatExists(response.chat_id !== null);
-            } catch (error) {
-              console.error('Failed to check chat existence:', error);
-              setMyApplicationChatExists(false);
-            } finally {
-              setMyApplicationChatLoading(false);
-            }
           } 
         } finally {
           setMyApplicationLoading(false);
         }
       } else {
         setMyApplication(null);
-        setMyApplicationChatExists(null);
       }
 
       // Only try to load applications and invitations if user is authenticated and is a client
@@ -88,60 +70,20 @@ const SingleTask: React.FC = () => {
           
           if (applicantsData && applicantsData.applications) {
             setApplicants(applicantsData.applications);
-            // After applicants load, batch check for existing chats per helper
-            const helperIds = applicantsData.applications.map(a => a.helper.id);
-            if (helperIds.length > 0) {
-              setHelperChatLoading(true);
-              try {
-                const chatMap = await chatApi.batchCheckChatsWithParticipants(helperIds);
-                setHelperChatMap(chatMap);
-              } catch (e) {
-                console.warn('Failed to check chats:', e);
-                // Fallback: set all to null
-                setHelperChatMap(Object.fromEntries(helperIds.map(id => [id, null])));
-              }
-              setHelperChatLoading(false);
-            } else {
-              setHelperChatMap({});
-            }
           } else {
             setApplicants([]);
-            setHelperChatMap({});
           }
           
           if (invitationsData && invitationsData.invitations) {
             setInvitations(invitationsData.invitations);
-            // After invitations load, batch check for existing chats per invited helper
-            const invitedHelperIds = invitationsData.invitations
-              .filter(inv => inv.helpers) // Only include invitations with helper data
-              .map(inv => inv.helpers!.id);
-            if (invitedHelperIds.length > 0) {
-              setInvitedHelperChatLoading(true);
-              try {
-                const chatMap = await chatApi.batchCheckChatsWithParticipants(invitedHelperIds);
-                console.log('Invited helper chat map:', chatMap);
-                console.log('Invited helper IDs:', invitedHelperIds);
-                setInvitedHelperChatMap(chatMap);
-              } catch (e) {
-                console.warn('Failed to check chats for invited helpers:', e);
-                // Fallback: set all to null
-                setInvitedHelperChatMap(Object.fromEntries(invitedHelperIds.map(id => [id, null])));
-              }
-              setInvitedHelperChatLoading(false);
-            } else {
-              setInvitedHelperChatMap({});
-            }
           } else {
             setInvitations([]);
-            setInvitedHelperChatMap({});
           }
         } catch (appErr) {
           // If applications/invitations fail to load, just set empty arrays
           console.warn('Failed to load applications/invitations:', appErr);
           setApplicants([]);
           setInvitations([]);
-          setHelperChatMap({});
-          setInvitedHelperChatMap({});
         } finally {
           setApplicantsLoading(false);
           setInvitationsLoading(false);
@@ -245,30 +187,7 @@ const SingleTask: React.FC = () => {
     }
   };
 
-  const handleMyApplicationChatAction = async () => {
-    if (!task) return;
-    
-    if (myApplicationChatExists) {
-      // Navigate to existing chat
-      navigate('/chat');
-      toast.success('Opening chat with client');
-    } else {
-      // Create new chat
-      try {
-        setMyApplicationChatLoading(true);
-        await chatApi.createChat({
-          participant_id: task.client_id
-        });
-        navigate('/chat');
-        toast.success('Chat created with client!');
-      } catch (error) {
-        console.error('Failed to create chat:', error);
-        toast.error('Failed to create chat. Please try again.');
-      } finally {
-        setMyApplicationChatLoading(false);
-      }
-    }
-  };
+  
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -552,12 +471,6 @@ const SingleTask: React.FC = () => {
                               <div className="flex items-center space-x-4"></div>
 
                               <div className="flex items-center justify-end sm:justify-start space-x-3">
-                                {helperChatLoading ? (
-                                  <div className="flex items-center space-x-2 px-3 py-2 sm:px-4 sm:py-2 bg-gray-50 rounded-xl border border-gray-200 w-full sm:w-auto justify-center">
-                                    <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-gray-300 border-t-blue-600"></div>
-                                    <span className="text-gray-600 text-xs sm:text-sm">Checking...</span>
-                                  </div>
-                                ) : (
                                   <ShowContactDetails 
                                     phone={helper.phone}
                                     email={helper.email}
@@ -565,7 +478,6 @@ const SingleTask: React.FC = () => {
                                     size="lg"
                                     className="w-full sm:w-auto"
                                   />
-                                )}
                               </div>
                             </div>
                           </div>
@@ -714,19 +626,6 @@ const SingleTask: React.FC = () => {
                                   <span className="text-purple-700 text-sm font-medium">Waiting for response</span>
                           </div>
                         </div>
-
-                              <div className="flex items-center justify-end sm:justify-start space-x-3">
-                                {invitation.helpers && (
-                                  <>
-                                    {invitedHelperChatLoading ? (
-                                      <div className="flex items-center space-x-2 px-3 py-2 sm:px-4 sm:py-2 bg-gray-50 rounded-xl border border-gray-200 w-full sm:w-auto justify-center">
-                                        <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-gray-300 border-t-purple-600"></div>
-                                        <span className="text-gray-600 text-xs sm:text-sm">Checking...</span>
-                                      </div>
-                                    ) : null}
-                                  </>
-                                )}
-                              </div>
                             </div>
                           </div>
                         </div>

@@ -20,6 +20,8 @@ export interface HelperResponse {
   graduation_year: number;
   zip_code: string;
   pfp_url?: string;
+  phone?: string;
+  email?: string;
   email_verified: boolean;
   phone_verified: boolean;
 }
