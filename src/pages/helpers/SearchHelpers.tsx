@@ -1,32 +1,22 @@
-import React from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import Navbar from '../../components/Navbar';
+import { Dispatch, SetStateAction } from 'react';
 import ModernHelperSearch from '../../components/helpers/ModernHelperSearch';
 import { useAuth } from '../../lib/contexts/AuthContext';
+import type { Page } from '@/lib/utils/types';
 
-const SearchHelpers: React.FC = () => {
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
+type SearchHelpersProps = {
+  setPage: Dispatch<SetStateAction<Page>>;
+}
+
+function SearchHelpers({ setPage }: SearchHelpersProps) {
   const { authRoute, isAuthenticated } = useAuth();
-  const taskId = searchParams.get('task_id');
-
-  const handleBack = () => {
-    if (window.history.length > 2) {
-      navigate(-1);
-    } else {
-      // Fallback to dashboard if no history
-      navigate('/dashboard');
-    }
-  };
 
   if (!isAuthenticated || authRoute !== 'client') {
     return null;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100">
-      <Navbar />
-      <ModernHelperSearch onBack={handleBack} />
+    <div className="min-h-screen bg-linear-to-b from-white via-blue-50 to-blue-100">
+      <ModernHelperSearch setPage={setPage} />
     </div>
   );
 };

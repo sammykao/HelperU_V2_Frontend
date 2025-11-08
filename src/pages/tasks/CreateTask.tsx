@@ -1,15 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Dispatch, SetStateAction } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import Navbar from '../../components/Navbar';
 import { taskApi, TaskCreate } from '../../lib/api/tasks';
 import { useAuth } from '../../lib/contexts/AuthContext';
 import { validateRequired, validateZipCode } from '../../lib/utils/validation';
 import toast from 'react-hot-toast';
+import { TaskDateSelctor } from '@/components/tasks/TaskDateSelector';
+import { formatDateTime } from '@/lib/utils';
+import { X } from 'lucide-react';
+import type { Page } from '@/lib/utils/types';
 
-const CreateTask: React.FC = () => {
+type CreateTaskProps = {
+  setPage: Dispatch<SetStateAction<Page>>;
+}
+
+function CreateTask({ setPage }: CreateTaskProps) {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const [searchParams] = useSearchParams();
+  const [dates, setDates] = useState<Date[]>([]);
+
   const [formData, setFormData] = useState<TaskCreate>({
     title: '',
     dates: [],
@@ -22,7 +31,6 @@ const CreateTask: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [selectedDates, setSelectedDates] = useState<{timestamp: string, display: string}[]>([]);
 
   // Handle pre-filling form data from URL parameters
   useEffect(() => {
@@ -56,95 +64,17 @@ const CreateTask: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    
+
     // Clear ZIP code when switching away from in_person
     if (name === 'location_type' && value !== 'in_person') {
       setFormData(prev => ({ ...prev, [name]: value, zip_code: '' }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  };
-
-  const handleDateInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    console.log("date change value", value);
-    // Only auto-add if the date is complete and valid
-    if (value && value.length === 10) { // YYYY-MM-DD format is 10 characters
-      // Additional validation: check if it's a valid date
-      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-      if (dateRegex.test(value)) {
-        const date = new Date(value);
-        // Check if the date is valid and not NaN
-        if (!isNaN(date.getTime())) {
-          // Additional check: ensure the date string matches what the Date object represents
-          // Use UTC methods to avoid timezone issues
-          const reconstructedDate = date.getUTCFullYear() + '-' + 
-            String(date.getUTCMonth() + 1).padStart(2, '0') + '-' + 
-            String(date.getUTCDate()).padStart(2, '0');
-          
-          if (reconstructedDate === value) {
-            const rawDate = value;
-            const timestampFormat = formatDate(rawDate);
-      
-      // Check if this timestamp already exists
-      if (!selectedDates.some(dateObj => dateObj.timestamp === timestampFormat)) {
-              const displayFormat = formatDateForDisplay(rawDate);
-        
-        setSelectedDates(prev => {
-          const updated = [...prev, { timestamp: timestampFormat, display: displayFormat }].sort((a, b) => a.timestamp.localeCompare(b.timestamp));
-          return updated;
-        });
-        
-        setFormData(prev => {
-          const updated = { ...prev, dates: [...prev.dates, timestampFormat].sort() };
-          return updated;
-        });
-        
-              // Clear the input after adding
-              e.target.value = '';
-            }
-          }
-        }
-      }
-    }
-  };
-
-  const handleDateRemove = (timestampToRemove: string) => {
-    setSelectedDates(prev => prev.filter(dateObj => dateObj.timestamp !== timestampToRemove));
-    setFormData(prev => ({ ...prev, dates: prev.dates.filter(date => date !== timestampToRemove) }));
-  };
-
-  const formatDate = (dateString: string) => {
-    try {
-      // Parse the date string as local date to avoid timezone issues
-      const [year, month, day] = dateString.split('-').map(Number);
-      const date = new Date(year, month - 1, day); // month is 0-indexed
-      // Return the full date string with time and timezone
-      return date.toString();
-    } catch (error) {
-      return dateString; // fallback to original string
-    }
-  };
-
-  const formatDateForDisplay = (dateString: string) => {
-    try {
-      // Parse the date string as local date to avoid timezone issues
-      const [year, month, day] = dateString.split('-').map(Number);
-      const date = new Date(year, month - 1, day); // month is 0-indexed
-      
-      return date.toLocaleDateString('en-US', {
-        weekday: 'short',
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      });
-    } catch (error) {
-      return dateString; // fallback to original string
     }
   };
 
@@ -155,7 +85,7 @@ const CreateTask: React.FC = () => {
       newErrors.title = 'Title is required';
     }
 
-    if (formData.dates.length === 0) {
+    if (dates.length === 0) {
       newErrors.dates = 'At least one date is required';
     }
 
@@ -193,6 +123,7 @@ const CreateTask: React.FC = () => {
     // Clean up the data before sending
     const cleanedFormData = {
       ...formData,
+      dates: dates.map((date) => date.toString()),
       zip_code: formData.location_type === 'in_person' && formData.zip_code ? formData.zip_code : undefined
     };
 
@@ -201,14 +132,14 @@ const CreateTask: React.FC = () => {
     try {
       const resp = await taskApi.createTask(cleanedFormData);
       toast.success('Task created successfully!');
-      navigate('/helpers/search?task_id=' + resp.id);
+      navigate('/tasks/browse/' + resp.id);
     } catch (err: any) {
       // Check if the error is due to post limit reached
       if (err.message && err.message.includes('post limit')) {
         toast.error('You have reached your post limit. Please upgrade your plan to create more tasks.');
         navigate('/subscription/upgrade');
       } else {
-      toast.error(err.message || 'Failed to create task');
+        toast.error(err.message || 'Failed to create task');
       }
     } finally {
       setIsLoading(false);
@@ -216,9 +147,7 @@ const CreateTask: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100">
-      <Navbar />
-      
+    <div className="min-h-screen bg-linear-to-b from-white via-blue-50 to-blue-100">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -239,9 +168,8 @@ const CreateTask: React.FC = () => {
                 name="title"
                 value={formData.title}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 ${
-                  errors.title ? 'border-red-400' : 'border-gray-300'
-                } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
+                className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 ${errors.title ? 'border-red-400' : 'border-gray-300'
+                  } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
                 placeholder="What do you need help with?"
                 disabled={isLoading}
               />
@@ -255,34 +183,37 @@ const CreateTask: React.FC = () => {
               <label className="block text-sm font-medium text-gray-800 mb-2">
                 Available Dates *
               </label>
-               <div className="mb-2">
-                <input
-                  id="date-input"
-                  type="date"
-                   onChange={handleDateInputChange}
-                   className="px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 w-auto min-w-[200px]"
-                  min={new Date().toISOString().split('T')[0]}
-                 />
-              </div>
-              {selectedDates.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {selectedDates.map((dateObj) => (
-                    <span
-                      key={dateObj.timestamp}
-                      className="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-sm border border-blue-200"
-                    >
-                      {dateObj.display}
-                      <button
-                        type="button"
-                        onClick={() => handleDateRemove(dateObj.timestamp)}
-                        className="ml-2 text-blue-700 hover:text-blue-800"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
+
+              <div className="mb-2 grid grid-cols-2 justify-center items-start w-full px-4">
+                <div className="flex items-center justify-center">
+                  <TaskDateSelctor dates={dates} setDates={setDates} />
                 </div>
-              )}
+
+                {/* Scrollable date list */}
+                <div className="flex flex-col p-4 gap-y-2 overflow-y-auto h-[290px] rounded-md bg-white shadow-sm">
+                  <span className="mb-2 font-medium text-gray-700">Your Selected Dates</span>
+
+                  <div className="flex flex-col gap-y-2">
+                    {dates.map((date) => (
+                      <span
+                        key={date.toString()}
+                        className="inline-flex items-center justify-between px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-sm border border-blue-200"
+                      >
+                        {formatDateTime(date.toString()).split(",")[0]} {formatDateTime(date.toString()).split(",")[1]}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDates((prev) => prev.filter((d) => d !== date));
+                          }}
+                          className="ml-2 text-blue-700 hover:text-blue-800"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
               {errors.dates && (
                 <p className="mt-1 text-sm text-red-400">{errors.dates}</p>
               )}
@@ -291,16 +222,15 @@ const CreateTask: React.FC = () => {
             {/* Location and Rate */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-              <label className="block text-sm font-medium text-gray-800 mb-2">
+                <label className="block text-sm font-medium text-gray-800 mb-2">
                   Location Type *
                 </label>
                 <select
                   name="location_type"
                   value={formData.location_type}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 pr-10 bg-white border rounded-xl text-gray-900 transition-all duration-300 appearance-none cursor-pointer ${
-                    errors.location_type ? 'border-red-400' : 'border-gray-300'
-                  } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
+                  className={`w-full px-4 py-3 pr-10 bg-white border rounded-xl text-gray-900 transition-all duration-300 appearance-none cursor-pointer ${errors.location_type ? 'border-red-400' : 'border-gray-300'
+                    } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
                   style={{
                     backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
                     backgroundPosition: 'right 0.75rem center',
@@ -328,9 +258,8 @@ const CreateTask: React.FC = () => {
                     value={formData.zip_code}
                     onChange={handleInputChange}
                     maxLength={5}
-                    className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-400 transition-all duration-300 ${
-                      errors.zip_code ? 'border-red-400' : 'border-gray-300'
-                    } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
+                    className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-400 transition-all duration-300 ${errors.zip_code ? 'border-red-400' : 'border-gray-300'
+                      } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
                     placeholder="02138"
                     disabled={isLoading}
                   />
@@ -341,7 +270,7 @@ const CreateTask: React.FC = () => {
               )}
 
               <div>
-              <label className="block text-sm font-medium text-gray-800 mb-2">
+                <label className="block text-sm font-medium text-gray-800 mb-2">
                   Hourly Rate ($) *
                 </label>
                 <input
@@ -351,9 +280,8 @@ const CreateTask: React.FC = () => {
                   onChange={handleInputChange}
                   min="0"
                   step="0.01"
-                  className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-400 transition-all duration-300 ${
-                    errors.hourly_rate ? 'border-red-400' : 'border-gray-300'
-                  } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
+                  className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-400 transition-all duration-300 ${errors.hourly_rate ? 'border-red-400' : 'border-gray-300'
+                    } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
                   placeholder="25.00"
                   disabled={isLoading}
                 />
@@ -373,9 +301,8 @@ const CreateTask: React.FC = () => {
                 value={formData.description}
                 onChange={handleInputChange}
                 rows={4}
-                className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 resize-none ${
-                  errors.description ? 'border-red-400' : 'border-gray-300'
-                } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
+                className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 resize-none ${errors.description ? 'border-red-400' : 'border-gray-300'
+                  } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
                 placeholder="Describe what you need help with, what skills are required, and any other important details..."
                 disabled={isLoading}
               />
@@ -425,7 +352,7 @@ const CreateTask: React.FC = () => {
             <div className="flex justify-end space-x-4">
               <button
                 type="button"
-                onClick={() => navigate('/tasks/my-posts')}
+                onClick={() => setPage('myPosts')}
                 className="px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl border border-gray-300 hover:bg-gray-200 transition-all duration-300"
                 disabled={isLoading}
               >
@@ -434,7 +361,7 @@ const CreateTask: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="px-6 py-3 bg-linear-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 {isLoading ? (
                   <div className="flex items-center">

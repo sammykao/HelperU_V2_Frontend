@@ -1,67 +1,35 @@
-import React from 'react';
+import Cards from "@/components/landing/Cards";
+import Navbar from "@/components/Navbar"
 import { Link } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import landingImg from '../data/landing.jpg';
 
-const HomePage: React.FC = () => {
+// <section className="flex flex-col items-center justify-center text-center flex-1 px-6 relative">
+export function HomePage() {
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100 overflow-hidden">
+    <div className="min-h-screen bg-linear-to-br from-white via-blue-50 to-blue-100 overflow-hidden flex flex-col gap-y-10">
       <Navbar />
-      {/* Animated Background */}
-      <div className="absolute inset-0 overflow-hidden hidden sm:block">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-200/40 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-pulse-blue"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-200/40 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-pulse-blue animation-delay-2000"></div>
-        <div className="absolute top-40 left-40 w-60 h-60 bg-sky-200/40 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-pulse-blue animation-delay-4000"></div>
-        <div className="absolute top-1/2 right-1/4 w-40 h-40 bg-blue-100/50 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-wave"></div>
-      </div>
 
       {/* Hero Section */}
-      <section className="relative z-10 min-h-[50vh] sm:min-h-[80vh] flex items-start sm:items-center px-4 py-16 sm:py-2">
-        <div className="absolute inset-0">
-          <img src={landingImg} alt="HelperU background" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-white/10"></div>
-        </div>
-        <div className="relative max-w-6xl mx-auto w-full">
-          <div className="max-w-sm sm:max-w-2xl md:max-w-3xl mx-auto bg-white/90 backdrop-blur-sm border border-gray-200 rounded-3xl p-3 sm:p-6 md:p-10 shadow-lg">
-            {/* Main Heading */}
-            <div className="mb-4 sm:mb-8 text-center">
-              <h1 className="text-2xl sm:text-5xl md:text-7xl font-display font-black text-gray-900 leading-tight mb-2 sm:mb-6">
-                HelperU
-              </h1>
-              <p className="text-xs sm:text-lg md:text-2xl text-gray-600 max-w-xl sm:max-w-2xl mx-auto leading-normal sm:leading-relaxed font-medium">
-                The future of reaching college students
-              </p>
-            </div>
+      <section className="grid grid-cols-[3fr_4fr] justify-center items-center w-full" >
+        {/* Text Heading */}
+        <div className="flex flex-col items-center justify-center gap-6 w-full text-center">
+          <h1 className="text-2xl sm:text-4xl md:text-6xl font-display font-black text-gray-900 leading-tight">
+            The future of reaching college students
+          </h1>
+          <p className="text-sm sm:text-lg md:text-2xl text-gray-600 max-w-xl sm:max-w-2xl leading-relaxed font-medium">
+            Connecting clients with needs to verified helpers
+          </p>
+          <div className="flex flex-row gap-x-2 items-center justify-center">
+            <button className="bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 px-4 py-2">Post a [placeholder]</button>
+            <button className="bg-blue-200 text-blue-700 font-semibold rounded-xl border border-blue-200 hover:bg-blue-200/80 transition-all duration-300 font-display text-center px-4 py-2">
+              Start Earning
+            </button>
 
-            {/* CTA */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-3 sm:p-5 md:p-8 max-w-sm sm:max-w-2xl mx-auto shadow-sm">
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 justify-center">
-                <Link to="/auth/client" className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow hover:shadow-blue-500/20 font-display text-center">
-                  Create a Post
-                </Link>
-                <Link to="/auth/helper" className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-blue-50 text-blue-700 font-semibold rounded-xl border border-blue-200 hover:bg-blue-100 transition-all duration-300 font-display text-center">
-                  I'm a Student
-                </Link>
-              </div>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6 max-w-xs sm:max-w-2xl md:max-w-4xl mx-auto mt-6 sm:mt-8 md:mt-10">
-              <div className="bg-white border border-gray-200 rounded-lg sm:rounded-xl p-2 sm:p-4 md:p-6 transition-all duration-300 animate-float">
-                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-700 mb-1 sm:mb-2 font-display">1,000+</div>
-                <div className="text-[10px] sm:text-sm text-gray-600 leading-snug">Active Students</div>
-              </div>
-              <div className="bg-white border border-gray-200 rounded-lg sm:rounded-xl p-2 sm:p-4 md:p-6 transition-all duration-300 animate-float animation-delay-2000">
-                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-700 mb-1 sm:mb-2 font-display">100+</div>
-                <div className="text-[10px] sm:text-sm text-gray-600 leading-snug">Posts Completed</div>
-              </div>
-              <div className="bg-white border border-gray-200 rounded-lg sm:rounded-xl p-2 sm:p-4 md:p-6 transition-all duration-300 animate-float animation-delay-4000">
-                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-700 mb-1 sm:mb-2 font-display">FREE</div>
-                <div className="text-[10px] sm:text-sm text-gray-600 leading-snug">No Cost to Use</div>
-              </div>
-            </div>
           </div>
         </div>
+
+        {/* Cards Container */}
+        <Cards />
       </section>
 
       {/* Features Section */}
@@ -72,7 +40,7 @@ const HomePage: React.FC = () => {
               What is HelperU?
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto font-medium">
-             A platform to share opportunities with college students — from getting task help, to company jobs, to advertisements.
+              A platform to share opportunities with college students — from getting task help, to company jobs, to advertisements.
             </p>
           </div>
 
@@ -245,8 +213,6 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
-};
-
-export { HomePage };
+    </div >
+  )
+}

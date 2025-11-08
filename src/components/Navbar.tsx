@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/contexts/AuthContext';
+import { cn } from '@/lib/utils';
 
 const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -24,13 +25,13 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="relative z-20 bg-white border-b border-white/10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="relative z-20  border-b border-white/10">
+      <div className="max-w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <Link to={isFullyLoggedIn ? "/dashboard" : "/"}>
-              <h1 className="text-2xl font-display font-extrabold bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-300 bg-clip-text text-transparent drop-shadow-md">
+              <h1 className="text-2xl font-display font-extrabold bg-linear-to-r from-blue-400 via-cyan-400 to-teal-300 bg-clip-text text-transparent drop-shadow-md">
                 HelperU
               </h1>
             </Link>
@@ -69,10 +70,10 @@ const Navbar: React.FC = () => {
               ) : (
                 // Unauthenticated navbar
                 <>
-                  <Link to="/faqs" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                  <Link to="/faqs" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium hover:underline hover:underline-offset-1 transition-all">
                     FAQs
                   </Link>
-                  <Link to="/contact" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                  <Link to="/contact" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium hover:underline hover:underline-offset-1 transition-all">
                     Contact Us
                   </Link>
                 </>
@@ -85,8 +86,8 @@ const Navbar: React.FC = () => {
             <div className="ml-4 flex items-center space-x-4">
               {isFullyLoggedIn ? (
                 <div className="flex items-center space-x-3">
-                  <Link 
-                    to="/profile" 
+                  <Link
+                    to="/profile"
                     className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-white/10"
                   >
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -94,7 +95,7 @@ const Navbar: React.FC = () => {
                     </svg>
                     <span>Profile</span>
                   </Link>
-                  <button 
+                  <button
                     onClick={handleLogout}
                     className="flex items-center space-x-2 text-gray-600 hover:text-red-400 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-red-500/10"
                   >
@@ -106,10 +107,10 @@ const Navbar: React.FC = () => {
                 </div>
               ) : (
                 <>
-                  <Link to="/auth/client" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                  <Link to="/auth/client" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-slate-100 hover:scale-105">
                     Client
                   </Link>
-                  <Link to="/auth/helper" className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 transform hover:scale-105">
+                  <Link to="/auth/helper" className="bg-linear-to-r from-blue-600 to-cyan-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 transform hover:scale-105">
                     Helper
                   </Link>
                 </>
@@ -119,9 +120,9 @@ const Navbar: React.FC = () => {
 
           {/* Mobile menu button */}
           <div className="md:hidden">
-            <button 
+            <button
               onClick={toggleMobileMenu}
-              className="text-gray-600 hover:text-gray-900 p-2 rounded-md transition-colors"
+              className="text-gray-600 hover:text-gray-900 p-2 rounded-md transition-all"
             >
               {isMobileMenuOpen ? (
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -139,29 +140,36 @@ const Navbar: React.FC = () => {
 
       {/* Mobile Navigation Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white/5 backdrop-blur-lg border-t border-white/10">
+        <div
+          className={cn(
+            "md:hidden overflow-hidden transition-all duration-300 ease-in-out",
+            isMobileMenuOpen
+              ? "opacity-100 translate-y-0 max-h-[30rem]"
+              : "opacity-0 -translate-y-4 max-h-0 pointer-events-none"
+          )}
+        >
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white/70 backdrop-blur-lg border-t border-white/10 rounded-b-lg shadow-md">
             {isFullyLoggedIn ? (
               <>
                 {authRoute === 'client' ? (
                   // Client mobile navbar
                   <>
-                    <Link 
-                      to="/tasks/my-posts" 
+                    <Link
+                      to="/tasks/my-posts"
                       onClick={closeMobileMenu}
                       className="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium transition-colors"
                     >
                       My Posts
                     </Link>
-                    <Link 
-                      to="/tasks/create" 
+                    <Link
+                      to="/tasks/create"
                       onClick={closeMobileMenu}
                       className="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium transition-colors"
                     >
                       Create Post
                     </Link>
-                    <Link 
-                      to="/helpers/search" 
+                    <Link
+                      to="/helpers/search"
                       onClick={closeMobileMenu}
                       className="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium transition-colors"
                     >
@@ -171,15 +179,15 @@ const Navbar: React.FC = () => {
                 ) : (
                   // Helper mobile navbar
                   <>
-                    <Link 
-                      to="/tasks/browse" 
+                    <Link
+                      to="/tasks/browse"
                       onClick={closeMobileMenu}
                       className="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium transition-colors"
                     >
                       Browse Posts
                     </Link>
-                    <Link 
-                      to="/applications" 
+                    <Link
+                      to="/applications"
                       onClick={closeMobileMenu}
                       className="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium transition-colors"
                     >
@@ -191,15 +199,15 @@ const Navbar: React.FC = () => {
             ) : (
               // Unauthenticated mobile navbar
               <>
-                <Link 
-                  to="/faqs" 
+                <Link
+                  to="/faqs"
                   onClick={closeMobileMenu}
                   className="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium transition-colors"
                 >
                   FAQs
                 </Link>
-                <Link 
-                  to="/contact" 
+                <Link
+                  to="/contact"
                   onClick={closeMobileMenu}
                   className="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium transition-colors"
                 >
@@ -211,8 +219,8 @@ const Navbar: React.FC = () => {
               <div className="flex items-center px-3 space-x-3">
                 {isFullyLoggedIn ? (
                   <div className="flex items-center space-x-3 w-full">
-                    <Link 
-                      to="/profile" 
+                    <Link
+                      to="/profile"
                       onClick={closeMobileMenu}
                       className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-white/10 flex-1 justify-center"
                     >
@@ -221,7 +229,7 @@ const Navbar: React.FC = () => {
                       </svg>
                       <span>Profile</span>
                     </Link>
-                    <button 
+                    <button
                       onClick={() => {
                         closeMobileMenu();
                         handleLogout();
@@ -236,14 +244,14 @@ const Navbar: React.FC = () => {
                   </div>
                 ) : (
                   <>
-                    <Link 
+                    <Link
                       to="/auth/client"
                       onClick={closeMobileMenu}
                       className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
                     >
                       Client
                     </Link>
-                    <Link 
+                    <Link
                       to="/auth/helper"
                       onClick={closeMobileMenu}
                       className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300"

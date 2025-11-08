@@ -4,22 +4,16 @@ import { AuthProvider } from './lib/contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import { HomePage } from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
-import AIAssistantPage from './pages/AIAssistantPage';
+// import AIAssistantPage from './pages/AIAssistantPage';
+
 import FAQPage from './pages/FAQPage';
 import ContactPage from './pages/ContactPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfUsePage from './pages/TermsOfUsePage';
 
 // Task Pages
-import BrowseTasks from './pages/tasks/BrowseTasks';
-import CreateTask from './pages/tasks/CreateTask';
-import EditTask from './pages/tasks/EditTask';
-import MyPosts from './pages/tasks/MyPosts';
-import MyApplications from './pages/tasks/MyApplications';
+// import EditTask from './pages/tasks/EditTask';
 import SingleTask from './pages/tasks/SingleTask';
-
-// Helper Pages
-import SearchHelpers from './pages/helpers/SearchHelpers';
 
 // Subscription Pages
 import SubscriptionUpgrade from './pages/subscriptions/SubscriptionUpgrade';
@@ -45,64 +39,37 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
+
+          {/* Misc. Routes */}
           <Route path="/faqs" element={<FAQPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/terms-of-use" element={<TermsOfUsePage />} />
-          
+
           {/* Auth Routes */}
           <Route path="/auth/client" element={<ClientAuth />} />
           <Route path="/auth/client/verify-otp" element={<ClientVerifyOTP />} />
           <Route path="/auth/client/complete-profile" element={<ClientCompleteProfile />} />
-          
           <Route path="/auth/helper" element={<HelperAuth />} />
           <Route path="/become-helper" element={<HelperAuth />} />
           <Route path="/auth/helper/verify-otp" element={<HelperVerifyOTP />} />
           <Route path="/auth/helper/verify-email" element={<HelperVerifyEmail />} />
           <Route path="/auth/helper/complete-profile" element={<HelperCompleteProfile />} />
 
-          {/* Task Routes */}
-          <Route path="/tasks/browse/:id" element={<SingleTask />} />
-          
-          {/* General Protected Routes (Any authenticated user) */}
+          {/* Dashboard Routes */}
           <Route path="/dashboard" element={
             <ProtectedRoute requiredRoles={['client', 'helper']}>
               <Dashboard />
             </ProtectedRoute>
           } />
+
           <Route path="/profile" element={
             <ProtectedRoute requiredRoles={['client', 'helper']}>
               <Profile />
             </ProtectedRoute>
           } />
-          <Route path="/ai-assistant" element={
-            <ProtectedRoute requiredRoles={['client', 'helper']}>
-              <AIAssistantPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/tasks/browse" element={
-            <ProtectedRoute requiredRole="helper">
-              <BrowseTasks />
-            </ProtectedRoute>
-          } />
-          
-          
-          {/* Client-Only Routes */}
-          <Route path="/tasks/create" element={
-            <ProtectedRoute requiredRole="client">
-              <CreateTask />
-            </ProtectedRoute>
-          } />
-          <Route path="/tasks/edit/:id" element={
-            <ProtectedRoute requiredRole="client">
-              <EditTask />
-            </ProtectedRoute>
-          } />
-          <Route path="/tasks/my-posts" element={
-            <ProtectedRoute requiredRole="client">
-              <MyPosts />
-            </ProtectedRoute>
-          } />
+
+          {/* Subscription Routes */}
           <Route path="/subscription/upgrade" element={
             <ProtectedRoute requiredRole="client">
               <SubscriptionUpgrade />
@@ -113,20 +80,11 @@ function App() {
               <SubscriptionSuccess />
             </ProtectedRoute>
           } />
-          <Route path="/helpers/search" element={
-            <ProtectedRoute requiredRole="client">
-              <SearchHelpers />
-            </ProtectedRoute>
-          } />
-          
-          {/* Helper-Only Routes */}
-          <Route path="/applications" element={
-            <ProtectedRoute requiredRole="helper">
-              <MyApplications />
-            </ProtectedRoute>
-          } />
+
+          {/* Generic Task Routes*/}
+          <Route path="/tasks/browse/:id" element={<SingleTask />} />
         </Routes>
-        
+
         <Toaster
           position="top-right"
           toastOptions={{
@@ -144,3 +102,23 @@ function App() {
 }
 
 export default App;
+
+
+// {/* Task Routes */}
+// <Route path="/tasks/browse/:id" element={<SingleTask />} />
+//
+// <Route path="/ai-assistant" element={
+//   <ProtectedRoute requiredRoles={['client', 'helper']}>
+//     <AIAssistantPage />
+//   </ProtectedRoute>
+// } />
+// <Route path="/tasks/browse" element={
+//   <ProtectedRoute requiredRole="helper">
+//     <BrowseTasks />
+//   </ProtectedRoute>
+// } />
+// <Route path="/tasks/edit/:id" element={
+//   <ProtectedRoute requiredRole="client">
+//     <EditTask />
+//   </ProtectedRoute>
+// } />

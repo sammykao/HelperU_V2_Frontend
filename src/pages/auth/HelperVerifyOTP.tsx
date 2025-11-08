@@ -43,21 +43,21 @@ const HelperVerifyOTP: React.FC = () => {
     try {
       const request: PhoneOTPVerifyRequest = { phone, token: otpValue };
       const response = await authApi.helperVerifyOTP(request);
-      
+
       if (response.success && response.access_token) {
         login(response.access_token, { id: response.user_id || '' } as any, null, response.refresh_token);
         toast.success('Successfully signed in!');
-        
+
         // Check email verification status first
         try {
           const emailStatus = await authApi.checkHelperEmailVerification(response.user_id || '');
-          
+
           if (!emailStatus.email_verified) {
             // Email not verified, go to email verification
-            navigate('/auth/helper/verify-email', { 
-              state: { 
-                user_id: response.user_id 
-              } 
+            navigate('/auth/helper/verify-email', {
+              state: {
+                user_id: response.user_id
+              }
             });
           } else {
             // Email verified, check if profile is completed
@@ -65,18 +65,18 @@ const HelperVerifyOTP: React.FC = () => {
             if (isHelperCompleted) {
               // Profile already exists, set auth route immediately
               setAuthRoute('helper');
-              navigate('/tasks/browse');
+              navigate('/dashboard');
             } else {
               // Profile doesn't exist, go to profile completion
-              navigate('/auth/helper/complete-profile');  
+              navigate('/auth/helper/complete-profile');
             }
           }
         } catch (emailError) {
           // If we can't check email status, go to email verification
-          navigate('/auth/helper/verify-email', { 
-            state: { 
-              user_id: response.user_id 
-            } 
+          navigate('/auth/helper/verify-email', {
+            state: {
+              user_id: response.user_id
+            }
           });
         }
       }
@@ -111,7 +111,7 @@ const HelperVerifyOTP: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-linear-to-b from-white via-blue-50 to-blue-100 flex items-center justify-center px-4">
       {/* Background Effects (subtle) */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-200/40 rounded-full mix-blend-multiply blur-2xl opacity-70 animate-pulse-blue"></div>
@@ -121,7 +121,7 @@ const HelperVerifyOTP: React.FC = () => {
       <div className="relative z-10 w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-display font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-300 bg-clip-text text-transparent drop-shadow-md mb-2">
+          <h1 className="text-4xl font-display font-bold bg-linear-to-r from-blue-400 via-cyan-400 to-teal-300 bg-clip-text text-transparent drop-shadow-md mb-2">
             HelperU
           </h1>
           <h2 className="text-2xl font-semibold text-gray-900 mb-2">Verify Your Phone</h2>
@@ -149,8 +149,8 @@ const HelperVerifyOTP: React.FC = () => {
                 disabled={isLoading || resendCooldown > 0}
                 className="text-blue-700 hover:text-blue-800 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {resendCooldown > 0 
-                  ? `Resend in ${resendCooldown}s` 
+                {resendCooldown > 0
+                  ? `Resend in ${resendCooldown}s`
                   : 'Resend OTP'
                 }
               </button>

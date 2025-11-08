@@ -44,27 +44,27 @@ const ClientVerifyOTP: React.FC = () => {
     try {
       const request: PhoneOTPVerifyRequest = { phone, token: otpValue };
       const response = await authApi.clientVerifyOTP(request);
-      
+
       if (response.success && response.access_token) {
         login(response.access_token, { id: response.user_id || '' } as any, null, response.refresh_token);
         toast.success(isSignup ? 'Successfully verified!' : 'Successfully signed in!');
-        
+
         // Check profile status to determine next step
         try {
           const isClientCompleted = await authApi.clientCheckCompletion();
           if (isClientCompleted.does_exist) {
             // Profile already exists, set auth route immediately
             setAuthRoute('client');
-            navigate('/tasks/create');
+            navigate('/dashboard');
           } else {
             // Profile doesn't exist, go to profile completion
             navigate('/auth/client/complete-profile');
           }
         } catch (clientError) {
           // If we can't check client status, go to profile completion
-            navigate('/auth/client/complete-profile');
+          navigate('/auth/client/complete-profile');
         }
-       
+
       }
     } catch (err: any) {
       setError(err.message || 'Invalid OTP');
@@ -86,7 +86,7 @@ const ClientVerifyOTP: React.FC = () => {
       } else {
         await authApi.clientSignin({ phone });
       }
-      
+
       setResendCooldown(60);
       toast.success('OTP resent!');
     } catch (err: any) {
@@ -140,8 +140,8 @@ const ClientVerifyOTP: React.FC = () => {
                 disabled={isLoading || resendCooldown > 0}
                 className="text-blue-700 hover:text-blue-800 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {resendCooldown > 0 
-                  ? `Resend in ${resendCooldown}s` 
+                {resendCooldown > 0
+                  ? `Resend in ${resendCooldown}s`
                   : 'Resend OTP'
                 }
               </button>

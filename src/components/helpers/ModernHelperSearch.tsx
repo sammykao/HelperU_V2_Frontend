@@ -1,19 +1,18 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect, Dispatch, SetStateAction } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { helperApi, HelperResponse, HelperSearchRequest } from '../../lib/api/helpers';
 import { applicationApi, InvitationResponse } from '../../lib/api/applications';
 import { taskApi, TaskResponse } from '../../lib/api/tasks';
 import { useAuth } from '../../lib/contexts/AuthContext';
 import CollegeInput from '../ui/CollegeInput';
 import toast from 'react-hot-toast';
-import collegesData from '../../data/colleges.json';
+import { Page } from '@/lib/utils/types';
 
-interface ModernHelperSearchProps {
-  onBack?: () => void;
+type ModernHelperSearchProps = {
+  setPage: Dispatch<SetStateAction<Page>>;
 }
 
-const ModernHelperSearch: React.FC<ModernHelperSearchProps> = ({ onBack }) => {
-  const [searchParams] = useSearchParams();
+function ModernHelperSearch({ setPage }: ModernHelperSearchProps) {
   const navigate = useNavigate();
   const { authRoute, isAuthenticated } = useAuth();
 
@@ -37,9 +36,6 @@ const ModernHelperSearch: React.FC<ModernHelperSearchProps> = ({ onBack }) => {
   const [taskInvitations, setTaskInvitations] = useState<Record<string, InvitationResponse[]>>({});
   const [invitingHelper, setInvitingHelper] = useState<string | null>(null);
 
-  // Get college names for filter
-  const collegeNames = useMemo(() => Object.keys(collegesData).sort(), []);
-
   useEffect(() => {
     if (!isAuthenticated || authRoute !== 'client') {
       navigate('/auth/client');
@@ -60,7 +56,7 @@ const ModernHelperSearch: React.FC<ModernHelperSearchProps> = ({ onBack }) => {
     try {
       const response = await taskApi.getMyTasks(100, 0);
       setUserTasks(response.tasks);
-      
+
       // Load invitations for each task
       const invitationsMap: Record<string, InvitationResponse[]> = {};
       for (const task of response.tasks) {
@@ -106,7 +102,7 @@ const ModernHelperSearch: React.FC<ModernHelperSearchProps> = ({ onBack }) => {
       setInvitingHelper(`${helperId}-${taskId}`);
       await applicationApi.inviteHelperToTask(taskId, helperId);
       toast.success('Helper invited successfully!');
-      
+
       // Refresh invitations for this task
       const invitationsResponse = await applicationApi.getInvitationsByTask(taskId);
       setTaskInvitations(prev => ({
@@ -144,28 +140,18 @@ const ModernHelperSearch: React.FC<ModernHelperSearchProps> = ({ onBack }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100">
+    <div className="min-h-screen bg-linear-to-b from-white via-blue-50 to-blue-100">
       {/* Header */}
-      <div className="bg-white border border-gray-200 shadow-sm">
+      <div className="bg-white border border-gray-200 shadow-sm mx-52 rounded-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              {onBack && (
-                <button
-                  onClick={onBack}
-                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
-                >
-                  <svg className="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-              )}
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Find Helpers</h1>
                 <p className="text-gray-700 text-sm">Search and invite helpers to your tasks</p>
               </div>
             </div>
-            
+
             {hasSearched && (
               <button
                 onClick={resetSearch}
@@ -179,7 +165,7 @@ const ModernHelperSearch: React.FC<ModernHelperSearchProps> = ({ onBack }) => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
+
         {/* Search Section */}
         <div className="mb-8">
           <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
@@ -201,7 +187,7 @@ const ModernHelperSearch: React.FC<ModernHelperSearchProps> = ({ onBack }) => {
               <button
                 onClick={searchHelpers}
                 disabled={loading}
-                className="absolute right-2 top-2 bottom-2 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-medium rounded-lg transition-all duration-200 flex items-center"
+                className="absolute right-2 top-2 bottom-2 px-6 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-medium rounded-lg transition-all duration-200 flex items-center"
               >
                 {loading ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -222,7 +208,7 @@ const ModernHelperSearch: React.FC<ModernHelperSearchProps> = ({ onBack }) => {
                 </svg>
                 <span>Advanced Filters</span>
               </button>
-              
+
               {(collegeFilter || graduationYearFilter || zipCodeFilter) && (
                 <button
                   onClick={clearFilters}
@@ -238,13 +224,10 @@ const ModernHelperSearch: React.FC<ModernHelperSearchProps> = ({ onBack }) => {
               <div className="mt-4 pt-4 border-t border-gray-200">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* College Filter */}
-                  <div>
-                    <CollegeInput
-                      value={collegeFilter}
-                      onChange={setCollegeFilter}
-                      placeholder="Search colleges..."
-                      label="College"
-                    />
+
+                  <div className='flex flex-col'>
+                    <span className='text-gray-600 tracking-tight text-sm font-semibold mb-2'>Helper School</span>
+                    <CollegeInput onChange={((val) => setCollegeFilter(val.label))} value={""} />
                   </div>
 
                   {/* Graduation Year Filter */}
@@ -253,7 +236,7 @@ const ModernHelperSearch: React.FC<ModernHelperSearchProps> = ({ onBack }) => {
                     <select
                       value={graduationYearFilter}
                       onChange={(e) => setGraduationYearFilter(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="h-10 w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="">Any Year</option>
                       {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i).map((year) => (
@@ -272,7 +255,7 @@ const ModernHelperSearch: React.FC<ModernHelperSearchProps> = ({ onBack }) => {
                       value={zipCodeFilter}
                       onChange={(e) => setZipCodeFilter(e.target.value)}
                       placeholder="Enter zip code"
-                      className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="h-10 w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
@@ -329,7 +312,7 @@ const ModernHelperSearch: React.FC<ModernHelperSearchProps> = ({ onBack }) => {
                 {helpers.map((helper) => (
                   <div
                     key={helper.id}
-                    className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-sm transition-all duration-200"
+                    className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-sm transition-all duration-200 flex flex-col items-start justify-between"
                   >
                     {/* Helper Info */}
                     <div className="flex items-start space-x-4 mb-4">
@@ -340,7 +323,7 @@ const ModernHelperSearch: React.FC<ModernHelperSearchProps> = ({ onBack }) => {
                           className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
                         />
                       ) : (
-                        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">
+                        <div className="w-12 h-12 bg-linear-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">
                           {helper.first_name[0]}{helper.last_name[0]}
                         </div>
                       )}
@@ -379,7 +362,7 @@ const ModernHelperSearch: React.FC<ModernHelperSearchProps> = ({ onBack }) => {
                         setSelectedHelper(helper);
                         setShowTaskSelection(true);
                       }}
-                      className="w-full px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg transition-all duration-200 flex items-center justify-center"
+                      className="w-full px-4 py-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg transition-all duration-200 flex items-center justify-center"
                     >
                       <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -420,7 +403,7 @@ const ModernHelperSearch: React.FC<ModernHelperSearchProps> = ({ onBack }) => {
               {userTasks.map((task) => {
                 const isInvited = isHelperInvitedToTask(selectedHelper.id, task.id);
                 const isInviting = invitingHelper === `${selectedHelper.id}-${task.id}`;
-                
+
                 return (
                   <div
                     key={task.id}
@@ -448,7 +431,7 @@ const ModernHelperSearch: React.FC<ModernHelperSearchProps> = ({ onBack }) => {
                           <button
                             onClick={() => handleInviteHelper(selectedHelper.id, task.id)}
                             disabled={isInviting}
-                            className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-medium rounded-lg transition-all duration-200 flex items-center"
+                            className="px-4 py-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-medium rounded-lg transition-all duration-200 flex items-center"
                           >
                             {isInviting ? (
                               <>
@@ -482,8 +465,8 @@ const ModernHelperSearch: React.FC<ModernHelperSearchProps> = ({ onBack }) => {
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No tasks available</h3>
                 <p className="text-gray-600 mb-4">You need to create tasks before you can invite helpers</p>
                 <button
-                  onClick={() => navigate('/tasks/create')}
-                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg transition-all duration-200"
+                  onClick={() => setPage("createPost")}
+                  className="px-4 py-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg transition-all duration-200"
                 >
                   Create Task
                 </button>

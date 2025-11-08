@@ -115,7 +115,7 @@ const HelperVerifyEmail: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-linear-to-br from-white via-blue-50 to-blue-100 flex items-center justify-center px-4">
       {/* Background Effects */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/30 rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-pulse"></div>
@@ -125,13 +125,13 @@ const HelperVerifyEmail: React.FC = () => {
       <div className="relative z-10 w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-display font-bold bg-gradient-to-r from-white via-blue-200 to-cyan-200 bg-clip-text text-transparent mb-2">
+          <h1 className="text-4xl font-display font-bold bg-linear-to-r from-blue-400 via-cyan-400 to-teal-300 bg-clip-text text-transparent mb-2">
             HelperU
           </h1>
-          <h2 className="text-2xl font-semibold text-white mb-2">
+          <h2 className="text-2xl font-semibold text-black mb-2">
             {showEmailInput ? 'Enter Your Educational Email' : 'Verify Your Email'}
           </h2>
-          <p className="text-gray-300">
+          <p className="text-gray-700">
             {showEmailInput ? (
               'Please enter your .edu email address to receive a verification code'
             ) : (
@@ -140,7 +140,7 @@ const HelperVerifyEmail: React.FC = () => {
                 Enter the 6-digit code sent to<br />
                 <span className="text-blue-400 font-medium">{email}</span>
                 <br />
-                <span className="text-gray-300">
+                <span className="text-gray-700">
                   Check your spam folder if you don't receive the code, it may have been sent to spam or promotions.
                 </span>
               </>
@@ -149,12 +149,12 @@ const HelperVerifyEmail: React.FC = () => {
         </div>
 
         {/* Form */}
-        <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-8">
+        <div className="backdrop-blur-lg bg-white border border-white/20 rounded-2xl p-8">
           <div className="space-y-6">
             {showEmailInput ? (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Educational Email Address (.edu)
                   </label>
                   <input
@@ -163,17 +163,17 @@ const HelperVerifyEmail: React.FC = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your .edu email address"
                     disabled={isLoading}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 transition-all duration-300 hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-4 py-3 bg-white border border-gray-400 rounded-xl text-black placeholder-gray-700 transition-all duration-300 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                   {error && (
-                    <p className="text-red-400 text-sm mt-2">{error}</p>
+                    <p className="text-red-600 text-sm mt-2">{error}</p>
                   )}
                 </div>
 
                 <button
                   onClick={handleSendEmail}
                   disabled={isLoading || !email}
-                  className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  className="w-full px-6 py-3 bg-linear-to-r from-blue-400 via-cyan-400 to-teal-300 text-white font-semibold rounded-xl hover:from-blue-500 hover:via-cyan-500 hover:to-teal-400 transition-all duration-300 transform hover:scale-105 disabled:scale-100 shadow-lg hover:shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   {isLoading ? (
                     <div className="flex items-center justify-center">
@@ -194,7 +194,7 @@ const HelperVerifyEmail: React.FC = () => {
                 />
 
                 <div className="text-center">
-                  <p className="text-gray-300 mb-4">
+                  <p className="text-gray-700 mb-4">
                     Didn't receive the code?
                   </p>
                   <button
@@ -202,8 +202,8 @@ const HelperVerifyEmail: React.FC = () => {
                     disabled={isLoading || resendCooldown > 0}
                     className="text-blue-400 hover:text-blue-300 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {resendCooldown > 0 
-                      ? `Resend in ${resendCooldown}s` 
+                    {resendCooldown > 0
+                      ? `Resend in ${resendCooldown}s`
                       : 'Resend OTP'
                     }
                   </button>

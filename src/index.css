@@ -1,6 +1,93 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  /* PRIMARY COLORS */
+  --color-primary-50: "#EBF2FF";
+  --color-primary-100: "#D7E6FF";
+  --color-primary-200: "#B0CFFF";
+  --color-primary-300: "#89B8FF";
+  --color-primary-400: "#62A1FF";
+  --color-primary-500: "#3B82F6";
+  --color-primary-600: "#0B61EA";
+  --color-primary-700: "#084BB5";
+  --color-primary-800: "#063480";
+  --color-primary-900: "#041E4B";
+  --color-primary: "#3B82F6";
+
+  /* SECONDARY COLORS */
+  --color-secondary-50: "#ECFFFE";
+  --color-secondary-100: "#C5F1EE";
+  --color-secondary-200: "#9EE4E0";
+  --color-secondary-300: "#77D7D1";
+  --color-secondary-400: "#50CAC3";
+  --color-secondary-500: "#0D9488";
+  --color-secondary-600: "#0A756C";
+  --color-secondary-700: "#075650";
+  --color-secondary-800: "#053734";
+  --color-secondary-900: "#021918";
+  --color-secondary: "#0D9488";
+
+  /* ACCENT COLORS */
+  --color-accent-50: "#FFF1E7";
+  --color-accent-100: "#FFE3CF";
+  --color-accent-200: "#FFC79F";
+  --color-accent-300: "#FFAC6F";
+  --color-accent-400: "#FF903F";
+  --color-accent-500: "#F97316";
+  --color-accent-600: "#D55A08";
+  --color-accent-700: "#A14406";
+  --color-accent-800: "#6D2E04";
+  --color-accent-900: "#391802";
+  --color-accent: "#F97316";
+
+  /* SUCCESS COLORS */
+  --color-success-100: "#ECFDF5";
+  --color-success-500: "#10B981";
+  --color-success-700: "#047857";
+  --color-success: "#10B981";
+
+  /* WARNING COLORS */
+  --color-warning-100: "#FEF9E7";
+  --color-warning-500: "#F59E0B";
+  --color-warning-700: "#B45309";
+  --color-warning: "#F59E0B";
+
+  /* ERROR COLORS */
+  --color-error-100: "#FEE2E2";
+  --color-error-500: "#EF4444";
+  --color-error-700: "#B91C1C";
+  --color-error: "#EF4444";
+
+  /* ANIMATIONS */
+  --animate-fade-in: fadeIn 0.5s ease-in-out;
+  --animate-slide-up: slideUp 0.5s ease-in-out;
+  @keyframes fadeIn: {
+    0%: {
+      opacity: "0";
+    }
+    100%: {
+      opacity: "1";
+    }
+  }
+
+  @keyframes slideUp: {
+    0%: {
+      transform: "translateY(20px)";
+      opacity: "0";
+    }
+    100%: {
+      transform: "translateY(0)";
+      opacity: "1";
+    }
+  }
+
+  /* spacing: { */
+  /*   128: "32rem", */
+  /* }, */
+}
 
 @layer base {
   html {
@@ -28,6 +115,26 @@
 
   .font-mono {
     font-family: "JetBrains Mono", monospace;
+  }
+  :root {
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+  .dark {
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 
@@ -119,7 +226,8 @@
 
 /* Custom animations for the futuristic blue design */
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {
@@ -128,7 +236,8 @@
 }
 
 @keyframes glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
   }
   50% {
@@ -137,7 +246,8 @@
 }
 
 @keyframes glow-cyan {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
   }
   50% {
@@ -155,7 +265,8 @@
 }
 
 @keyframes pulse-blue {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.4;
     transform: scale(1);
   }
@@ -166,7 +277,8 @@
 }
 
 @keyframes wave {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0) translateY(0) rotate(0deg);
   }
   25% {
@@ -181,14 +293,15 @@
 }
 
 @keyframes neon-glow {
-  0%, 100% {
-    text-shadow: 
+  0%,
+  100% {
+    text-shadow:
       0 0 5px rgba(59, 130, 246, 0.5),
       0 0 10px rgba(59, 130, 246, 0.3),
       0 0 15px rgba(59, 130, 246, 0.2);
   }
   50% {
-    text-shadow: 
+    text-shadow:
       0 0 10px rgba(59, 130, 246, 0.8),
       0 0 20px rgba(59, 130, 246, 0.5),
       0 0 30px rgba(59, 130, 246, 0.3);
@@ -208,7 +321,12 @@
 }
 
 .animate-shimmer {
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
 }
@@ -272,7 +390,9 @@
 
 /* Hover effects */
 .hover-lift {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .hover-lift:hover {
@@ -296,4 +416,47 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(59, 130, 246, 0.7);
+}
+
+/* @layer base { */
+/*   * { */
+/*     @apply border-border; */
+/*   } */
+/*   body { */
+/*     @apply bg-background text-foreground; */
+/*   } */
+/* } */
+/**/
+
+:root {
+  --sidebar: hsl(0 0% 98%);
+  --sidebar-foreground: hsl(240 5.3% 26.1%);
+  --sidebar-primary: hsl(240 5.9% 10%);
+  --sidebar-primary-foreground: hsl(0 0% 98%);
+  --sidebar-accent: hsl(240 4.8% 95.9%);
+  --sidebar-accent-foreground: hsl(240 5.9% 10%);
+  --sidebar-border: hsl(220 13% 91%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+.dark {
+  --sidebar: hsl(240 5.9% 10%);
+  --sidebar-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-primary: hsl(224.3 76.3% 48%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(240 3.7% 15.9%);
+  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-border: hsl(240 3.7% 15.9%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+@theme inline {
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 }

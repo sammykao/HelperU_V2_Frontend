@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Dispatch, SetStateAction } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
-import Tooltip from '../../components/ui/Tooltip';
+import { Tooltip } from '../../components/ui/Tooltip';
 import ApplicationsPreview from '../../components/tasks/ApplicationsPreview';
 import { taskApi, TaskResponse } from '../../lib/api/tasks';
 import { applicationApi, ApplicationResponse } from '../../lib/api/applications';
 import { subscriptionApi, SubscriptionStatus } from '../../lib/api/subscriptions';
 import { formatCurrency } from '../../lib/utils/format';
+import { Page } from '@/lib/utils/types';
 
 interface PostStats {
   total: number;
@@ -14,7 +15,11 @@ interface PostStats {
   active: number;
 }
 
-const MyPosts: React.FC = () => {
+type MyPostsProps = {
+  setPage: Dispatch<SetStateAction<Page>>;
+}
+
+function MyPosts({ setPage }: MyPostsProps) {
   const navigate = useNavigate();
   const [posts, setPosts] = useState<TaskResponse[]>([]);
   const [applications, setApplications] = useState<ApplicationResponse[]>([]);
@@ -36,10 +41,10 @@ const MyPosts: React.FC = () => {
         taskApi.getMyTasks(50, 0),
         subscriptionApi.getStatus()
       ]);
-      
+
       setPosts(postsResponse.tasks);
       setSubscriptionStatus(subscriptionResponse);
-      
+
       // Load applications after posts are loaded
       loadApplications();
     } catch (err) {
@@ -95,7 +100,7 @@ const MyPosts: React.FC = () => {
 
   const handlePostAgain = (post: TaskResponse) => {
     const params = new URLSearchParams();
-    
+
     // Pre-fill all fields except dates
     if (post.title) params.append('title', post.title);
     if (post.description) params.append('description', post.description);
@@ -104,7 +109,7 @@ const MyPosts: React.FC = () => {
     if (post.tools_info) params.append('tools_info', post.tools_info);
     if (post.public_transport_info) params.append('public_transport_info', post.public_transport_info);
     if (post.hourly_rate) params.append('hourly_rate', post.hourly_rate.toString());
-    
+
     navigate(`/tasks/create?${params.toString()}`);
   };
 
@@ -159,7 +164,7 @@ const MyPosts: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100">
+      <div className="min-h-screen bg-linear-to-b from-white via-blue-50 to-blue-100">
         <Navbar />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-center h-64">
@@ -171,10 +176,9 @@ const MyPosts: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100">
-      <Navbar />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-linear-to-b from-white via-blue-50 to-blue-100">
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">My Posts</h1>
@@ -202,17 +206,16 @@ const MyPosts: React.FC = () => {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4">
               <h2 className="text-xl font-semibold text-gray-900">Subscription Status</h2>
               <div className="flex items-center gap-3">
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  subscriptionStatus.status === 'active' 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-yellow-100 text-yellow-800'
-                }`}>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${subscriptionStatus.status === 'active'
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-yellow-100 text-yellow-800'
+                  }`}>
                   {subscriptionStatus.status.charAt(0).toUpperCase() + subscriptionStatus.status.slice(1)}
                 </span>
                 {subscriptionStatus.plan === 'free' && (
                   <button
                     onClick={() => navigate('/subscription/upgrade')}
-                    className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg transition-all duration-200 flex items-center text-sm font-medium"
+                    className="px-4 py-2 bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg transition-all duration-200 flex items-center text-sm font-medium"
                   >
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -222,31 +225,30 @@ const MyPosts: React.FC = () => {
                 )}
               </div>
             </div>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
                 <div className="text-sm text-gray-700 mb-1">Plan</div>
                 <div className="text-lg font-semibold text-gray-900 capitalize">{subscriptionStatus.plan}</div>
               </div>
-              
+
               <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
                 <div className="text-sm text-gray-700 mb-1">Posts Used This Month</div>
                 <div className="text-lg font-semibold text-gray-900">
                   {subscriptionStatus.posts_used} / {subscriptionStatus.plan === "free" ? '1' : '∞'}
                 </div>
               </div>
-              
+
               <div className="bg-white rounded-lg p-3 sm:p-4 sm:col-span-2 lg:col-span-1 border border-gray-200">
                 <div className="text-sm text-gray-700 mb-1">Remaining Posts This Month</div>
-                <div className={`text-lg font-semibold ${
-                  subscriptionStatus.post_limit === -1 
-                    ? 'text-green-700' 
-                    : subscriptionStatus.post_limit - subscriptionStatus.posts_used > 0 
-                      ? 'text-gray-900' 
-                      : 'text-red-600'
-                }`}>
-                  {subscriptionStatus.post_limit === -1 
-                    ? 'Unlimited' 
+                <div className={`text-lg font-semibold ${subscriptionStatus.post_limit === -1
+                  ? 'text-green-700'
+                  : subscriptionStatus.post_limit - subscriptionStatus.posts_used > 0
+                    ? 'text-gray-900'
+                    : 'text-red-600'
+                  }`}>
+                  {subscriptionStatus.post_limit === -1
+                    ? 'Unlimited'
                     : Math.max(0, subscriptionStatus.post_limit - subscriptionStatus.posts_used)
                   }
                 </div>
@@ -330,16 +332,19 @@ const MyPosts: React.FC = () => {
 
           {posts.length === 0 ? (
             <div className="text-center py-12">
-            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-            </div>
+              <div className="w-16 h-16 bg-linear-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No Posts Yet</h3>
-            <p className="text-gray-700 mb-6">
+              <p className="text-gray-700 mb-6">
                 You haven't created any posts yet. Create your first opportunity to get started!
               </p>
-              <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-lg transition-all duration-200">
+              <button
+                onClick={() => setPage("createPost")}
+                className="px-6 py-3 bg-linear-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-lg transition-all duration-200"
+              >
                 Create Your First Post
               </button>
             </div>
@@ -348,7 +353,7 @@ const MyPosts: React.FC = () => {
               {posts.map((post) => (
                 <div key={post.id} className="group bg-white border border-gray-200 rounded-xl p-4 sm:p-6 hover:shadow-sm transition-colors duration-200">
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                    <div 
+                    <div
                       className="flex-1 cursor-pointer"
                       onClick={() => handlePostClick(post.id)}
                     >
@@ -361,10 +366,10 @@ const MyPosts: React.FC = () => {
                         </div>
                         {getStatusBadge(post)}
                       </div>
-                      
+
                       <p className="text-gray-700 mb-4 line-clamp-2">{post.description}</p>
                       <p className="text-xs text-gray-500 mb-2">Click to view details</p>
-                      
+
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 text-sm">
                         <div>
                           <span className="text-gray-600">Rate:</span>
@@ -379,7 +384,7 @@ const MyPosts: React.FC = () => {
                           <span className="text-gray-900 ml-2 font-medium">{formatDate(post.created_at)}</span>
                         </div>
                       </div>
-                      
+
                       {post.dates && post.dates.length > 0 && (
                         <div className="mt-3">
                           <span className="text-gray-600 text-sm">Dates:</span>
@@ -392,31 +397,31 @@ const MyPosts: React.FC = () => {
                           </div>
                         </div>
                       )}
-                      
+
                       {post.tools_info && (
                         <div className="mt-3">
                           <span className="text-gray-600 text-sm">Tools Required:</span>
                           <p className="text-gray-700 text-sm mt-1">{post.tools_info}</p>
                         </div>
                       )}
-                      
+
                       {post.public_transport_info && (
                         <div className="mt-3">
                           <span className="text-gray-600 text-sm">Public Transport:</span>
                           <p className="text-gray-700 text-sm mt-1">{post.public_transport_info}</p>
                         </div>
                       )}
-                      
+
                       {/* Applications Preview */}
-                      <ApplicationsPreview 
-                        postId={post.id} 
+                      <ApplicationsPreview
+                        postId={post.id}
                         applications={applications}
                         applicationsLoading={applicationsLoading}
                         onViewAll={handlePostClick}
                       />
                     </div>
-                    
-                    <div 
+
+                    <div
                       className="flex flex-row lg:flex-col gap-2 lg:ml-4"
                       onClick={(e) => e.stopPropagation()}
                     >
@@ -424,7 +429,7 @@ const MyPosts: React.FC = () => {
                         // Show "Post Again" button for completed posts
                         <button
                           onClick={() => handlePostAgain(post)}
-                          className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg transition-all duration-200 flex items-center text-sm font-medium shadow-sm hover:shadow-md"
+                          className="px-4 py-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg transition-all duration-200 flex items-center text-sm font-medium shadow-sm hover:shadow-md"
                         >
                           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -437,7 +442,7 @@ const MyPosts: React.FC = () => {
                           <button
                             onClick={() => handleCompletePost(post.id)}
                             disabled={completingPost === post.id}
-                            className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-green-500 disabled:to-emerald-500 text-white rounded-lg transition-all duration-200 flex items-center text-sm font-medium shadow-sm hover:shadow-md"
+                            className="px-4 py-2 bg-linear-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-green-500 disabled:to-emerald-500 text-white rounded-lg transition-all duration-200 flex items-center text-sm font-medium shadow-sm hover:shadow-md"
                           >
                             {completingPost === post.id ? (
                               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -450,15 +455,14 @@ const MyPosts: React.FC = () => {
                           </button>
                         </Tooltip>
                       )}
-                      
+
                       <button
                         onClick={() => handleDeletePost(post.id)}
                         disabled={deletingPost === post.id || !!post.completed_at}
-                        className={`px-4 py-2 rounded-lg transition-all duration-200 flex items-center text-sm font-medium shadow-sm hover:shadow-md ${
-                          post.completed_at 
-                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                            : 'bg-gray-100 hover:bg-gray-200 text-red-600 hover:text-red-700 disabled:bg-gray-100 disabled:text-red-400'
-                        }`}
+                        className={`px-4 py-2 rounded-lg transition-all duration-200 flex items-center text-sm font-medium shadow-sm hover:shadow-md ${post.completed_at
+                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                          : 'bg-gray-100 hover:bg-gray-200 text-red-600 hover:text-red-700 disabled:bg-gray-100 disabled:text-red-400'
+                          }`}
                         title={post.completed_at ? 'Cannot delete completed posts' : 'Delete post'}
                       >
                         {deletingPost === post.id ? (
@@ -471,10 +475,10 @@ const MyPosts: React.FC = () => {
                         Delete
                       </button>
                     </div>
-          </div>
+                  </div>
                 </div>
               ))}
-          </div>
+            </div>
           )}
         </div>
       </div>

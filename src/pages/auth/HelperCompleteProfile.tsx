@@ -26,14 +26,14 @@ const HelperCompleteProfile: React.FC = () => {
   useEffect(() => {
     // Check if profile is already complete
     if (profileStatus?.profile_completed && (profileStatus?.profile_type === 'helper' || profileStatus?.profile_type === 'both')) {
-      navigate('/tasks/browse');
+      navigate('/dashboard');
     }
   }, [profileStatus, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
@@ -119,7 +119,7 @@ const HelperCompleteProfile: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100 flex items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-linear-to-b from-white via-blue-50 to-blue-100 flex items-center justify-center px-4 py-8">
       {/* Background Effects (subtle) */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-200/40 rounded-full mix-blend-multiply blur-2xl opacity-70 animate-pulse-blue"></div>
@@ -129,7 +129,7 @@ const HelperCompleteProfile: React.FC = () => {
       <div className="relative z-10 w-full max-w-2xl">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-display font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-300 bg-clip-text text-transparent drop-shadow-md mb-2">
+          <h1 className="text-4xl font-display font-bold bg-linear-to-r from-blue-400 via-cyan-400 to-teal-300 bg-clip-text text-transparent drop-shadow-md mb-2">
             HelperU
           </h1>
           <h2 className="text-2xl font-semibold text-gray-900 mb-2">Complete Your Helper Profile</h2>
@@ -149,9 +149,8 @@ const HelperCompleteProfile: React.FC = () => {
                   name="first_name"
                   value={formData.first_name}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 ${
-                    errors.first_name ? 'border-red-400' : 'border-gray-400'
-                  } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
+                  className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 ${errors.first_name ? 'border-red-400' : 'border-gray-400'
+                    } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
                   placeholder="John"
                   disabled={isLoading}
                 />
@@ -169,9 +168,8 @@ const HelperCompleteProfile: React.FC = () => {
                   name="last_name"
                   value={formData.last_name}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 ${
-                    errors.last_name ? 'border-red-400' : 'border-gray-400'
-                  } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
+                  className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 ${errors.last_name ? 'border-red-400' : 'border-gray-400'
+                    } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
                   placeholder="Doe"
                   disabled={isLoading}
                 />
@@ -181,21 +179,20 @@ const HelperCompleteProfile: React.FC = () => {
               </div>
             </div>
 
-            <div>
+            <div className='flex flex-col gap-y-2'>
+              <span className='tracking-tight text-gray-700'>Your College</span>
               <CollegeInput
                 value={formData.college}
                 onChange={(value) => {
-                  setFormData(prev => ({ ...prev, college: value }));
+                  setFormData(prev => ({ ...prev, college: value.value }));
                   if (errors.college) {
                     setErrors(prev => ({ ...prev, college: '' }));
                   }
                 }}
-                placeholder="Search for your college..."
-                label="College/University"
-                required
-                error={errors.college}
-                disabled={isLoading}
               />
+              {errors.college && (
+                <p className="mt-1 text-sm text-red-600">{errors.college}</p>
+              )}
             </div>
 
             <div>
@@ -207,9 +204,8 @@ const HelperCompleteProfile: React.FC = () => {
                 value={formData.bio}
                 onChange={handleInputChange}
                 rows={4}
-                className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 resize-none ${
-                  errors.bio ? 'border-red-400' : 'border-gray-400'
-                } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
+                className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 resize-none ${errors.bio ? 'border-red-400' : 'border-gray-400'
+                  } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
                 placeholder="Tell clients about your skills, experience, and what makes you a great helper..."
                 disabled={isLoading}
               />
@@ -235,9 +231,8 @@ const HelperCompleteProfile: React.FC = () => {
                   onChange={handleInputChange}
                   min="2020"
                   max="2030"
-                  className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 ${
-                    errors.graduation_year ? 'border-red-400' : 'border-gray-400'
-                  } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
+                  className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 ${errors.graduation_year ? 'border-red-400' : 'border-gray-400'
+                    } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
                   disabled={isLoading}
                 />
                 {errors.graduation_year && (
@@ -255,9 +250,8 @@ const HelperCompleteProfile: React.FC = () => {
                   value={formData.zip_code}
                   onChange={handleInputChange}
                   maxLength={5}
-                  className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 ${
-                    errors.zip_code ? 'border-red-400' : 'border-gray-400'
-                  } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
+                  className={`w-full px-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 ${errors.zip_code ? 'border-red-400' : 'border-gray-400'
+                    } focus:outline-none focus:ring-2 focus:ring-blue-500/30`}
                   placeholder="02138"
                   disabled={isLoading}
                 />
@@ -284,7 +278,7 @@ const HelperCompleteProfile: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              className="w-full px-6 py-3 bg-linear-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">

@@ -1,174 +1,65 @@
-import React, { useState, useEffect, useRef } from 'react';
-import collegesData from '../../data/colleges.json';
+import * as React from "react";
+import {
+  Command,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import collegesData from "../../data/colleges.json";
 
-interface CollegeInputProps {
+type CollegeInputProps = {
   value: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
-  className?: string;
-  disabled?: boolean;
-  error?: string;
-  label?: string;
-  required?: boolean;
+  onChange?: (value: { label: string; value: string }) => void;
 }
 
-const CollegeInput: React.FC<CollegeInputProps> = ({
-  value,
-  onChange,
-  placeholder = "Search for your college...",
-  className = "",
-  disabled = false,
-  error = "",
-  label = "",
-  required = false
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [filteredColleges, setFilteredColleges] = useState<string[]>([]);
-  const [inputValue, setInputValue] = useState(value);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+export default function CollegeInput({ onChange, value: startVal }: CollegeInputProps) {
+  const [open, setOpen] = React.useState(false);
+  const [value, setValue] = React.useState(collegesData[startVal] ?? "");
 
-  // Get all college names from the JSON data
-  const allColleges = Object.keys(collegesData);
+  const colleges = Object.entries(collegesData).map(([label, value]) => ({
+    label,
+    value,
+  }));
 
-  useEffect(() => {
-    setInputValue(value);
-  }, [value]);
+  const selectedLabel = colleges.find((c) => c.value === value)?.label;
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node) &&
-        inputRef.current &&
-        !inputRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const searchTerm = e.target.value;
-    setInputValue(searchTerm);
-    
-    if (searchTerm.length > 0) {
-      // Filter colleges that contain the search term (case-insensitive)
-      const filtered = allColleges.filter(college =>
-        college.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredColleges(filtered.slice(0, 10)); // Limit to 10 results
-      setIsOpen(true);
-    } else {
-      setFilteredColleges([]);
-      setIsOpen(false);
-    }
-  };
-
-  const handleCollegeSelect = (college: string) => {
-    setInputValue(college);
-    onChange(college);
-    setIsOpen(false);
-  };
-
-  const handleInputFocus = () => {
-    if (inputValue.length > 0) {
-      const filtered = allColleges.filter(college =>
-        college.toLowerCase().includes(inputValue.toLowerCase())
-      );
-      setFilteredColleges(filtered.slice(0, 10));
-      setIsOpen(true);
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Escape') {
-      setIsOpen(false);
-    }
+  const handleSelect = (collegeValue: { label: string; value: string }) => {
+    setValue(collegeValue.value);
+    setOpen(false);
+    if (onChange) onChange(collegeValue);
   };
 
   return (
-    <div className={`relative ${className}`}>
-      {label && (
-        <label className="block text-sm font-medium text-gray-800 mb-2">
-          {label}
-          {required && <span className="text-red-400 ml-1">*</span>}
-        </label>
-      )}
-      
-      <div className="relative">
-        <input
-          ref={inputRef}
-          type="text"
-          value={inputValue}
-          onChange={handleInputChange}
-          onFocus={handleInputFocus}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder}
-          disabled={disabled}
-          className={`w-full px-4 py-3 bg-white/10 border rounded-xl text-gray-900 placeholder-gray-400 transition-all duration-300 ${
-            error 
-              ? 'border-red-400 bg-red-500/10' 
-              : 'border-white/20 hover:bg-white/15'
-          } focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed`}
-        />
-        
-        {/* Dropdown arrow */}
-        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-          <svg 
-            className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
-      </div>
-
-      {/* Dropdown */}
-      {isOpen && filteredColleges.length > 0 && (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
         <div
-          ref={dropdownRef}
-          className="absolute z-50 w-full mt-1 bg-white/95 backdrop-blur-lg border border-white/20 rounded-xl shadow-2xl max-h-60 overflow-y-auto"
+          role="combobox"
+          className="w-full hover:bg-neutral-100 h-10 border border-slate-300 flex justify-start items-center rounded-md pl-4"
         >
-          {filteredColleges.map((college, index) => (
-            <div
-              key={index}
-              onClick={() => handleCollegeSelect(college)}
-              className="px-4 py-3 text-gray-800 hover:bg-blue-500/10 hover:text-blue-600 cursor-pointer transition-colors duration-200 first:rounded-t-xl last:rounded-b-xl"
-            >
-              <div className="font-medium">{college}</div>
-              <div className="text-sm text-gray-500">
-                {(collegesData as any)[college]}
-              </div>
-            </div>
-          ))}
+          {selectedLabel || "Select a college..."}
         </div>
-      )}
-
-      {/* No results message */}
-      {isOpen && filteredColleges.length === 0 && inputValue.length > 0 && (
-        <div
-          ref={dropdownRef}
-          className="absolute z-50 w-full mt-1 bg-white/95 backdrop-blur-lg border border-white/20 rounded-xl shadow-2xl"
-        >
-          <div className="px-4 py-3 text-gray-500 text-center">
-            No colleges found matching "{inputValue}"
-          </div>
-        </div>
-      )}
-
-      {error && (
-        <p className="mt-1 text-sm text-red-400">{error}</p>
-      )}
-    </div>
+      </PopoverTrigger>
+      <PopoverContent className="w-(--radix-popover-trigger-width) p-0 bg-white">
+        <Command >
+          <CommandInput placeholder="Search colleges..." />
+          <CommandList className="max-h-60 overflow-y-auto bg-white">
+            {colleges.map((college) => (
+              <CommandItem
+                key={college.value}
+                onSelect={() => handleSelect(college)}
+                className="bg-white hover:bg-neutral-100 cursor-pointer"
+              >
+                {college.label}
+              </CommandItem>
+            ))}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
-};
-
-export default CollegeInput;
+}
