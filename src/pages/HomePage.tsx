@@ -2,26 +2,26 @@ import Cards from "@/components/landing/Cards";
 import Navbar from "@/components/Navbar"
 import { Link } from 'react-router-dom';
 
-// <section className="flex flex-col items-center justify-center text-center flex-1 px-6 relative">
 export function HomePage() {
-
   return (
-    <div className="min-h-screen bg-linear-to-br from-white via-blue-50 to-blue-100 overflow-hidden flex flex-col gap-y-10">
+    <div className="min-h-screen bg-linear-to-br from-white via-blue-50 to-blue-100 overflow-hidden flex flex-col gap-y-6 xl:gap-y-10" style={{ scrollbarWidth: "none" }}>
       <Navbar />
 
       {/* Hero Section */}
-      <section className="grid grid-cols-[3fr_4fr] justify-center items-center w-full" >
+      <section className="grid grid-rows-1 xl:grid-cols-2 justify-center items-start xl:items-center w-full my-0 lg:my-20 gap-y-2 sm:gap-y-5 md:gap-y-8 xl:gap-y-20">
         {/* Text Heading */}
         <div className="flex flex-col items-center justify-center gap-6 w-full text-center">
-          <h1 className="text-2xl sm:text-4xl md:text-6xl font-display font-black text-gray-900 leading-tight">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-black text-gray-900 leading-tight">
             The future of reaching college students
           </h1>
           <p className="text-sm sm:text-lg md:text-2xl text-gray-600 max-w-xl sm:max-w-2xl leading-relaxed font-medium">
-            Connecting clients with needs to verified helpers
+            Connecting clients to verified student helpers
           </p>
           <div className="flex flex-row gap-x-2 items-center justify-center">
-            <button className="bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 px-4 py-2">Post a [placeholder]</button>
-            <button className="bg-blue-200 text-blue-700 font-semibold rounded-xl border border-blue-200 hover:bg-blue-200/80 transition-all duration-300 font-display text-center px-4 py-2">
+            <button className="bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 px-8 py-4 active:scale-95 transition-all duration-300">
+              Post a Job
+            </button>
+            <button className="active:scale-95 bg-blue-200 text-blue-700 font-semibold rounded-xl border border-blue-200 hover:bg-blue-200/80 transition-all duration-300 font-display text-center px-8 py-4">
               Start Earning
             </button>
 

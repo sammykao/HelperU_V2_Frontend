@@ -7,8 +7,9 @@ import { useAuth } from '../../lib/contexts/AuthContext';
 import toast from 'react-hot-toast';
 import { ClipboardPen, Share } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { SearchTasks } from '@/components/tasks/SearchTasks';
 
-const BrowseTasks: React.FC = () => {
+function BrowseTasks() {
   const { authRoute } = useAuth();
   const [tasks, setTasks] = useState<TaskSearchResponse[]>([]);
   const [filteredTasks, setFilteredTasks] = useState<TaskSearchResponse[]>([]);
@@ -23,7 +24,6 @@ const BrowseTasks: React.FC = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [hasSearched, setHasSearched] = useState(false);
   const [sortBy, setSortBy] = useState<'distance' | 'post_date'>('post_date');
-  const [showFilters, setShowFilters] = useState(false);
   const [distanceRadius, setDistanceRadius] = useState<number | undefined>(100);
   const [selectedTask, setTask] = useState<TaskSearchResponse | null>(null);
 
@@ -146,10 +146,6 @@ const BrowseTasks: React.FC = () => {
     fetchTasks();
   };
 
-  const handleFilterChange = (key: keyof TaskSearchRequest, value: any) => {
-    setSearchParams(prev => ({ ...prev, [key]: value, search_offset: 0 }));
-  };
-
   // On sort change, push to server-side sort and reset pagination
   useEffect(() => {
     setSearchParams(prev => ({ ...prev, sort_by: sortBy, search_offset: 0 } as any));
@@ -184,7 +180,7 @@ const BrowseTasks: React.FC = () => {
   };
 
   return (
-    <div className="h-screen bg-white w-full py-6">
+    <div className="min-h-screen h-full bg-white w-full py-6">
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-18 ">
         {/* Header */}
@@ -207,10 +203,13 @@ const BrowseTasks: React.FC = () => {
           </div>
         )}
 
+        {/* Search Bar */}
+        <SearchTasks searchParams={searchParams} setSearchParams={setSearchParams} handleSearch={handleSearch} />
+
         <div className='bg-white w-full h-full grid grid-cols-[2fr_3fr] gap-x-2 rounded-md p-1'>
           <div>
             {filteredTasks.length === 0 ? (
-              <div className="text-center py-12">
+              <div className="text-center py-12 border border-gray-300 rounded-2xl h-[650px]">
                 <div className="w-16 h-16 bg-gray-100 flex items-center justify-center mx-auto mb-4 p-2">
                   <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -220,39 +219,52 @@ const BrowseTasks: React.FC = () => {
                 <p className="text-gray-700">Try adjusting your search criteria</p>
               </div>
             ) : (
-              <div className='flex flex-col justify-start items-start w-full space-y-2 overflow-y-auto h-[750px]' style={{ scrollbarWidth: "none" }}>
-                {filteredTasks.map((task, idx) => (
-                  <div className={cn('flex flex-row gap-x-2 items-start justify-start w-full h-fit px-2 border border-slate-300 rounded-2xl py-4', (selectedTask && task.id === selectedTask.id) ? "bg-gray-200" : "bg-white hover:bg-gray-100")} key={idx}>
-                    <div className='mt-2 mr-2'>
-                      {task.client.pfp_url ? (
-                        <img
-                          src={task.client.pfp_url}
-                          alt={`${task.client.first_name} ${task.client.last_name}`}
-                          className="w-12 h-12 rounded-full object-cover border border-gray-200 shrink-0 flex-1"
-                        />
-                      ) : (
-                        <div className='w-12 h-12 flex justify-center items-center rounded-full bg-slate-100'>
-                          {task.client.first_name.slice(0, 1)} {task.client.last_name.slice(0, 1)}
-                        </div>
-                      )}
+              <div className='flex flex-col gap-y-4 items-center justify-center'>
+                <div className='flex flex-col justify-start items-start w-full space-y-2 overflow-y-auto h-[595px]' style={{ scrollbarWidth: "none" }}>
+                  {filteredTasks.map((task, idx) => (
+                    <div className={cn('flex flex-row gap-x-2 items-start justify-start w-full h-fit px-2 border border-slate-300 rounded-2xl py-4', (selectedTask && task.id === selectedTask.id) ? "bg-gray-200" : "bg-white hover:bg-gray-100")} key={idx}>
+                      <div className='mt-2 mr-2'>
+                        {task.client.pfp_url ? (
+                          <div className="w-12 h-12 rounded-full overflow-hidden shrink-0">
+                            <img
+                              src={task.client.pfp_url}
+                              alt={`${task.client.first_name} ${task.client.last_name}`}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className='w-12 h-12 flex justify-center items-center rounded-full bg-slate-100'>
+                            {task.client.first_name.slice(0, 1)} {task.client.last_name.slice(0, 1)}
+                          </div>
+                        )}
+                      </div>
+                      <div
+                        className={`flex flex-col items-start justify-center w-full py-2 text-xs sm:text-sm text-gray-700 tracking-tight cursor-pointer`}
+                        onClick={() => setTask(task)}
+                      >
+                        <span className='font-bold'>{task.title}</span>
+                        <span className='text-green-700 '>${task.hourly_rate}/hr</span>
+                        <span className=''>{task.location_type === "remote" ? "Remote" : `Zipcode: ${task.zip_code}`}</span>
+                        <span className="truncate ">
+                          Posted by {task.client.first_name} {task.client.last_name}
+                        </span>
+                      </div>
                     </div>
-                    <div
-                      className={`flex flex-col items-start justify-center w-full py-2 text-xs sm:text-sm text-gray-700 tracking-tight cursor-pointer`}
-                      onClick={() => setTask(task)}
-                    >
-                      <span className='font-bold'>{task.title}</span>
-                      <span className='text-green-700 '>${task.hourly_rate}/hr</span>
-                      <span className=''>{task.location_type === "remote" ? "Remote" : `Zipcode: ${task.zip_code}`}</span>
-                      <span className="truncate ">
-                        Posted by {task.client.first_name} {task.client.last_name}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+
+                <div className='w-full h-fit'>
+                  <button
+                    className={cn('h-10 py-2 w-full bg-blue-500 hover:bg-blue-500/90 flex justify-center items-center rounded-md text-white active:scale-[99%]')}
+                    onClick={loadMore}
+                  >
+                    Load More
+                  </button>
+                </div>
               </div>
             )}
           </div>
-          <div className='border-2 rounded-2xl border-gray-300 h-[750px] overflow-y-auto overflow-x-hidden scroll-x-1 scroll-my-6'>
+          <div className='border rounded-2xl border-gray-300 h-[650px] overflow-y-auto overflow-x-hidden scroll-x-1 scroll-my-6'>
             {selectedTask ? (
               <div className="grid grid-cols-1 pt-4">
                 {/* Main Content */}
@@ -332,7 +344,7 @@ const BrowseTasks: React.FC = () => {
               </div>
 
             ) : (
-              <div className="bg-white border border-gray-400 rounded-2xl p-6 shadow-sm py-10 mt-2 mx-4">
+              <div className="rounded-2xl p-6 py-12 mx-4 h-full w-full flex flex-col items-center justify-start overflow-y-hidden">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">No Task Selected</h2>
                 <p>Please click on a task on the left to view details</p>
               </div>

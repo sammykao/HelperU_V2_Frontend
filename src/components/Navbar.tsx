@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/contexts/AuthContext';
-import { cn } from '@/lib/utils';
 
 const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -25,8 +24,8 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="relative z-20  border-b border-white/10">
-      <div className="max-w-full px-4 sm:px-6 lg:px-8">
+    <nav className="relative z-20 border-b border-white/10">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="shrink-0">
@@ -70,10 +69,10 @@ const Navbar: React.FC = () => {
               ) : (
                 // Unauthenticated navbar
                 <>
-                  <Link to="/faqs" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium hover:underline hover:underline-offset-1 transition-all">
+                  <Link to="/faqs" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                     FAQs
                   </Link>
-                  <Link to="/contact" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium hover:underline hover:underline-offset-1 transition-all">
+                  <Link to="/contact" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                     Contact Us
                   </Link>
                 </>
@@ -107,7 +106,7 @@ const Navbar: React.FC = () => {
                 </div>
               ) : (
                 <>
-                  <Link to="/auth/client" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-slate-100 hover:scale-105">
+                  <Link to="/auth/client" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                     Client
                   </Link>
                   <Link to="/auth/helper" className="bg-linear-to-r from-blue-600 to-cyan-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 transform hover:scale-105">
@@ -122,7 +121,7 @@ const Navbar: React.FC = () => {
           <div className="md:hidden">
             <button
               onClick={toggleMobileMenu}
-              className="text-gray-600 hover:text-gray-900 p-2 rounded-md transition-all"
+              className="text-gray-600 hover:text-gray-900 p-2 rounded-md transition-colors"
             >
               {isMobileMenuOpen ? (
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -140,15 +139,8 @@ const Navbar: React.FC = () => {
 
       {/* Mobile Navigation Menu */}
       {isMobileMenuOpen && (
-        <div
-          className={cn(
-            "md:hidden overflow-hidden transition-all duration-300 ease-in-out",
-            isMobileMenuOpen
-              ? "opacity-100 translate-y-0 max-h-[30rem]"
-              : "opacity-0 -translate-y-4 max-h-0 pointer-events-none"
-          )}
-        >
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white/70 backdrop-blur-lg border-t border-white/10 rounded-b-lg shadow-md">
+        <div className="md:hidden">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white/5 backdrop-blur-lg border-t border-white/10">
             {isFullyLoggedIn ? (
               <>
                 {authRoute === 'client' ? (
@@ -254,7 +246,7 @@ const Navbar: React.FC = () => {
                     <Link
                       to="/auth/helper"
                       onClick={closeMobileMenu}
-                      className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300"
+                      className="bg-linear-to-r from-blue-600 to-cyan-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300"
                     >
                       Helper
                     </Link>

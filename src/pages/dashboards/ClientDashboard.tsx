@@ -71,13 +71,6 @@ function DashboardLayout({ children, setPage, routes, profile, isLoading }: any)
         isLoading={isLoading}
       />
 
-      {/* Trigger fixed at top, moves with sidebar */}
-      <SidebarTrigger
-        className={cn(
-          "fixed top-2 transition-all duration-300 ease-in-out z-9999 rounded-md p-2 bg-white shadow-sm hover:bg-slate-100",
-          open ? "left-80" : "left-2"
-        )}
-      />
 
       {/* Main content area */}
       <main

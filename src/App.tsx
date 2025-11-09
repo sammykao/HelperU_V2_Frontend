@@ -12,7 +12,7 @@ import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfUsePage from './pages/TermsOfUsePage';
 
 // Task Pages
-// import EditTask from './pages/tasks/EditTask';
+import EditTask from './pages/tasks/EditTask';
 import SingleTask from './pages/tasks/SingleTask';
 
 // Subscription Pages
@@ -83,6 +83,12 @@ function App() {
 
           {/* Generic Task Routes*/}
           <Route path="/tasks/browse/:id" element={<SingleTask />} />
+
+          <Route path="/tasks/edit/:id" element={
+            <ProtectedRoute requiredRole="client">
+              <EditTask />
+            </ProtectedRoute>
+          } />
         </Routes>
 
         <Toaster
@@ -110,11 +116,6 @@ export default App;
 // <Route path="/ai-assistant" element={
 //   <ProtectedRoute requiredRoles={['client', 'helper']}>
 //     <AIAssistantPage />
-//   </ProtectedRoute>
-// } />
-// <Route path="/tasks/browse" element={
-//   <ProtectedRoute requiredRole="helper">
-//     <BrowseTasks />
 //   </ProtectedRoute>
 // } />
 // <Route path="/tasks/edit/:id" element={

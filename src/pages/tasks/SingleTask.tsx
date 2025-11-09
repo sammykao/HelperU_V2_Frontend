@@ -100,18 +100,6 @@ function SingleTask() {
     }
   };
 
-  const handleBack = () => {
-    if (window.history.length > 2) {
-      navigate(-1);
-    } else {
-      if (authRoute === 'client') {
-        navigate('/tasks/my-posts');
-      } else {
-        navigate('/tasks/browse');
-      }
-    }
-  };
-
   const handleApply = () => {
     if (!task) return;
 
@@ -273,7 +261,7 @@ function SingleTask() {
                 <h1 className="text-3xl font-bold text-gray-900">{task.title}</h1>
                 <button
                   onClick={handleShare}
-                  className="flex-shrink-0 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200 flex items-center gap-2"
+                  className="shrink-0 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200 flex items-center gap-2"
                   title="Share this task"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
