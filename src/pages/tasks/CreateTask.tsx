@@ -150,14 +150,14 @@ function CreateTask({ setPage }: CreateTaskProps) {
     <div className="min-h-screen bg-linear-to-b from-white via-blue-50 to-blue-100">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Create New Post</h1>
-          <p className="text-gray-700">Post an opportunity for students to help with</p>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Create New Post</h1>
+          <p className="text-sm sm:text-base text-gray-700">Post an opportunity for students to help with</p>
         </div>
 
         {/* Form */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-white border border-gray-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 shadow-sm">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {/* Title */}
             <div>
               <label className="block text-sm font-medium text-gray-800 mb-2">
@@ -184,33 +184,40 @@ function CreateTask({ setPage }: CreateTaskProps) {
                 Available Dates *
               </label>
 
-              <div className="mb-2 grid grid-cols-2 justify-center items-start w-full px-4">
-                <div className="flex items-center justify-center">
+              <div className="mb-2 flex flex-col md:grid md:grid-cols-2 gap-4 md:gap-6 justify-center items-start w-full px-0 md:px-4">
+                <div className="flex items-center justify-center w-full md:w-auto">
                   <TaskDateSelctor dates={dates} setDates={setDates} />
                 </div>
 
                 {/* Scrollable date list */}
-                <div className="flex flex-col p-4 gap-y-2 overflow-y-auto h-[290px] rounded-md bg-white shadow-sm">
-                  <span className="mb-2 font-medium text-gray-700">Your Selected Dates</span>
+                <div className="flex flex-col p-3 sm:p-4 gap-y-2 overflow-y-auto min-h-[200px] md:h-[290px] max-h-[300px] md:max-h-[290px] rounded-md bg-white shadow-sm w-full">
+                  <span className="mb-2 text-sm sm:text-base font-medium text-gray-700">Your Selected Dates</span>
 
                   <div className="flex flex-col gap-y-2">
-                    {dates.map((date) => (
-                      <span
-                        key={date.toString()}
-                        className="inline-flex items-center justify-between px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-sm border border-blue-200"
-                      >
-                        {formatDateTime(date.toString()).split(",")[0]} {formatDateTime(date.toString()).split(",")[1]}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setDates((prev) => prev.filter((d) => d !== date));
-                          }}
-                          className="ml-2 text-blue-700 hover:text-blue-800"
+                    {dates.length === 0 ? (
+                      <p className="text-xs sm:text-sm text-gray-500 italic">No dates selected yet</p>
+                    ) : (
+                      dates.map((date) => (
+                        <span
+                          key={date.toString()}
+                          className="inline-flex items-center justify-between px-2 sm:px-3 py-1.5 sm:py-1 bg-blue-50 text-blue-700 rounded-lg text-xs sm:text-sm border border-blue-200"
                         >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </span>
-                    ))}
+                          <span className="flex-1 truncate mr-2">
+                            {formatDateTime(date.toString()).split(",")[0]} {formatDateTime(date.toString()).split(",")[1]}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setDates((prev) => prev.filter((d) => d !== date));
+                            }}
+                            className="ml-2 text-blue-700 hover:text-blue-800 flex-shrink-0"
+                            aria-label="Remove date"
+                          >
+                            <X className="w-3 h-3 sm:w-4 sm:h-4" />
+                          </button>
+                        </span>
+                      ))
+                    )}
                   </div>
                 </div>
               </div>
@@ -220,7 +227,7 @@ function CreateTask({ setPage }: CreateTaskProps) {
             </div>
 
             {/* Location and Rate */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-2">
                   Location Type *
@@ -349,11 +356,11 @@ function CreateTask({ setPage }: CreateTaskProps) {
             </div>
 
             {/* Submit Button */}
-            <div className="flex justify-end space-x-4">
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 sm:space-x-4">
               <button
                 type="button"
                 onClick={() => setPage('myPosts')}
-                className="px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl border border-gray-300 hover:bg-gray-200 transition-all duration-300"
+                className="w-full sm:w-auto px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl border border-gray-300 hover:bg-gray-200 transition-all duration-300"
                 disabled={isLoading}
               >
                 Cancel
@@ -361,10 +368,10 @@ function CreateTask({ setPage }: CreateTaskProps) {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="px-6 py-3 bg-linear-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="w-full sm:w-auto px-6 py-3 bg-linear-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 {isLoading ? (
-                  <div className="flex items-center">
+                  <div className="flex items-center justify-center">
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                     Creating Post...
                   </div>

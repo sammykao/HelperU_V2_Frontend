@@ -1,6 +1,7 @@
 import { useRef, useEffect, Dispatch, SetStateAction } from "react"
 import { Button } from "@/components/ui/button"
-import { formatPhone } from "@/lib/utils"
+import { formatPhone, cn } from "@/lib/utils"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 import {
   SidebarHeader,
@@ -34,15 +35,21 @@ type NavSideBarProps = {
 export function NavSideBar({ setPage, navigationItems, profile, isLoading }: NavSideBarProps) {
   const { logout } = useAuth()
   const navigate = useNavigate()
-  const { open, setOpen } = useSidebar()
+  const { open, setOpen, openMobile, setOpenMobile, isMobile } = useSidebar()
   const prevInRange = useRef(false)
+  const isMobileDevice = useIsMobile()
 
   const handleLogout = async () => {
     await logout();
     navigate('/');
   }
 
+  // Only enable mouse hover on desktop (not mobile)
   useEffect(() => {
+    if (isMobileDevice || isMobile) {
+      return; // Don't add mouse listeners on mobile
+    }
+
     const handleMouseMove = (e: MouseEvent) => {
       const rem = parseFloat(getComputedStyle(document.documentElement).fontSize)
       const x = e.clientX
@@ -67,17 +74,18 @@ export function NavSideBar({ setPage, navigationItems, profile, isLoading }: Nav
 
     window.addEventListener("mousemove", handleMouseMove)
     return () => window.removeEventListener("mousemove", handleMouseMove)
-  }, [open])
+  }, [open, isMobileDevice, isMobile, setOpen])
 
   return (
     <Sidebar
       side="left"
       variant="floating"
       collapsible="offcanvas"
-      className={`
-    transition-transform duration-300 ease-in-out z-10 w-[20rem] flex flex-col justify-between
-    ${open ? "translate-x-0" : "-translate-x-full"}
-  `}
+      className={cn(
+        "transition-transform duration-300 ease-in-out z-10 w-[20rem] flex flex-col justify-between",
+        // Only apply manual transforms on desktop (mobile uses Sheet component)
+        !(isMobileDevice || isMobile) && (open ? "translate-x-0" : "-translate-x-full")
+      )}
     >
       {/* Top Section — Profile */}
       <div className="shrink-0">
@@ -111,7 +119,12 @@ export function NavSideBar({ setPage, navigationItems, profile, isLoading }: Nav
                         className="flex items-center justify-start gap-x-2"
                         onClick={() => {
                           setPage(item.page);
-                          setOpen(false);
+                          // Close sidebar on mobile when clicking menu item
+                          if (isMobileDevice || isMobile) {
+                            setOpenMobile(false);
+                          } else {
+                            setOpen(false);
+                          }
                         }}
                       >
                         {item.icon && <item.icon />}
@@ -206,7 +219,22 @@ function ProfileCard({ profile }: ProfileCardProps) {
               <span className="w-18 text-md tracking-tight">School:</span>
               <div className="px-2 py-1 rounded-md flex-1 text-right mr-2">
                 {/* @ts-ignore */}
-                {Object.keys(collegesData).find(key => collegesData[key] === (profile as HelperProfileData).college) || "School Not Found"}
+                {(() => {
+                  const collegeValue = (profile as HelperProfileData).college;
+                  if (!collegeValue) return "Not Set";
+                  
+                  // First check if it's already a college name (key in collegesData)
+                  if (collegesData[collegeValue as keyof typeof collegesData]) {
+                    return collegeValue;
+                  }
+                  
+                  // Otherwise, try to find the college name by matching the domain (value)
+                  const collegeName = Object.keys(collegesData).find(
+                    key => collegesData[key as keyof typeof collegesData] === collegeValue
+                  );
+                  
+                  return collegeName || collegeValue || "Not Set";
+                })()}
               </div>
             </div>
           )}

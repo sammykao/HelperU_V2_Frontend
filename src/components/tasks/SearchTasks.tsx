@@ -26,64 +26,65 @@ export function SearchTasks({ handleSearch, searchParams, setSearchParams }: Sea
 
   return (
     <form className='flex flex-col gap-y-4 w-full h-full px-2 py-4 gap-x-3 mb-2 rounded-xl' onSubmit={(e) => handleSearch(e)}>
-      <div className="w-full flex flex-row items-end justify-between gap-x-2">
+      <div className="w-full flex flex-col sm:flex-row items-stretch sm:items-end justify-between gap-3 sm:gap-x-2">
         <div className="flex-1 flex flex-col">
           <label
             htmlFor="search"
-            className="text-sm font-medium text-gray-700 mb-1"
+            className="text-xs sm:text-sm font-medium text-gray-700 mb-1"
           >
             Search Criteria
           </label>
           <input
             id="search"
-            className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+            className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white border border-gray-300 rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
             placeholder="Babysitting, Furniture Moving, etc..."
             onChange={(e) => handleFilterChange("search_query", e.target.value)}
           />
         </div>
 
-        <div className="w-48 flex flex-col">
+        <div className="w-full sm:w-48 flex flex-col">
           <label
             htmlFor="zipcode"
-            className="text-sm font-medium text-gray-700 mb-1"
+            className="text-xs sm:text-sm font-medium text-gray-700 mb-1"
           >
             Search Zipcode
           </label>
           <input
             id="zipcode"
-            className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+            className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white border border-gray-300 rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
             placeholder="Your Location"
             value={searchParams.search_zip_code}
             onChange={(e) => handleFilterChange("search_zip_code", e.target.value)}
           />
         </div>
 
-        <div className="flex flex-row gap-x-2 self-end">
-          <button className="bg-blue-500 px-4 py-3 text-white rounded-xl transition-all active:scale-95" onClick={handleSearch} type="submit">
+        <div className="flex flex-row gap-x-2 self-stretch sm:self-end">
+          <button className="bg-blue-500 px-3 sm:px-4 py-2 sm:py-3 text-white rounded-lg sm:rounded-xl transition-all active:scale-95 text-sm sm:text-base flex-1 sm:flex-none" onClick={handleSearch} type="submit">
             Search
           </button>
           <button
-            className="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-all active:scale-95 flex flex-row gap-x-2"
+            className="px-3 sm:px-4 py-2 sm:py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg sm:rounded-xl transition-all active:scale-95 flex flex-row gap-x-2 items-center justify-center text-sm sm:text-base flex-1 sm:flex-none"
             onClick={() => setIsSearchSettingsOpen(!isSearchSettingsOpen)}
             type="button"
           >
-            <ChevronDown className={cn("transition-all duration-300", isSearchSettingsOpen ? "rotate-180" : "rotate-0")} />
-            Refine Search
+            <ChevronDown className={cn("w-4 h-4 transition-all duration-300", isSearchSettingsOpen ? "rotate-180" : "rotate-0")} />
+            <span className="hidden sm:inline">Refine Search</span>
+            <span className="sm:hidden">Filters</span>
           </button>
         </div>
       </div>
 
       {isSearchSettingsOpen && (
-        <div className='w-full h-fit flex flex-row gap-x-2'>
+        <div className='w-full h-fit flex flex-col sm:flex-row gap-3 sm:gap-x-2'>
           <div className="flex-1 flex flex-col">
             <label
               htmlFor="sortBy"
-              className="text-sm font-medium text-gray-700 mb-1"
+              className="text-xs sm:text-sm font-medium text-gray-700 mb-1"
             >
               Sort By
             </label>
             <Select value={searchParams.sort_by} onValueChange={(val) => handleFilterChange("sort_by", val)}>
-              <SelectTrigger className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base h-full">
+              <SelectTrigger className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white border border-gray-300 rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base h-full">
                 <SelectValue id="sort_by" />
               </SelectTrigger>
               <SelectContent className="bg-white border border-gray-300">
@@ -98,12 +99,12 @@ export function SearchTasks({ handleSearch, searchParams, setSearchParams }: Sea
           <div className="flex-1 flex flex-col">
             <label
               htmlFor="locationType"
-              className="text-sm font-medium text-gray-700 mb-1"
+              className="text-xs sm:text-sm font-medium text-gray-700 mb-1"
             >
               Location Type
             </label>
             <Select value={searchParams.search_location_type} onValueChange={(val) => handleFilterChange("search_location_type", val)}>
-              <SelectTrigger className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base h-full">
+              <SelectTrigger className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white border border-gray-300 rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base h-full">
                 <SelectValue placeholder="All Locations" id="locationType" />
               </SelectTrigger>
               <SelectContent className="bg-white border border-gray-300">
@@ -118,7 +119,7 @@ export function SearchTasks({ handleSearch, searchParams, setSearchParams }: Sea
           <div className="flex-1 flex flex-col">
             <label
               htmlFor="minRate"
-              className="text-sm font-medium text-gray-700 mb-1"
+              className="text-xs sm:text-sm font-medium text-gray-700 mb-1"
             >
               Min Rate ($/hr)
             </label>
@@ -127,7 +128,7 @@ export function SearchTasks({ handleSearch, searchParams, setSearchParams }: Sea
               type="number"
               min={1}
               value={searchParams.min_hourly_rate}
-              className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+              className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white border border-gray-300 rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
               placeholder="1"
               onChange={(e) => handleFilterChange("min_hourly_rate", e.target.value)}
             />
@@ -136,7 +137,7 @@ export function SearchTasks({ handleSearch, searchParams, setSearchParams }: Sea
           <div className="flex-1 flex flex-col">
             <label
               htmlFor="distance"
-              className="text-sm font-medium text-gray-700 mb-1"
+              className="text-xs sm:text-sm font-medium text-gray-700 mb-1"
             >
               Distance (miles)
             </label>
@@ -144,7 +145,7 @@ export function SearchTasks({ handleSearch, searchParams, setSearchParams }: Sea
               type="number"
               id="distance"
               value={searchParams.distance_radius}
-              className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+              className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white border border-gray-300 rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
               onChange={(e) => handleFilterChange("distance_radius", e.target.value)}
             />
           </div>

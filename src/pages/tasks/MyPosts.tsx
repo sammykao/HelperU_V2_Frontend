@@ -180,9 +180,9 @@ function MyPosts({ setPage }: MyPostsProps) {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">My Posts</h1>
-          <p className="text-gray-700">Manage your posted opportunities</p>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">My Posts</h1>
+          <p className="text-sm sm:text-base text-gray-700">Manage your posted opportunities</p>
         </div>
 
 
@@ -325,52 +325,54 @@ function MyPosts({ setPage }: MyPostsProps) {
         </div>
 
         {/* Posts List */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">Your Posts</h2>
+        <div className="bg-white border border-gray-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Your Posts</h2>
           </div>
 
           {posts.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 bg-linear-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="text-center py-8 sm:py-12">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-linear-to-r from-blue-500 to-cyan-500 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Posts Yet</h3>
-              <p className="text-gray-700 mb-6">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">No Posts Yet</h3>
+              <p className="text-sm sm:text-base text-gray-700 mb-4 sm:mb-6 px-4">
                 You haven't created any posts yet. Create your first opportunity to get started!
               </p>
               <button
                 onClick={() => setPage("createPost")}
-                className="px-6 py-3 bg-linear-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-lg transition-all duration-200"
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-linear-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white text-sm sm:text-base rounded-lg transition-all duration-200"
               >
                 Create Your First Post
               </button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {posts.map((post) => (
-                <div key={post.id} className="group bg-white border border-gray-200 rounded-xl p-4 sm:p-6 hover:shadow-sm transition-colors duration-200">
-                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                <div key={post.id} className="group bg-white border border-gray-200 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 hover:shadow-sm transition-colors duration-200">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3 sm:gap-4">
                     <div
-                      className="flex-1 cursor-pointer"
+                      className="flex-1 cursor-pointer min-w-0"
                       onClick={() => handlePostClick(post.id)}
                     >
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-3">
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-lg font-semibold text-gray-900 hover:text-blue-700 transition-colors">{post.title}</h3>
-                          <svg className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 hover:text-blue-700 transition-colors truncate">{post.title}</h3>
+                          <svg className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                           </svg>
                         </div>
-                        {getStatusBadge(post)}
+                        <div className="flex-shrink-0">
+                          {getStatusBadge(post)}
+                        </div>
                       </div>
 
-                      <p className="text-gray-700 mb-4 line-clamp-2">{post.description}</p>
-                      <p className="text-xs text-gray-500 mb-2">Click to view details</p>
+                      <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4 line-clamp-2">{post.description}</p>
+                      <p className="text-xs text-gray-500 mb-2 sm:mb-3">Click to view details</p>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 text-sm">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4 text-xs sm:text-sm">
                         <div>
                           <span className="text-gray-600">Rate:</span>
                           <span className="text-gray-900 ml-2 font-medium">{formatCurrency(post.hourly_rate)}/hr</span>
@@ -386,11 +388,11 @@ function MyPosts({ setPage }: MyPostsProps) {
                       </div>
 
                       {post.dates && post.dates.length > 0 && (
-                        <div className="mt-3">
-                          <span className="text-gray-600 text-sm">Dates:</span>
-                          <div className="flex flex-wrap gap-2 mt-1">
+                        <div className="mt-2 sm:mt-3">
+                          <span className="text-gray-600 text-xs sm:text-sm">Dates:</span>
+                          <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-1">
                             {post.dates.map((date, index) => (
-                              <span key={index} className="px-2 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded text-xs">
+                              <span key={index} className="px-2 py-0.5 sm:py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded text-xs">
                                 {formatDate(date)}
                               </span>
                             ))}
@@ -399,16 +401,16 @@ function MyPosts({ setPage }: MyPostsProps) {
                       )}
 
                       {post.tools_info && (
-                        <div className="mt-3">
-                          <span className="text-gray-600 text-sm">Tools Required:</span>
-                          <p className="text-gray-700 text-sm mt-1">{post.tools_info}</p>
+                        <div className="mt-2 sm:mt-3">
+                          <span className="text-gray-600 text-xs sm:text-sm">Tools Required:</span>
+                          <p className="text-gray-700 text-xs sm:text-sm mt-1">{post.tools_info}</p>
                         </div>
                       )}
 
                       {post.public_transport_info && (
-                        <div className="mt-3">
-                          <span className="text-gray-600 text-sm">Public Transport:</span>
-                          <p className="text-gray-700 text-sm mt-1">{post.public_transport_info}</p>
+                        <div className="mt-2 sm:mt-3">
+                          <span className="text-gray-600 text-xs sm:text-sm">Public Transport:</span>
+                          <p className="text-gray-700 text-xs sm:text-sm mt-1">{post.public_transport_info}</p>
                         </div>
                       )}
 
@@ -422,19 +424,20 @@ function MyPosts({ setPage }: MyPostsProps) {
                     </div>
 
                     <div
-                      className="flex flex-row lg:flex-col gap-2 lg:ml-4"
+                      className="flex flex-row lg:flex-col gap-2 lg:ml-4 flex-shrink-0"
                       onClick={(e) => e.stopPropagation()}
                     >
                       {post.completed_at ? (
                         // Show "Post Again" button for completed posts
                         <button
                           onClick={() => handlePostAgain(post)}
-                          className="px-4 py-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg transition-all duration-200 flex items-center text-sm font-medium shadow-sm hover:shadow-md"
+                          className="px-3 sm:px-4 py-1.5 sm:py-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg transition-all duration-200 flex items-center justify-center text-xs sm:text-sm font-medium shadow-sm hover:shadow-md flex-1 sm:flex-none"
                         >
-                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                           </svg>
-                          Post Again
+                          <span className="hidden sm:inline">Post Again</span>
+                          <span className="sm:hidden">Again</span>
                         </button>
                       ) : (
                         // Show "Complete" button for active posts
@@ -442,16 +445,17 @@ function MyPosts({ setPage }: MyPostsProps) {
                           <button
                             onClick={() => handleCompletePost(post.id)}
                             disabled={completingPost === post.id}
-                            className="px-4 py-2 bg-linear-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-green-500 disabled:to-emerald-500 text-white rounded-lg transition-all duration-200 flex items-center text-sm font-medium shadow-sm hover:shadow-md"
+                            className="px-3 sm:px-4 py-1.5 sm:py-2 bg-linear-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-green-500 disabled:to-emerald-500 text-white rounded-lg transition-all duration-200 flex items-center justify-center text-xs sm:text-sm font-medium shadow-sm hover:shadow-md flex-1 sm:flex-none"
                           >
                             {completingPost === post.id ? (
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                              <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white mr-1 sm:mr-2"></div>
                             ) : (
-                              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                               </svg>
                             )}
-                            Job Done?
+                            <span className="hidden sm:inline">Job Done?</span>
+                            <span className="sm:hidden">Done</span>
                           </button>
                         </Tooltip>
                       )}
@@ -459,20 +463,21 @@ function MyPosts({ setPage }: MyPostsProps) {
                       <button
                         onClick={() => handleDeletePost(post.id)}
                         disabled={deletingPost === post.id || !!post.completed_at}
-                        className={`px-4 py-2 rounded-lg transition-all duration-200 flex items-center text-sm font-medium shadow-sm hover:shadow-md ${post.completed_at
+                        className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-all duration-200 flex items-center justify-center text-xs sm:text-sm font-medium shadow-sm hover:shadow-md flex-1 sm:flex-none ${post.completed_at
                           ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                           : 'bg-gray-100 hover:bg-gray-200 text-red-600 hover:text-red-700 disabled:bg-gray-100 disabled:text-red-400'
                           }`}
                         title={post.completed_at ? 'Cannot delete completed posts' : 'Delete post'}
                       >
                         {deletingPost === post.id ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600 mr-2"></div>
+                          <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-red-600 mr-1 sm:mr-2"></div>
                         ) : (
-                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
                         )}
-                        Delete
+                        <span className="hidden sm:inline">Delete</span>
+                        <span className="sm:hidden">Del</span>
                       </button>
                     </div>
                   </div>

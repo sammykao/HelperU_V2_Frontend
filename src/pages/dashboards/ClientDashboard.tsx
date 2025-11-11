@@ -3,12 +3,14 @@ import { ClientProfileData } from '@/lib/api/profile';
 import { NavSideBar } from '@/components/NavSideBar';
 import { SidebarProvider, SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { cn } from '@/lib/utils';
-import { Briefcase, PenLine, Search, User } from "lucide-react";
+import { Briefcase, PenLine, Search, User, Menu } from "lucide-react";
 import { ClientPage, NavSidebarRoute } from '@/lib/utils/types';
 import Profile from '../auth/Profile';
 import MyPosts from '../tasks/MyPosts';
 import SearchHelpers from '../helpers/SearchHelpers';
 import CreateTask from '../tasks/CreateTask';
+import { Button } from '@/components/ui/button';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 type ClientDashboardProps = {
   profile: ClientProfileData;
@@ -59,7 +61,8 @@ function ClientDashboard({ profile, isLoading }: ClientDashboardProps) {
 }
 
 function DashboardLayout({ children, setPage, routes, profile, isLoading }: any) {
-  const { open } = useSidebar();
+  const { open, openMobile, isMobile, toggleSidebar } = useSidebar();
+  const isMobileDevice = useIsMobile();
 
   return (
     <div className="flex h-full w-full relative">
@@ -71,12 +74,36 @@ function DashboardLayout({ children, setPage, routes, profile, isLoading }: any)
         isLoading={isLoading}
       />
 
+      {/* Mobile Sidebar Trigger Button - Floating */}
+      {(isMobileDevice || isMobile) && !openMobile && (
+        <Button
+          onClick={toggleSidebar}
+          className="fixed top-20 left-4 z-50 h-12 w-12 rounded-full shadow-lg bg-blue-600 hover:bg-blue-700 text-white md:hidden"
+          size="icon"
+          aria-label="Open sidebar"
+        >
+          <Menu className="h-6 w-6" />
+        </Button>
+      )}
+
+      {/* Desktop Sidebar Trigger - Top Left */}
+      {!(isMobileDevice || isMobile) && !open && (
+        <Button
+          onClick={toggleSidebar}
+          className="fixed top-4 left-4 z-50 h-10 w-10 rounded-lg shadow-md bg-white hover:bg-gray-100 text-gray-700 border border-gray-200 md:flex hidden items-center justify-center"
+          size="icon"
+          aria-label="Open sidebar"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+      )}
 
       {/* Main content area */}
       <main
         className={cn(
-          "flex-1 p-6 transition-all duration-300 ease-in-out h-full w-full",
-          open ? "translate-x-40" : "translate-x-0"
+          "flex-1 p-4 md:p-6 transition-all duration-300 ease-in-out h-full w-full",
+          // Only translate on desktop when sidebar is open
+          !(isMobileDevice || isMobile) && open ? "md:translate-x-40" : "translate-x-0"
         )}
       >
         {children}

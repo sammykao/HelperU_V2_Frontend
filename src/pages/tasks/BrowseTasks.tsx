@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { taskApi, TaskSearchResponse, TaskSearchRequest } from '../../lib/api/tasks';
-import { formatCurrency, formatDate, formatDistance, formatPhone } from '../../lib/utils/format';
 import { profileApi } from '../../lib/api/profile';
-import { applicationApi, ApplicationInfo } from '../../lib/api/applications';
+import { applicationApi, ApplicationInfo, ApplicationCreateData } from '../../lib/api/applications';
 import { useAuth } from '../../lib/contexts/AuthContext';
 import toast from 'react-hot-toast';
-import { ClipboardPen, Share } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SearchTasks } from '@/components/tasks/SearchTasks';
+import { TaskCardSkeleton } from '@/components/tasks/TaskCardSkeleton';
+import { TaskDetailSkeleton } from '@/components/tasks/TaskDetailSkeleton';
+import { TaskDetailView } from '@/components/tasks/TaskDetailView';
+import { TaskCard } from '@/components/tasks/TaskCard';
+import { QuickApplyModal } from '@/components/tasks/modals/QuickApplyModal';
+import { ApplicationModal } from '@/components/tasks/modals/ApplicationModal';
 
 function BrowseTasks() {
   const { authRoute } = useAuth();
+  const [searchParamsUrl] = useSearchParams();
   const [tasks, setTasks] = useState<TaskSearchResponse[]>([]);
   const [filteredTasks, setFilteredTasks] = useState<TaskSearchResponse[]>([]);
   const [applications, setApplications] = useState<ApplicationInfo[]>([]);
@@ -21,11 +27,23 @@ function BrowseTasks() {
     search_offset: 0,
     sort_by: 'post_date',
   });
-  const [totalCount, setTotalCount] = useState(0);
   const [hasSearched, setHasSearched] = useState(false);
-  const [sortBy, setSortBy] = useState<'distance' | 'post_date'>('post_date');
-  const [distanceRadius, setDistanceRadius] = useState<number | undefined>(100);
+  const [sortBy] = useState<'distance' | 'post_date'>('post_date');
+  const [distanceRadius] = useState<number | undefined>(100);
   const [selectedTask, setTask] = useState<TaskSearchResponse | null>(null);
+  const [hasMoreTasks, setHasMoreTasks] = useState(false);
+  const [lastAppliedUrlTaskId, setLastAppliedUrlTaskId] = useState<string | null>(null);
+  const [showApplicationModal, setShowApplicationModal] = useState(false);
+  const [applicationMessage, setApplicationMessage] = useState('');
+  const [applying, setApplying] = useState(false);
+  const [quickApplying, setQuickApplying] = useState<string | null>(null); // Track which task is being quick applied
+  const [showQuickApplyModal, setShowQuickApplyModal] = useState(false);
+  const [taskToQuickApply, setTaskToQuickApply] = useState<TaskSearchResponse | null>(null);
+  const [helperBio, setHelperBio] = useState<string | null>(null);
+  const carouselRef = React.useRef<HTMLDivElement>(null);
+
+  // Get task ID from URL query string
+  const taskIdFromUrl = searchParamsUrl.get('taskId');
 
   // Load applications for helper
   const loadApplications = async () => {
@@ -48,6 +66,11 @@ function BrowseTasks() {
 
         try {
           const profileResponse = await profileApi.getProfile();
+          // Load helper bio for quick apply
+          if (profileResponse.profile?.helper?.bio) {
+            setHelperBio(profileResponse.profile.helper.bio);
+          }
+          
           if (profileResponse.profile?.helper?.zip_code) {
             const zipCode = profileResponse.profile!.helper!.zip_code!;
             setSearchParams(prev => ({
@@ -67,12 +90,20 @@ function BrowseTasks() {
               });
 
               setTasks(response.tasks);
-              setTotalCount(response.tasks.length < response.limit ?
-                response.tasks.length :
-                response.tasks.length + 1
-              );
               setHasSearched(true);
-              setTask(response.tasks[0])
+              
+              // Select task from URL if provided, otherwise select first task
+              if (taskIdFromUrl) {
+                const taskFromUrl = response.tasks.find(t => t.id === taskIdFromUrl);
+                if (taskFromUrl) {
+                  setTask(taskFromUrl);
+                  setLastAppliedUrlTaskId(taskIdFromUrl);
+                } else {
+                  setTask(response.tasks[0] || null);
+                }
+              } else {
+                setTask(response.tasks[0] || null);
+              }
             } catch (error: any) {
               toast.error('Failed to load tasks');
               console.error('Error fetching tasks:', error);
@@ -89,16 +120,35 @@ function BrowseTasks() {
     initializeZipCodeAndLoadTasks();
   }, [authRoute]);
 
-  // Filter tasks to remove those already applied to (for helpers)
+  // Helper function to check if a task has been applied to
+  const isTaskApplied = (taskId: string): boolean => {
+    if (authRoute !== 'helper') return false;
+    return applications.some(app => app.task_id === taskId);
+  };
+
+  // Helper function to get the application message for a task
+  const getApplicationMessage = (taskId: string): string | undefined => {
+    if (authRoute !== 'helper') return undefined;
+    const application = applications.find(app => app.task_id === taskId);
+    return application?.introduction_message;
+  };
+
+  // Show all tasks (don't filter out applied ones)
   useEffect(() => {
-    if (authRoute === 'helper' && applications.length > 0) {
-      const appliedTaskIds = new Set(applications.map(app => app.task_id));
-      const filtered = tasks.filter(task => !appliedTaskIds.has(task.id));
-      setFilteredTasks(filtered);
-    } else {
       setFilteredTasks(tasks);
+  }, [tasks]);
+
+  // Handle taskId from URL query string when tasks are already loaded
+  // Only apply if it's different from what we last applied, or if no task is selected
+  useEffect(() => {
+    if (taskIdFromUrl && tasks.length > 0 && taskIdFromUrl !== lastAppliedUrlTaskId) {
+      const taskFromUrl = tasks.find(t => t.id === taskIdFromUrl);
+      if (taskFromUrl) {
+        setTask(taskFromUrl);
+        setLastAppliedUrlTaskId(taskIdFromUrl);
+      }
     }
-  }, [tasks, applications, authRoute]);
+  }, [taskIdFromUrl, tasks, lastAppliedUrlTaskId]);
 
   const fetchTasks = async () => {
     setIsLoading(true);
@@ -114,19 +164,47 @@ function BrowseTasks() {
         distance_radius: distanceRadius,
       });
 
+      // Update total count and hasMoreTasks flag
+      const hasMore = response.tasks.length >= (response.limit || 20);
+      setHasMoreTasks(hasMore);
+
       if ((searchParams.search_offset || 0) === 0) {
         // First page or new search - replace tasks
         setTasks(response.tasks);
+        
+        // Select task from URL if provided and different from last applied, otherwise select first task if none selected
+        if (taskIdFromUrl && taskIdFromUrl !== lastAppliedUrlTaskId) {
+          const taskFromUrl = response.tasks.find(t => t.id === taskIdFromUrl);
+          if (taskFromUrl) {
+            setTask(taskFromUrl);
+            setLastAppliedUrlTaskId(taskIdFromUrl);
+          } else if (response.tasks.length > 0 && !selectedTask) {
+            setTask(response.tasks[0]);
+          }
+        } else if (response.tasks.length > 0 && !selectedTask) {
+          setTask(response.tasks[0]);
+        }
       } else {
         // Load more - append tasks
+        const previousTaskCount = tasks.length;
         setTasks(prev => [...prev, ...response.tasks]);
+        
+        // On mobile, scroll carousel to show newly loaded tasks
+        // Use setTimeout to ensure DOM has updated
+        setTimeout(() => {
+          if (carouselRef.current && previousTaskCount > 0) {
+            // Scroll to show the first newly loaded task
+            // Card width: 280px, gap: 12px (gap-3 = 0.75rem)
+            const cardWidth = 280;
+            const gap = 12;
+            const scrollPosition = previousTaskCount * (cardWidth + gap);
+            carouselRef.current.scrollTo({
+              left: scrollPosition,
+              behavior: 'smooth'
+            });
+          }
+        }, 100);
       }
-
-      // Update total count based on whether we got a full page
-      setTotalCount(response.tasks.length < response.limit ?
-        ((searchParams.search_offset || 0) + response.tasks.length) :
-        ((searchParams.search_offset || 0) + response.tasks.length + 1)
-      );
     } catch (error: any) {
       toast.error('Failed to fetch tasks');
       console.error('Error fetching tasks:', error);
@@ -143,6 +221,7 @@ function BrowseTasks() {
     }
     setSearchParams(prev => ({ ...prev, search_offset: 0 }));
     setHasSearched(true);
+    setHasMoreTasks(false); // Reset on new search
     fetchTasks();
   };
 
@@ -179,14 +258,173 @@ function BrowseTasks() {
     }));
   };
 
-  return (
-    <div className="min-h-screen h-full bg-white w-full py-6">
+  const handleShare = async () => {
+    if (!selectedTask) return;
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-18 ">
+    // Create share URL - using task ID to navigate to browse page with task selected
+    const taskUrl = `${window.location.origin}/dashboard?taskId=${selectedTask.id}`;
+    const shareText = `Check out this task: ${selectedTask.title} - $${selectedTask.hourly_rate}/hr`;
+
+    if (navigator.share) {
+      // Use native share API if available (mobile)
+      try {
+        await navigator.share({
+          title: selectedTask.title,
+          text: shareText,
+          url: taskUrl,
+        });
+        toast.success('Task shared!');
+      } catch (err: any) {
+        // User cancelled or error occurred, fall back to clipboard
+        if (err.name !== 'AbortError') {
+          await copyToClipboard(taskUrl);
+        }
+      }
+    } else {
+      // Fall back to clipboard copy
+      await copyToClipboard(taskUrl);
+    }
+  };
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success('Link copied to clipboard!');
+    } catch (err) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      toast.success('Link copied to clipboard!');
+    }
+  };
+
+  const handleApply = () => {
+    if (!selectedTask) return;
+
+    if (authRoute !== 'helper') {
+      toast.error('Only helpers can apply for tasks');
+      return;
+    }
+
+    if (isTaskApplied(selectedTask.id)) {
+      toast.error('You have already applied to this task');
+      return;
+    }
+
+    setShowApplicationModal(true);
+  };
+
+  const handleSubmitApplication = async () => {
+    if (!selectedTask || !applicationMessage.trim()) {
+      toast.error('Please enter an introduction message');
+      return;
+    }
+
+    try {
+      setApplying(true);
+
+      const applicationData: ApplicationCreateData = {
+        introduction_message: applicationMessage.trim(),
+        supplements_url: undefined
+      };
+
+      await applicationApi.createApplication(selectedTask.id, applicationData);
+      toast.success('Application submitted successfully!');
+      setShowApplicationModal(false);
+      setApplicationMessage('');
+      
+      // Reload applications to update the UI
+      await loadApplications();
+    } catch (err: any) {
+      console.error('Failed to apply:', err);
+      const errorMessage = err?.response?.data?.detail || err?.message || 'Failed to submit application. Please try again.';
+      toast.error(errorMessage);
+    } finally {
+      setApplying(false);
+    }
+  };
+
+  const handleQuickApplyClick = (task: TaskSearchResponse, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent task selection when clicking quick apply
+
+    if (authRoute !== 'helper') {
+      toast.error('Only helpers can apply for tasks');
+      return;
+    }
+
+    if (isTaskApplied(task.id)) {
+      toast.error('You have already applied to this task');
+      return;
+    }
+
+    if (!helperBio || !helperBio.trim()) {
+      toast.error('Please add a bio to your profile to use quick apply');
+      return;
+    }
+
+    // Show confirmation modal
+    setTaskToQuickApply(task);
+    setShowQuickApplyModal(true);
+  };
+
+  const handleQuickApplyConfirm = async () => {
+    if (!taskToQuickApply) return;
+
+    const taskId = taskToQuickApply.id;
+
+    try {
+      setQuickApplying(taskId);
+      setShowQuickApplyModal(false);
+
+      const applicationData: ApplicationCreateData = {
+        introduction_message: helperBio!.trim(),
+        supplements_url: undefined
+      };
+
+      await applicationApi.createApplication(taskId, applicationData);
+      toast.success('Quick applied successfully!');
+      
+      // Reload applications to update the UI
+      await loadApplications();
+      
+      // Select the task to show it as applied
+      setTask(taskToQuickApply);
+    } catch (err: any) {
+      console.error('Failed to quick apply:', err);
+      const errorMessage = err?.response?.data?.detail || err?.message || 'Failed to submit application. Please try again.';
+      toast.error(errorMessage);
+    } finally {
+      setQuickApplying(null);
+      setTaskToQuickApply(null);
+    }
+  };
+
+  // Prevent body scroll when modals are open
+  useEffect(() => {
+    if (showApplicationModal || showQuickApplyModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [showApplicationModal, showQuickApplyModal]);
+
+  return (
+    <div className="min-h-screen h-full bg-gradient-to-br from-gray-50 to-blue-50 w-full py-4 sm:py-6">
+
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-1 sm:mb-2">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Browse Opportunities</h1>
-          <p className="text-sm sm:text-base text-gray-700">
+        <div className="mb-4 sm:mb-6">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Browse Opportunities</h1>
+          <p className="text-sm sm:text-base text-gray-600">
             {hasSearched
               ? `Showing opportunities near ${searchParams.search_zip_code} - modify filters below to refine your search`
               : 'Find posts that match your skills and interests'
@@ -194,166 +432,224 @@ function BrowseTasks() {
           </p>
         </div>
 
-        {/* Results */}
-        {hasSearched && (
-          <div className="mb-4">
-            <p className="text-sm sm:text-base text-gray-700">
-              {filteredTasks.length} opportunit{filteredTasks.length !== 1 ? 'ies' : 'y'} found
-            </p>
+        {/* Search Bar */}
+        <div className="mb-4 sm:mb-6">
+          <SearchTasks searchParams={searchParams} setSearchParams={setSearchParams} handleSearch={handleSearch} />
+        </div>
+
+        {/* Mobile: Horizontal Carousel + Details Below */}
+        <div className='lg:hidden flex flex-col gap-4'>
+          {isLoading && !hasSearched ? (
+            <>
+              {/* Loading Skeleton for Mobile Carousel */}
+              <div className='relative'>
+                <div className='flex overflow-x-auto gap-3 pb-4 px-1 scrollbar-hide'>
+                  {[...Array(3)].map((_, idx) => (
+                    <TaskCardSkeleton key={idx} isMobile={true} />
+                  ))}
+                </div>
+              </div>
+              {/* Loading Skeleton for Task Details */}
+              <div className='bg-white border rounded-xl border-gray-300 overflow-hidden shadow-sm'>
+                <TaskDetailSkeleton />
+              </div>
+            </>
+          ) : filteredTasks.length === 0 ? (
+            <div className="text-center py-12 border border-gray-300 rounded-xl h-[300px] flex flex-col items-center justify-center bg-white">
+              <div className="w-12 h-12 bg-gray-100 flex items-center justify-center mx-auto mb-4 p-2">
+                <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No opportunities found</h3>
+              <p className="text-sm text-gray-700">Try adjusting your search criteria</p>
+            </div>
+          ) : (
+            <>
+              {/* Horizontal Swipeable Carousel */}
+              <div className='relative'>
+                <div 
+                  ref={carouselRef}
+                  className='flex overflow-x-auto gap-3 pb-4 px-1 scrollbar-hide' 
+                  style={{ 
+                    WebkitOverflowScrolling: 'touch', 
+                    scrollSnapType: 'x mandatory',
+                  }}
+                >
+                  {filteredTasks.map((task, idx) => (
+                    <TaskCard
+                      key={task.id || idx}
+                      task={task}
+                      isSelected={selectedTask?.id === task.id}
+                      isApplied={isTaskApplied(task.id)}
+                      isMobile={true}
+                      isQuickApplying={quickApplying === task.id}
+                      canQuickApply={authRoute === 'helper'}
+                      hasHelperBio={!!helperBio}
+                      onSelect={() => setTask(task)}
+                      onQuickApply={(e) => handleQuickApplyClick(task, e)}
+                    />
+                  ))}
+                  
+                  {/* Load More Button - At End of Carousel */}
+                  {hasMoreTasks && (
+                    <div className='flex-shrink-0 w-[280px] snap-start flex items-center justify-center'>
+                      <button
+                        disabled={isLoading}
+                        className={cn(
+                          'w-full h-full min-h-[140px] bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 flex flex-col justify-center items-center rounded-xl text-white active:scale-[99%] text-sm font-medium transition-all shadow-sm border border-blue-400',
+                          isLoading && 'opacity-70'
+                        )}
+                        onClick={loadMore}
+                      >
+                        {isLoading ? (
+                          <span className="flex flex-col items-center gap-2">
+                            <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span>Loading...</span>
+                          </span>
+                        ) : (
+                          <span>Load More</span>
+                        )}
+                      </button>
           </div>
         )}
+                </div>
+              </div>
 
-        {/* Search Bar */}
-        <SearchTasks searchParams={searchParams} setSearchParams={setSearchParams} handleSearch={handleSearch} />
+              {/* Job Details Below Carousel on Mobile */}
+              {selectedTask && (
+                <div className='bg-white border rounded-xl border-gray-300 overflow-hidden shadow-sm'>
+                  <TaskDetailView 
+                    task={selectedTask} 
+                    isApplied={isTaskApplied(selectedTask.id)} 
+                    applicationMessage={getApplicationMessage(selectedTask.id)}
+                    onShare={handleShare}
+                    onApply={handleApply}
+                  />
+                </div>
+              )}
+            </>
+          )}
+        </div>
 
-        <div className='bg-white w-full h-full grid grid-cols-[2fr_3fr] gap-x-2 rounded-md p-1'>
-          <div>
-            {filteredTasks.length === 0 ? (
-              <div className="text-center py-12 border border-gray-300 rounded-2xl h-[650px]">
+        {/* Desktop: Side-by-side Layout */}
+        <div className='hidden lg:grid lg:grid-cols-[320px_1fr] gap-4 bg-white w-full rounded-xl sm:rounded-2xl p-4 shadow-lg border border-gray-200'>
+          <div className="flex flex-col min-h-0 w-full max-w-[320px] h-[650px]">
+            {isLoading && !hasSearched ? (
+              <div className='flex flex-col gap-y-3 h-full min-h-0 w-full'>
+                <div className='flex flex-col justify-start items-start w-full space-y-2 overflow-y-auto flex-1 min-h-0 pr-1'>
+                  {[...Array(5)].map((_, idx) => (
+                    <TaskCardSkeleton key={idx} isMobile={false} />
+                  ))}
+                </div>
+              </div>
+            ) : filteredTasks.length === 0 ? (
+              <div className="text-center py-12 border border-gray-300 rounded-xl h-[650px] flex flex-col items-center justify-center">
                 <div className="w-16 h-16 bg-gray-100 flex items-center justify-center mx-auto mb-4 p-2">
                   <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">No opportunities found</h3>
-                <p className="text-gray-700">Try adjusting your search criteria</p>
+                <p className="text-base text-gray-700">Try adjusting your search criteria</p>
               </div>
             ) : (
-              <div className='flex flex-col gap-y-4 items-center justify-center'>
-                <div className='flex flex-col justify-start items-start w-full space-y-2 overflow-y-auto h-[595px]' style={{ scrollbarWidth: "none" }}>
+              <div className='flex flex-col gap-y-3 h-full min-h-0 w-full'>
+                <div className='flex flex-col justify-start items-start w-full space-y-2 overflow-y-auto flex-1 min-h-0 pr-1' style={{ scrollbarWidth: "thin" }}>
                   {filteredTasks.map((task, idx) => (
-                    <div className={cn('flex flex-row gap-x-2 items-start justify-start w-full h-fit px-2 border border-slate-300 rounded-2xl py-4', (selectedTask && task.id === selectedTask.id) ? "bg-gray-200" : "bg-white hover:bg-gray-100")} key={idx}>
-                      <div className='mt-2 mr-2'>
-                        {task.client.pfp_url ? (
-                          <div className="w-12 h-12 rounded-full overflow-hidden shrink-0">
-                            <img
-                              src={task.client.pfp_url}
-                              alt={`${task.client.first_name} ${task.client.last_name}`}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        ) : (
-                          <div className='w-12 h-12 flex justify-center items-center rounded-full bg-slate-100'>
-                            {task.client.first_name.slice(0, 1)} {task.client.last_name.slice(0, 1)}
-                          </div>
-                        )}
-                      </div>
-                      <div
-                        className={`flex flex-col items-start justify-center w-full py-2 text-xs sm:text-sm text-gray-700 tracking-tight cursor-pointer`}
-                        onClick={() => setTask(task)}
-                      >
-                        <span className='font-bold'>{task.title}</span>
-                        <span className='text-green-700 '>${task.hourly_rate}/hr</span>
-                        <span className=''>{task.location_type === "remote" ? "Remote" : `Zipcode: ${task.zip_code}`}</span>
-                        <span className="truncate ">
-                          Posted by {task.client.first_name} {task.client.last_name}
-                        </span>
-                      </div>
-                    </div>
+                    <TaskCard
+                      key={task.id || idx}
+                      task={task}
+                      isSelected={selectedTask?.id === task.id}
+                      isApplied={isTaskApplied(task.id)}
+                      isMobile={false}
+                      isQuickApplying={quickApplying === task.id}
+                      canQuickApply={authRoute === 'helper'}
+                      hasHelperBio={!!helperBio}
+                      onSelect={() => setTask(task)}
+                      onQuickApply={(e) => handleQuickApplyClick(task, e)}
+                    />
                   ))}
                 </div>
 
-                <div className='w-full h-fit'>
+                {hasMoreTasks && (
+                  <div className='w-full h-fit pt-2 border-t border-gray-200 flex-shrink-0 mt-auto'>
                   <button
-                    className={cn('h-10 py-2 w-full bg-blue-500 hover:bg-blue-500/90 flex justify-center items-center rounded-md text-white active:scale-[99%]')}
+                      disabled={isLoading}
+                      className={cn('h-9 py-1.5 w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 flex justify-center items-center rounded-lg text-white active:scale-[99%] text-xs font-medium transition-all shadow-sm hover:shadow-md whitespace-nowrap', isLoading && 'opacity-70')}
                     onClick={loadMore}
                   >
-                    Load More
+                      {isLoading ? (
+                        <span className="flex items-center gap-1.5">
+                          <svg className="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          <span className="text-xs">Loading...</span>
+                        </span>
+                      ) : (
+                        <span className="text-xs">Load More</span>
+                      )}
                   </button>
                 </div>
+                )}
               </div>
             )}
           </div>
-          <div className='border rounded-2xl border-gray-300 h-[650px] overflow-y-auto overflow-x-hidden scroll-x-1 scroll-my-6'>
-            {selectedTask ? (
-              <div className="grid grid-cols-1 pt-4">
-                {/* Main Content */}
-                <div className="lg:col-span-2">
-                  {/* Task title */}
-                  <div className='ml-4 mb-4 text-3xl tracking-tight'>
-                    {selectedTask.title}
+          <div className='border rounded-xl border-gray-300 h-[650px] overflow-y-auto overflow-x-hidden bg-white shadow-sm scrollbar-hide'>
+            {isLoading && !hasSearched ? (
+              <TaskDetailSkeleton />
+            ) : selectedTask ? (
+              <TaskDetailView 
+                task={selectedTask} 
+                isApplied={isTaskApplied(selectedTask.id)} 
+                applicationMessage={getApplicationMessage(selectedTask.id)}
+                onShare={handleShare}
+                onApply={handleApply}
+              />
+            ) : (
+              <div className="rounded-xl p-6 py-16 mx-4 h-full w-full flex flex-col items-center justify-center overflow-y-hidden bg-gradient-to-br from-gray-50 to-blue-50">
+                <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                  <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
                   </div>
-
-                  <div className='ml-4 mb-4 w-full flex flex-row gap-x-2 items-center justify-start'>
-                    <button className='bg-blue-600 px-4 py-2 rounded-md hover:bg-blue-500 active:scale-95 text-white transition-all duration-300 flex flex-row items-center justify-center gap-x-2'>
-                      <ClipboardPen />
-                      Apply To Task
-                    </button>
-                    <button className=' bg-gray-300 px-4 py-2 rounded-md hover:bg-gray-400 active:scale-95 text-black transition-all duration-300 flex flex-row items-center justify-center gap-x-2'>
-                      <Share />
-                      Share Task</button>
-                  </div>
-
-                  {/* Client Contact Info */}
-                  <div className="bg-white border-t border-gray-400 p-6 shadow-sm">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Client Information</h2>
-                    <div className='flex flex-col w-full justify-center items-start gap-y-2'>
-                      <p className="text-gray-700 leading-relaxed">Name: {selectedTask.client.first_name} {selectedTask.client.last_name}</p>
-                      <p className="text-gray-700 leading-relaxed flex flex-row gap-x-2 justify-center">
-                        Email:
-                        <a href={`mailto:${selectedTask.client.email}`}>{selectedTask.client.email}</a>
-
-                      </p>
-                      <p className="text-gray-700 leading-relaxed flex flex-row gap-x-2 justify-center">
-                        Phone:
-                        <a href={`tel:${selectedTask.client.phone}`}>{formatPhone(selectedTask.client.phone)}</a>
-
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  <div className="bg-white border-t border-gray-400 p-6 shadow-sm">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Description</h2>
-                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{selectedTask.description}</p>
-                  </div>
-
-                  {/* Additional Information */}
-                  {(selectedTask.tools_info || selectedTask.public_transport_info) && (
-                    <div className="bg-white border-y border-gray-400 p-6 shadow-sm">
-                      <h2 className="text-xl font-semibold text-gray-900 mb-4">Additional Information</h2>
-                      <div className="space-y-4">
-                        {selectedTask.tools_info && (
-                          <div>
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">Tools Required</h3>
-                            <p className="text-gray-700">{selectedTask.tools_info}</p>
-                          </div>
-                        )}
-                        {selectedTask.public_transport_info && (
-                          <div>
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">Public Transport</h3>
-                            <p className="text-gray-700">{selectedTask.public_transport_info}</p>
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">No Task Selected</h2>
+                <p className="text-base text-gray-600 text-center px-4 max-w-sm">Click on a task from the list to view full details</p>
                           </div>
                         )}
                       </div>
                     </div>
-                  )}
 
-                  {/* Dates */}
-                  <div className="bg-white  border-b border-gray-400 p-6 shadow-sm">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Available Dates</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {selectedTask.dates.map((date, index) => (
-                        <div key={index} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                          <p className="text-gray-700">{formatDate(date)}</p>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
 
-            ) : (
-              <div className="rounded-2xl p-6 py-12 mx-4 h-full w-full flex flex-col items-center justify-start overflow-y-hidden">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">No Task Selected</h2>
-                <p>Please click on a task on the left to view details</p>
-              </div>
+      {/* Modals */}
+      <QuickApplyModal
+        isOpen={showQuickApplyModal}
+        task={taskToQuickApply}
+        helperBio={helperBio}
+        isApplying={quickApplying === taskToQuickApply?.id}
+        onClose={() => {
+          setShowQuickApplyModal(false);
+          setTaskToQuickApply(null);
+        }}
+        onConfirm={handleQuickApplyConfirm}
+      />
 
-            )}
-          </div>
-        </div>
-
-      </div>
+      <ApplicationModal
+        isOpen={showApplicationModal}
+        applicationMessage={applicationMessage}
+        isApplying={applying}
+        onClose={() => {
+          setShowApplicationModal(false);
+          setApplicationMessage('');
+        }}
+        onMessageChange={setApplicationMessage}
+        onSubmit={handleSubmitApplication}
+      />
     </div >
   );
 };

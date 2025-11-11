@@ -25,12 +25,14 @@ export function TaskDateSelctor({ dates, setDates }: TaskDateSelctorProps) {
   }, [date]);
 
   return (
-    <Calendar
-      mode="single"
-      onSelect={setDate}
-      className="rounded-lg shadow-sm bg-white w-fit"
-      hidden={{ before: new Date() }}
-      startMonth={new Date()}
-    />
+    <div className="w-full flex justify-center md:justify-start">
+      <Calendar
+        mode="single"
+        onSelect={setDate}
+        className="rounded-lg shadow-sm bg-white w-full max-w-[320px] sm:max-w-none sm:w-fit"
+        hidden={{ before: new Date() }}
+        startMonth={new Date()}
+      />
+    </div>
   )
 }

@@ -110,7 +110,7 @@ const HelperCompleteProfile: React.FC = () => {
       toast.success('Profile completed successfully!');
       setAuthRoute('helper');
       await refreshProfileStatus();
-      navigate('/tasks/browse');
+      navigate('/dashboard');
     } catch (err: any) {
       toast.error(err.message || 'Failed to complete profile');
     } finally {

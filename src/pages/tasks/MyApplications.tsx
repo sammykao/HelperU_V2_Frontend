@@ -19,21 +19,14 @@ const TabButton: React.FC<{ active: boolean; onClick: () => void; children: Reac
   </button>
 );
 
-const TaskCard: React.FC<{ task: TaskResponse; subtitle?: string; type: 'application' | 'invitation' }> = ({ task, subtitle, type }) => {
+const TaskCard: React.FC<{ task: TaskResponse; subtitle?: string; type: 'application' | 'invitation'; isHelper?: boolean }> = ({ task, subtitle, type, isHelper = false }) => {
   const navigate = useNavigate();
-
-  const getCardGradient = () => {
-    if (type === 'application') {
-      return 'from-emerald-50 via-blue-50 to-purple-50';
-    }
-    return 'from-orange-50 via-pink-50 to-purple-50';
-  };
 
   const getIconGradient = () => {
     if (type === 'application') {
-      return 'from-emerald-500 to-blue-500';
+      return 'from-blue-400 to-blue-600';
     }
-    return 'from-orange-500 to-pink-500';
+    return 'from-blue-400 to-purple-500';
   };
 
   const getStatusIcon = () => {
@@ -52,14 +45,14 @@ const TaskCard: React.FC<{ task: TaskResponse; subtitle?: string; type: 'applica
   };
 
   return (
-    <div className="group relative overflow-hidden bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 shadow-sm hover:shadow-md transition-all duration-300">
+    <div className="group relative overflow-hidden bg-white border border-gray-300 rounded-xl p-4 sm:p-6 shadow-sm hover:shadow-md transition-all duration-300">
       <div className="relative z-10">
         <div className="flex items-start space-x-3 sm:space-x-4">
           <div className="relative">
             <div className={`w-12 h-12 sm:w-16 sm:h-16 bg-linear-to-r ${getIconGradient()} rounded-xl sm:rounded-2xl flex items-center justify-center shadow-sm`}>
               {getStatusIcon()}
             </div>
-            <div className={`absolute -top-1 -right-1 w-4 h-4 sm:w-6 sm:h-6 bg-linear-to-r ${type === 'application' ? 'from-green-400 to-emerald-500' : 'from-orange-400 to-red-500'} rounded-full`}></div>
+            <div className={`absolute -top-1 -right-1 w-4 h-4 sm:w-6 sm:h-6 bg-linear-to-r ${type === 'application' ? 'from-green-500 to-green-600' : 'from-blue-500 to-purple-500'} rounded-full`}></div>
           </div>
 
           <div className="flex-1 min-w-0">
@@ -67,7 +60,7 @@ const TaskCard: React.FC<{ task: TaskResponse; subtitle?: string; type: 'applica
               <h3 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
                 {task.title}
               </h3>
-              <span className={`px-2 py-1 sm:px-3 sm:py-1 bg-linear-to-r ${type === 'application' ? 'from-green-50 to-emerald-50 text-green-700' : 'from-orange-50 to-red-50 text-orange-700'} text-xs font-medium rounded-full border ${type === 'application' ? 'border-green-200' : 'border-orange-200'} self-start sm:self-auto`}>
+              <span className={`px-2 py-1 sm:px-3 sm:py-1 ${type === 'application' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-blue-50 text-blue-700 border-blue-200'} text-xs font-medium rounded-full border self-start sm:self-auto`}>
                 {type === 'application' ? 'Applied' : 'Invited'}
               </span>
             </div>
@@ -107,7 +100,16 @@ const TaskCard: React.FC<{ task: TaskResponse; subtitle?: string; type: 'applica
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-end space-y-2 sm:space-y-0 sm:space-x-2 mt-4 sm:mt-0">
             <button
-              onClick={() => navigate(`/tasks/browse/${task.id}`)}
+              onClick={() => {
+                if (isHelper) {
+                  // Navigate to dashboard with task details loaded via query string
+                  navigate(`/dashboard?taskId=${task.id}`, { 
+                    replace: false 
+                  });
+                } else {
+                  navigate(`/tasks/browse/${task.id}`);
+                }
+              }}
               className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900 font-medium rounded-lg transition-all duration-200 flex items-center justify-center text-xs sm:text-sm"
             >
               <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -128,13 +130,11 @@ const TaskCard: React.FC<{ task: TaskResponse; subtitle?: string; type: 'applica
 const InfoBlurb: React.FC<{ type: 'applications' | 'invitations' }> = ({ type }) => {
   if (type === 'applications') {
     return (
-      <div className="relative overflow-hidden backdrop-blur-xl bg-linear-to-br from-blue-500/15 via-purple-500/15 to-pink-500/15 border border-blue-500/30 rounded-3xl p-6 mb-8 shadow-2xl">
-        <div className="absolute inset-0 bg-linear-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 animate-pulse"></div>
-        <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-3xl animate-bounce"></div>
+      <div className="relative overflow-hidden bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8 shadow-sm">
 
         <div className="relative z-10">
           <div className="flex items-center space-x-4 mb-4">
-            <div className="w-12 h-12 bg-linear-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -145,7 +145,7 @@ const InfoBlurb: React.FC<{ type: 'applications' | 'invitations' }> = ({ type })
             </div>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-sm border border-gray-200 rounded-2xl p-4">
+          <div className="bg-white border border-gray-200 rounded-xl p-4">
             <p className="text-gray-800 leading-relaxed">
               <span className="font-semibold text-blue-700">Important:</span> Clients don't accept applications directly.
               Instead, they will reach out to you if they're interested, or you can proactively reach out to them through their listed phone number.
@@ -158,13 +158,11 @@ const InfoBlurb: React.FC<{ type: 'applications' | 'invitations' }> = ({ type })
   }
 
   return (
-    <div className="relative overflow-hidden backdrop-blur-xl bg-linear-to-br from-orange-500/15 via-pink-500/15 to-purple-500/15 border border-orange-500/30 rounded-3xl p-6 mb-8 shadow-2xl">
-      <div className="absolute inset-0 bg-linear-to-r from-orange-500/10 via-pink-500/10 to-purple-500/10 animate-pulse"></div>
-      <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-orange-400/20 to-pink-600/20 rounded-full blur-3xl animate-bounce"></div>
+    <div className="relative overflow-hidden bg-purple-50 border border-purple-200 rounded-xl p-6 mb-8 shadow-sm">
 
       <div className="relative z-10">
         <div className="flex items-center space-x-4 mb-4">
-          <div className="w-12 h-12 bg-linear-to-r from-orange-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg">
+          <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
             </svg>
@@ -175,7 +173,7 @@ const InfoBlurb: React.FC<{ type: 'applications' | 'invitations' }> = ({ type })
           </div>
         </div>
 
-        <div className="bg-white/10 backdrop-blur-sm border border-gray-200 rounded-2xl p-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
           <p className="text-gray-800 leading-relaxed">
             <span className="font-semibold text-orange-500">Important:</span> Invitations are only to apply to the task.
             When you receive an invitation, it means a client has specifically invited you to apply for their opportunity.
@@ -265,12 +263,10 @@ const MyApplications: React.FC = () => {
 
     return (
       <div className="text-center py-16">
-        <div className="relative overflow-hidden backdrop-blur-xl bg-linear-to-br from-white/15 via-white/10 to-white/5 border border-white/30 rounded-3xl p-12 shadow-2xl">
-          <div className="absolute inset-0 bg-linear-to-r from-gray-500/10 via-blue-500/10 to-purple-500/10 animate-pulse"></div>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-gray-400/20 to-blue-600/20 rounded-full blur-3xl animate-bounce"></div>
+        <div className="relative overflow-hidden bg-white border border-gray-300 rounded-xl p-12 shadow-sm">
 
           <div className="relative z-10">
-            <div className="w-24 h-24 bg-linear-to-r from-gray-500/20 to-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -278,8 +274,8 @@ const MyApplications: React.FC = () => {
             <h3 className="text-2xl font-bold text-black mb-4">{title}</h3>
             <p className="text-gray-600 mb-8 max-w-md mx-auto leading-relaxed">{description}</p>
             <button
-              onClick={() => navigate('/tasks/browse')}
-              className="px-8 py-4 bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25"
+              onClick={() => navigate('/dashboard?page=tasks')}
+              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
             >
               Browse Opportunities
             </button>
@@ -290,23 +286,21 @@ const MyApplications: React.FC = () => {
   }, [tab, navigate]);
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-white via-blue-50 to-blue-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {/* Header */}
-        <div className="relative overflow-hidden bg-white border border-gray-200 rounded-3xl p-8 mb-8 shadow-sm">
-          <div className="absolute inset-0 bg-linear-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 animate-pulse"></div>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-blue-400/10 to-purple-600/10 rounded-full blur-3xl"></div>
+        <div className="relative overflow-hidden bg-white border border-gray-300 rounded-xl p-8 mb-8 shadow-sm">
 
           <div className="relative z-10">
             <div className="flex items-center space-x-4 mb-4">
               <div className="relative">
-                <div className="w-16 h-16 bg-linear-to-r from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center shadow-lg">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
                   <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                   </svg>
                 </div>
-                <div className="absolute -top-1 -right-1 w-6 h-6 bg-linear-to-r from-green-400 to-emerald-500 rounded-full"></div>
+                <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full"></div>
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -385,6 +379,7 @@ const MyApplications: React.FC = () => {
                         task={task}
                         subtitle={`Applied on ${new Date(a.application.created_at).toLocaleDateString()}`}
                         type="application"
+                        isHelper={isHelper}
                       />
                     </div>
                   );
@@ -407,6 +402,7 @@ const MyApplications: React.FC = () => {
                         task={task}
                         subtitle={`Invited on ${new Date(i.created_at).toLocaleDateString()}`}
                         type="invitation"
+                        isHelper={isHelper}
                       />
                     </div>
                   );
