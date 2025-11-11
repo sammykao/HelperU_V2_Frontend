@@ -1,35 +1,78 @@
-import Cards from "@/components/landing/Cards";
-import Navbar from "@/components/Navbar"
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../lib/contexts/AuthContext';
+import Navbar from '../components/Navbar';
+import landingImg from '../data/landing.jpg';
 
-export function HomePage() {
+const HomePage: React.FC = () => {
+  const { isAuthenticated, authRoute, isLoading } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect to dashboard if logged in (but wait for auth to finish loading)
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && authRoute) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, authRoute, isLoading, navigate]);
+
   return (
-    <div className="min-h-screen bg-linear-to-br from-white via-blue-50 to-blue-100 overflow-hidden flex flex-col gap-y-6 xl:gap-y-10" style={{ scrollbarWidth: "none" }}>
+    <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100 overflow-hidden">
       <Navbar />
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden hidden sm:block">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-200/40 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-pulse-blue"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-200/40 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-pulse-blue animation-delay-2000"></div>
+        <div className="absolute top-40 left-40 w-60 h-60 bg-sky-200/40 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-pulse-blue animation-delay-4000"></div>
+        <div className="absolute top-1/2 right-1/4 w-40 h-40 bg-blue-100/50 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-wave"></div>
+      </div>
 
       {/* Hero Section */}
-      <section className="grid grid-rows-1 xl:grid-cols-2 justify-center items-start xl:items-center w-full my-0 lg:my-20 gap-y-2 sm:gap-y-5 md:gap-y-8 xl:gap-y-20">
-        {/* Text Heading */}
-        <div className="flex flex-col items-center justify-center gap-6 w-full text-center">
-          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-black text-gray-900 leading-tight">
-            The future of reaching college students
-          </h1>
-          <p className="text-sm sm:text-lg md:text-2xl text-gray-600 max-w-xl sm:max-w-2xl leading-relaxed font-medium">
-            Connecting clients to verified student helpers
-          </p>
-          <div className="flex flex-row gap-x-2 items-center justify-center">
-            <button className="bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 px-8 py-4 active:scale-95 transition-all duration-300">
-              Post a Job
-            </button>
-            <button className="active:scale-95 bg-blue-200 text-blue-700 font-semibold rounded-xl border border-blue-200 hover:bg-blue-200/80 transition-all duration-300 font-display text-center px-8 py-4">
-              Start Earning
-            </button>
+      <section className="relative z-10 min-h-[50vh] sm:min-h-[80vh] flex items-start sm:items-center px-4 py-16 sm:py-2">
+        <div className="absolute inset-0">
+          <img src={landingImg} alt="HelperU background" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-white/10"></div>
+        </div>
+        <div className="relative max-w-6xl mx-auto w-full">
+          <div className="max-w-sm sm:max-w-2xl md:max-w-3xl mx-auto bg-white/90 backdrop-blur-sm border border-gray-200 rounded-3xl p-3 sm:p-6 md:p-10 shadow-lg">
+            {/* Main Heading */}
+            <div className="mb-4 sm:mb-8 text-center">
+              <h1 className="text-2xl sm:text-5xl md:text-7xl font-display font-black text-gray-900 leading-tight mb-2 sm:mb-6">
+                HelperU
+              </h1>
+              <p className="text-xs sm:text-lg md:text-2xl text-gray-600 max-w-xl sm:max-w-2xl mx-auto leading-normal sm:leading-relaxed font-medium">
+                The future of reaching college students
+              </p>
+            </div>
 
+            {/* CTA */}
+            <div className="bg-white border border-gray-200 rounded-2xl p-3 sm:p-5 md:p-8 max-w-sm sm:max-w-2xl mx-auto shadow-sm">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 justify-center">
+                <Link to="/auth/client" className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow hover:shadow-blue-500/20 font-display text-center">
+                  Create a Post
+                </Link>
+                <Link to="/auth/helper" className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-blue-50 text-blue-700 font-semibold rounded-xl border border-blue-200 hover:bg-blue-100 transition-all duration-300 font-display text-center">
+                  I'm a Student
+                </Link>
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6 max-w-xs sm:max-w-2xl md:max-w-4xl mx-auto mt-6 sm:mt-8 md:mt-10">
+              <div className="bg-white border border-gray-200 rounded-lg sm:rounded-xl p-2 sm:p-4 md:p-6 transition-all duration-300 animate-float">
+                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-700 mb-1 sm:mb-2 font-display">1,000+</div>
+                <div className="text-[10px] sm:text-sm text-gray-600 leading-snug">Active Students</div>
+              </div>
+              <div className="bg-white border border-gray-200 rounded-lg sm:rounded-xl p-2 sm:p-4 md:p-6 transition-all duration-300 animate-float animation-delay-2000">
+                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-700 mb-1 sm:mb-2 font-display">100+</div>
+                <div className="text-[10px] sm:text-sm text-gray-600 leading-snug">Posts Completed</div>
+              </div>
+              <div className="bg-white border border-gray-200 rounded-lg sm:rounded-xl p-2 sm:p-4 md:p-6 transition-all duration-300 animate-float animation-delay-4000">
+                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-700 mb-1 sm:mb-2 font-display">FREE</div>
+                <div className="text-[10px] sm:text-sm text-gray-600 leading-snug">No Cost to Use</div>
+              </div>
+            </div>
           </div>
         </div>
-
-        {/* Cards Container */}
-        <Cards />
       </section>
 
       {/* Features Section */}
@@ -40,7 +83,7 @@ export function HomePage() {
               What is HelperU?
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto font-medium">
-              A platform to share opportunities with college students — from getting task help, to company jobs, to advertisements.
+             A platform to share opportunities with college students — from getting task help, to company jobs, to advertisements.
             </p>
           </div>
 
@@ -213,6 +256,8 @@ export function HomePage() {
           </div>
         </div>
       </footer>
-    </div >
-  )
-}
+    </div>
+  );
+};
+
+export { HomePage };

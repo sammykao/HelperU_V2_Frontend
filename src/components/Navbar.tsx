@@ -10,7 +10,8 @@ const Navbar: React.FC = () => {
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Only show logged-in state if both authenticated AND authRoute is set
-  const isFullyLoggedIn = isAuthenticated && authRoute;
+  // But never show logged-in state on homepage
+  const isFullyLoggedIn = isAuthenticated && authRoute && location.pathname !== '/';
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
