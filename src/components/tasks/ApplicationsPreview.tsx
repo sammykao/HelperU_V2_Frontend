@@ -16,29 +16,29 @@ const formatDate = (dateString: string) => {
   });
 };
 
-const ApplicationsPreview: React.FC<ApplicationsPreviewProps> = ({ 
-  postId, 
-  applications, 
-  applicationsLoading, 
-  onViewAll 
+const ApplicationsPreview: React.FC<ApplicationsPreviewProps> = ({
+  postId,
+  applications,
+  applicationsLoading,
+  onViewAll
 }) => {
   const getApplicationsForPost = (postId: string): ApplicationResponse[] => {
     return applications.filter(app => app.application.task_id === postId);
   };
 
   const postApplications = getApplicationsForPost(postId);
-  
+
   if (applicationsLoading) {
     return (
       <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
         <div className="flex items-center text-gray-600">
-          <div className="animate-spin rounded-full h-4 h-4 border-b-2 border-gray-400 mr-2"></div>
+          <div className="animate-spin rounded-full h-4 border-b-2 border-gray-400 mr-2"></div>
           <span className="text-sm">Loading applications...</span>
         </div>
       </div>
     );
   }
-  
+
   if (postApplications.length === 0) {
     return (
       <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
@@ -73,7 +73,7 @@ const ApplicationsPreview: React.FC<ApplicationsPreviewProps> = ({
           View all
         </button>
       </div>
-      
+
       <div className="space-y-2">
         {displayApplications.map((app) => (
           <div key={app.application.id} className="bg-white rounded-md p-2 border border-blue-100">
@@ -100,7 +100,7 @@ const ApplicationsPreview: React.FC<ApplicationsPreviewProps> = ({
             </div>
           </div>
         ))}
-        
+
         {hasMore && (
           <div className="text-center">
             <button

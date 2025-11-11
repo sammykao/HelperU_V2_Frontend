@@ -65,7 +65,7 @@ const ContactPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-blue-100">
       <Navbar />
-      
+
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-200/40 rounded-full mix-blend-multiply blur-2xl opacity-70 animate-pulse-blue"></div>
@@ -91,8 +91,8 @@ const ContactPage: React.FC = () => {
               <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
                 <h3 className="text-xl font-bold text-gray-900 mb-4 font-display">Get in Touch</h3>
                 <div className="space-y-4">
-                  
-                  
+
+
                   <div className="flex items-start space-x-3">
                     <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
                       <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -104,7 +104,7 @@ const ContactPage: React.FC = () => {
                       <div className="text-gray-600 text-sm">Within 4 hours</div>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start space-x-3">
                     <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
                       <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -145,7 +145,7 @@ const ContactPage: React.FC = () => {
             <div className="lg:col-span-2">
               <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
                 <h3 className="text-2xl font-bold text-gray-900 mb-6 font-display">Send us a Message</h3>
-                
+
                 {submitStatus === 'success' && (
                   <div className="mb-6 p-4 bg-green-500/20 border border-green-500/30 rounded-xl">
                     <div className="flex items-center">
@@ -185,7 +185,7 @@ const ContactPage: React.FC = () => {
                         placeholder="Enter your full name"
                       />
                     </div>
-                    
+
                     <div>
                       <label htmlFor="email" className="block text-sm font-medium text-gray-800 mb-2">
                         Email Address *
@@ -284,40 +284,11 @@ const ContactPage: React.FC = () => {
           </div>
 
           {/* Emergency Contact */}
-          <div className="mt-16">
-            <div className="backdrop-blur-lg bg-gradient-to-r from-red-600/20 to-orange-600/20 border border-red-300/20 rounded-2xl p-8 text-center">
-              <h3 className="text-2xl font-bold text-white mb-4 font-display">
-                Emergency Contact
-              </h3>
-              <p className="text-gray-300 mb-6">
-                For urgent safety concerns or emergencies, please contact us immediately.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a
-                  href="mailto:safety@helperu.com"
-                  className="inline-flex items-center px-6 py-3 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-all duration-300"
-                >
-                  <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                  </svg>
-                  Safety Issues
-                </a>
-                <a
-                  href="mailto:legal@helperu.com"
-                  className="inline-flex items-center px-6 py-3 bg-orange-600 text-white font-semibold rounded-xl hover:bg-orange-700 transition-all duration-300"
-                >
-                  <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                  Legal Matters
-                </a>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
   );
 };
+
 
 export default ContactPage;

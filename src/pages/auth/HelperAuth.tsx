@@ -5,7 +5,6 @@ import { authApi, PhoneOTPRequest } from '../../lib/api/auth';
 import { validatePhone } from '../../lib/utils/validation';
 import { useAuth } from '../../lib/contexts/AuthContext';
 import toast from 'react-hot-toast';
-
 const HelperAuth: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated, authRoute } = useAuth();
@@ -39,13 +38,13 @@ const HelperAuth: React.FC = () => {
 
     try {
       const request: PhoneOTPRequest = { phone };
-      
+
       // Try to sign in first (check if account exists)
       try {
         await authApi.helperSignin(request);
         toast.success('OTP sent to your phone!');
-        navigate('/auth/helper/verify-otp', { 
-          state: { phone, isSignup: false } 
+        navigate('/auth/helper/verify-otp', {
+          state: { phone, isSignup: false }
         });
       } catch (signinError: any) {
         // If signin fails, we need to collect email for signup
@@ -85,8 +84,8 @@ const HelperAuth: React.FC = () => {
       const signupRequest = { phone, email };
       await authApi.helperSignup(signupRequest);
       toast.success('OTP sent to your phone!');
-      navigate('/auth/helper/verify-otp', { 
-        state: { phone, email, isSignup: true } 
+      navigate('/auth/helper/verify-otp', {
+        state: { phone, email, isSignup: true }
       });
     } catch (err: any) {
       setError(err.message || 'Failed to create account');
@@ -126,7 +125,7 @@ const HelperAuth: React.FC = () => {
               error={error}
               disabled={isLoading}
             />
-            
+
             {showEmailInput && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -163,8 +162,8 @@ const HelperAuth: React.FC = () => {
           <div className="mt-6 text-center">
             <p className="text-gray-500 text-sm mt-2">
               Need help instead?{' '}
-              <Link 
-                to="/auth/client" 
+              <Link
+                to="/auth/client"
                 className="text-blue-700 hover:text-blue-800 transition-colors"
               >
                 Go to Client Sign in
