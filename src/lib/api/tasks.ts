@@ -53,6 +53,26 @@ export interface ClientInfo {
 export interface TaskSearchResponse extends TaskResponse {
   distance?: number;
   client: ClientInfo;
+  city?: string;
+  state?: string;
+}
+
+export interface ZipCodeInfo {
+  zip_code: string;
+  city: string;
+  state: string;
+  lat: number;
+  lng: number;
+}
+
+export interface GetZipCodesRequest {
+  zip_codes: string[];
+}
+
+export interface GetZipCodesResponse {
+  result: ZipCodeInfo[];
+  limit: number;
+  total_count: number;
 }
 
 export interface TaskUpdate {
@@ -160,4 +180,8 @@ export const taskApi = {
   // Complete task
   completeTask: (taskId: string): Promise<TaskResponse> =>
     apiClient.post(`/tasks/${taskId}/complete`),
+
+  // Get zip codes with city and state
+  getZipCodes: (zipCodes: string[]): Promise<GetZipCodesResponse> =>
+    apiClient.post('/tasks/get_zip_codes', { zip_codes: zipCodes }),
 };

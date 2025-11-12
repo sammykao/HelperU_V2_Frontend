@@ -57,6 +57,43 @@ function BrowseTasks() {
     }
   };
 
+  // Fetch zipcode data and map to tasks
+  const enrichTasksWithZipCodeData = async (tasksToEnrich: TaskSearchResponse[]): Promise<TaskSearchResponse[]> => {
+    // Collect unique zipcodes from tasks that are in_person
+    const zipCodes = Array.from(
+      new Set(
+        tasksToEnrich
+          .filter(task => task.location_type === 'in_person' && task.zip_code)
+          .map(task => task.zip_code!)
+      )
+    );
+
+    if (zipCodes.length === 0) {
+      return tasksToEnrich;
+    }
+
+    try {
+      const zipCodeResponse = await taskApi.getZipCodes(zipCodes);
+      const zipCodeMap = new Map(
+        zipCodeResponse.result.map(zc => [zc.zip_code, { city: zc.city, state: zc.state }])
+      );
+
+      // Map zipcode data to tasks
+      return tasksToEnrich.map(task => {
+        if (task.location_type === 'in_person' && task.zip_code) {
+          const zipData = zipCodeMap.get(task.zip_code);
+          if (zipData) {
+            return { ...task, city: zipData.city, state: zipData.state };
+          }
+        }
+        return task;
+      });
+    } catch (error) {
+      console.error('Failed to fetch zipcode data:', error);
+      return tasksToEnrich;
+    }
+  };
+
   // Fetch user profile and set zip code on mount, then automatically load tasks
   useEffect(() => {
     const initializeZipCodeAndLoadTasks = async () => {
@@ -89,6 +126,7 @@ function BrowseTasks() {
                 distance_radius: distanceRadius,
               });
 
+              // Set tasks immediately (with zipcodes)
               setTasks(response.tasks);
               setHasSearched(true);
               
@@ -104,6 +142,21 @@ function BrowseTasks() {
               } else {
                 setTask(response.tasks[0] || null);
               }
+
+              // Enrich tasks with zipcode data asynchronously (after page loads)
+              enrichTasksWithZipCodeData(response.tasks).then(enrichedTasks => {
+                setTasks(enrichedTasks);
+                
+                // Update selected task if it exists
+                if (selectedTask) {
+                  const enrichedSelectedTask = enrichedTasks.find(t => t.id === selectedTask.id);
+                  if (enrichedSelectedTask) {
+                    setTask(enrichedSelectedTask);
+                  }
+                }
+              }).catch(error => {
+                console.error('Failed to enrich tasks with zipcode data:', error);
+              });
             } catch (error: any) {
               toast.error('Failed to load tasks');
               console.error('Error fetching tasks:', error);
@@ -169,7 +222,7 @@ function BrowseTasks() {
       setHasMoreTasks(hasMore);
 
       if ((searchParams.search_offset || 0) === 0) {
-        // First page or new search - replace tasks
+        // First page or new search - replace tasks immediately (with zipcodes)
         setTasks(response.tasks);
         
         // Select task from URL if provided and different from last applied, otherwise select first task if none selected
@@ -185,7 +238,7 @@ function BrowseTasks() {
           setTask(response.tasks[0]);
         }
       } else {
-        // Load more - append tasks
+        // Load more - append tasks immediately (with zipcodes)
         const previousTaskCount = tasks.length;
         setTasks(prev => [...prev, ...response.tasks]);
         
@@ -204,6 +257,38 @@ function BrowseTasks() {
             });
           }
         }, 100);
+
+        // Enrich appended tasks with zipcode data asynchronously
+        enrichTasksWithZipCodeData(response.tasks).then(enrichedTasks => {
+          setTasks(prev => {
+            const updatedTasks = [...prev];
+            const startIndex = previousTaskCount;
+            enrichedTasks.forEach((enrichedTask, index) => {
+              updatedTasks[startIndex + index] = enrichedTask;
+            });
+            return updatedTasks;
+          });
+        }).catch(error => {
+          console.error('Failed to enrich tasks with zipcode data:', error);
+        });
+      }
+
+      // Enrich tasks with zipcode data asynchronously (after page loads) - for first page
+      if ((searchParams.search_offset || 0) === 0) {
+        enrichTasksWithZipCodeData(response.tasks).then(enrichedTasks => {
+          // Update tasks with enriched data
+          setTasks(enrichedTasks);
+          
+          // Update selected task if it exists
+          if (selectedTask) {
+            const enrichedSelectedTask = enrichedTasks.find(t => t.id === selectedTask.id);
+            if (enrichedSelectedTask) {
+              setTask(enrichedSelectedTask);
+            }
+          }
+        }).catch(error => {
+          console.error('Failed to enrich tasks with zipcode data:', error);
+        });
       }
     } catch (error: any) {
       toast.error('Failed to fetch tasks');
