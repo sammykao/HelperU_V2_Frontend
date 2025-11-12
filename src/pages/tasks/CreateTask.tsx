@@ -132,7 +132,8 @@ function CreateTask({ setPage }: CreateTaskProps) {
     try {
       const resp = await taskApi.createTask(cleanedFormData);
       toast.success('Task created successfully!');
-      navigate('/tasks/browse/' + resp.id);
+      // Navigate to search helpers page with the new task ID
+      navigate(`/dashboard?page=searchHelpers&taskId=${resp.id}`);
     } catch (err: any) {
       // Check if the error is due to post limit reached
       if (err.message && err.message.includes('post limit')) {

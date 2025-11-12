@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { ClientProfileData } from '@/lib/api/profile';
 import { NavSideBar } from '@/components/NavSideBar';
 import { SidebarProvider, SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
@@ -19,7 +20,23 @@ type ClientDashboardProps = {
 
 
 function ClientDashboard({ profile, isLoading }: ClientDashboardProps) {
+  const [searchParams] = useSearchParams();
   const [page, setPage] = useState<ClientPage>("myPosts");
+
+  // Check if we need to switch page based on query string
+  useEffect(() => {
+    const pageParam = searchParams.get('page');
+    
+    if (pageParam === 'createPost') {
+      setPage("createPost");
+    } else if (pageParam === 'myPosts') {
+      setPage("myPosts");
+    } else if (pageParam === 'searchHelpers') {
+      setPage("searchHelpers");
+    } else if (pageParam === 'profile') {
+      setPage("profile");
+    }
+  }, [searchParams]);
 
   const routes: NavSidebarRoute[] = [
     { title: "Create a Post", page: "createPost", icon: PenLine },

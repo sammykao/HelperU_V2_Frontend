@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Dispatch, SetStateAction } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
-import { Tooltip } from '../../components/ui/Tooltip';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../../components/ui/Tooltip';
 import ApplicationsPreview from '../../components/tasks/ApplicationsPreview';
 import { taskApi, TaskResponse } from '../../lib/api/tasks';
 import { applicationApi, ApplicationResponse } from '../../lib/api/applications';
@@ -110,7 +110,9 @@ function MyPosts({ setPage }: MyPostsProps) {
     if (post.public_transport_info) params.append('public_transport_info', post.public_transport_info);
     if (post.hourly_rate) params.append('hourly_rate', post.hourly_rate.toString());
 
-    navigate(`/tasks/create?${params.toString()}`);
+    // Switch to create post page first, then update URL with query params
+    setPage('createPost');
+    navigate(`/dashboard?${params.toString()}`, { replace: false });
   };
 
   const handlePostClick = (postId: string) => {
@@ -441,23 +443,30 @@ function MyPosts({ setPage }: MyPostsProps) {
                         </button>
                       ) : (
                         // Show "Complete" button for active posts
-                        <Tooltip content="Pressing this marks the job as complete and removes it from the Helper job board.">
-                          <button
-                            onClick={() => handleCompletePost(post.id)}
-                            disabled={completingPost === post.id}
-                            className="px-3 sm:px-4 py-1.5 sm:py-2 bg-linear-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-green-500 disabled:to-emerald-500 text-white rounded-lg transition-all duration-200 flex items-center justify-center text-xs sm:text-sm font-medium shadow-sm hover:shadow-md flex-1 sm:flex-none"
-                          >
-                            {completingPost === post.id ? (
-                              <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white mr-1 sm:mr-2"></div>
-                            ) : (
-                              <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              </svg>
-                            )}
-                            <span className="hidden sm:inline">Job Done?</span>
-                            <span className="sm:hidden">Done</span>
-                          </button>
-                        </Tooltip>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                onClick={() => handleCompletePost(post.id)}
+                                disabled={completingPost === post.id}
+                                className="px-3 sm:px-4 py-1.5 sm:py-2 bg-linear-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-green-500 disabled:to-emerald-500 text-white rounded-lg transition-all duration-200 flex items-center justify-center text-xs sm:text-sm font-medium shadow-sm hover:shadow-md flex-1 sm:flex-none"
+                              >
+                                {completingPost === post.id ? (
+                                  <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white mr-1 sm:mr-2"></div>
+                                ) : (
+                                  <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  </svg>
+                                )}
+                                <span className="hidden sm:inline">Job Done?</span>
+                                <span className="sm:hidden">Done</span>
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Pressing this marks the job as complete and removes it from the Helper job board.</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       )}
 
                       <button
