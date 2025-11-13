@@ -422,12 +422,12 @@ function ModernHelperSearch({ setPage }: ModernHelperSearchProps) {
 
       {/* Task Selection Modal */}
       {showTaskSelection && selectedHelper && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-start sm:items-center justify-center p-2 sm:p-4 z-50 overflow-y-auto">
-          <div className="bg-white border border-gray-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-2xl w-full max-h-[calc(100vh-2rem)] sm:max-h-[85vh] overflow-y-auto shadow-lg mt-4 sm:mt-0">
-            <div className="flex items-start justify-between mb-4 sm:mb-6 gap-3">
-              <div className="flex-1 min-w-0">
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Invite {selectedHelper.first_name} {selectedHelper.last_name}</h2>
-                <p className="text-gray-900 text-sm sm:text-base mt-1">This helper will be notified by text message when you invite them to a task.</p>
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-start justify-center p-2 sm:p-4 z-50 overflow-y-auto">
+          <div className="bg-white border border-gray-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-2xl w-full max-h-[90vh] sm:max-h-[85vh] overflow-y-auto shadow-lg mt-4 sm:mt-8">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">Invite {selectedHelper.first_name} {selectedHelper.last_name}</h2>
+                <p className="text-gray-900 text-md">This helper will be notified by text message when you invite them to a task.</p>
               </div>
               <button
                 onClick={() => {
