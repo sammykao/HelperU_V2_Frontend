@@ -47,13 +47,11 @@ export const subscriptionApi = {
     apiClient.post('/subscriptions/create-portal-session'),
 
   // Create one-time payment checkout session
-  // Sends task data and price_id in the request body
-  // FastAPI will parse both TaskCreate fields and OnetimePaymentRequest.price_id from the same JSON body
+  // price_id is passed via query string; task data remains in the body
   createOnetimePaymentSession: (taskData: TaskCreate, priceId?: string): Promise<{ checkout_url: string }> => {
-    const payload = {
-      ...taskData,
-      ...(priceId && { price_id: priceId }), // Only include price_id if provided
-    };
-    return apiClient.post('/subscriptions/create-onetime-payment-session', payload);
+    const endpoint = priceId
+      ? `/subscriptions/create-onetime-payment-session?price_id=${encodeURIComponent(priceId)}`
+      : '/subscriptions/create-onetime-payment-session';
+    return apiClient.post(endpoint, taskData);
   },
 };
