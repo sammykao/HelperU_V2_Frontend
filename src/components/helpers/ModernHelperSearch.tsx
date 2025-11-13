@@ -422,8 +422,8 @@ function ModernHelperSearch({ setPage }: ModernHelperSearchProps) {
 
       {/* Task Selection Modal */}
       {showTaskSelection && selectedHelper && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-50">
-          <div className="bg-white border border-gray-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-2xl w-full max-h-[90vh] sm:max-h-[80vh] overflow-y-auto shadow-sm">
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-start sm:items-center justify-center p-2 sm:p-4 z-50 overflow-y-auto">
+          <div className="bg-white border border-gray-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-2xl w-full max-h-[calc(100vh-2rem)] sm:max-h-[85vh] overflow-y-auto shadow-lg mt-4 sm:mt-0">
             <div className="flex items-start justify-between mb-4 sm:mb-6 gap-3">
               <div className="flex-1 min-w-0">
                 <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Invite {selectedHelper.first_name} {selectedHelper.last_name}</h2>
