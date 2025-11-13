@@ -18,6 +18,8 @@ import SingleTask from './pages/tasks/SingleTask';
 // Subscription Pages
 import SubscriptionUpgrade from './pages/subscriptions/SubscriptionUpgrade';
 import SubscriptionSuccess from './pages/subscriptions/SubscriptionSuccess';
+import OnetimePaymentSuccess from './pages/onetime/OnetimePaymentSuccess';
+import OnetimePaymentCancel from './pages/onetime/OnetimePaymentCancel';
 
 // Auth Pages
 import ClientAuth from './pages/auth/ClientAuth';
@@ -78,6 +80,16 @@ function App() {
           <Route path="/subscription/success" element={
             <ProtectedRoute requiredRole="client">
               <SubscriptionSuccess />
+            </ProtectedRoute>
+          } />
+          <Route path="/onetime-payment/success" element={
+            <ProtectedRoute requiredRole="client">
+              <OnetimePaymentSuccess />
+            </ProtectedRoute>
+          } />
+          <Route path="/onetime-payment/cancel" element={
+            <ProtectedRoute requiredRole="client">
+              <OnetimePaymentCancel />
             </ProtectedRoute>
           } />
 

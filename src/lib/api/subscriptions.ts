@@ -1,4 +1,5 @@
 import { apiClient } from './client';
+import type { TaskCreate } from './tasks';
 
 // Subscription Types
 export interface SubscriptionStatus {
@@ -44,4 +45,12 @@ export const subscriptionApi = {
   // Create portal session
   createPortalSession: (): Promise<{ portal_url: string }> =>
     apiClient.post('/subscriptions/create-portal-session'),
+
+  // Create one-time payment checkout session (uses default price if none supplied)
+  createOnetimePaymentSession: (taskData: TaskCreate, priceId?: string): Promise<{ checkout_url: string }> => {
+    const endpoint = priceId
+      ? `/subscriptions/create-onetime-payment-session?price_id=${encodeURIComponent(priceId)}`
+      : '/subscriptions/create-onetime-payment-session';
+    return apiClient.post(endpoint, taskData);
+  },
 };
