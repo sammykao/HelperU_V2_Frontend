@@ -98,7 +98,7 @@ const Profile: React.FC = () => {
                     <div className="flex items-center space-x-2">
                       <span className="text-gray-700 text-sm">Posts:</span>
                       <span className="text-gray-900 text-sm">
-                        {subscription.posts_used} / {subscription.post_limit === -1 ? '∞' : subscription.post_limit} this month
+                        {subscription.posts_used} / {subscription.post_limit === -1 ? '∞' : subscription.post_limit}
                       </span>
                     </div>
                   </div>

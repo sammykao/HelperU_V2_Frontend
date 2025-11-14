@@ -87,7 +87,7 @@ Trust Features:
         "answer": `HelperU offers flexible pricing plans for task posting:
 
 Free Plan:
-- 1 task postings per month
+- 1 task posting
 - Standard support
 
 Premium Plan ($10/month):

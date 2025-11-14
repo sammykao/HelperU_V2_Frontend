@@ -244,7 +244,7 @@ function MyPosts({ setPage }: MyPostsProps) {
                       <svg className="w-3 h-3 mr-1.5 mt-0.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      1 post per month (free)
+                      1 post (free)
                     </li>
                     <li className="flex items-start">
                       <svg className="w-3 h-3 mr-1.5 mt-0.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -303,14 +303,14 @@ function MyPosts({ setPage }: MyPostsProps) {
               </div>
 
               <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
-                <div className="text-sm text-gray-700 mb-1">Posts Used This Month</div>
+                <div className="text-sm text-gray-700 mb-1">Posts Used</div>
                 <div className="text-lg font-semibold text-gray-900">
                   {subscriptionStatus.posts_used} / {subscriptionStatus.plan === "free" ? '1' : '∞'}
                 </div>
               </div>
 
               <div className="bg-white rounded-lg p-3 sm:p-4 sm:col-span-2 lg:col-span-1 border border-gray-200">
-                <div className="text-sm text-gray-700 mb-1">Remaining Posts This Month</div>
+                <div className="text-sm text-gray-700 mb-1">Remaining Posts</div>
                 <div className={`text-lg font-semibold ${subscriptionStatus.post_limit === -1
                   ? 'text-green-700'
                   : subscriptionStatus.post_limit - subscriptionStatus.posts_used > 0
