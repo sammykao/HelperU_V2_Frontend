@@ -48,6 +48,7 @@ export interface ClientInfo {
   phone: string;
   email: string;
   pfp_url?: string;
+  number_of_posts?: number;
 }
 
 export interface TaskSearchResponse extends TaskResponse {

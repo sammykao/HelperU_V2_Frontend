@@ -41,9 +41,11 @@ function BrowseTasks() {
   const [taskToQuickApply, setTaskToQuickApply] = useState<TaskSearchResponse | null>(null);
   const [helperBio, setHelperBio] = useState<string | null>(null);
   const carouselRef = React.useRef<HTMLDivElement>(null);
+  const hasAppliedSearchQueryFromUrl = React.useRef(false); // Track if we've already applied search_query from URL
 
-  // Get task ID from URL query string
+  // Get task ID and search query from URL query string
   const taskIdFromUrl = searchParamsUrl.get('taskId');
+  const searchQueryFromUrl = searchParamsUrl.get('search_query');
 
   // Load applications for helper
   const loadApplications = async () => {
@@ -112,7 +114,9 @@ function BrowseTasks() {
             const zipCode = profileResponse.profile!.helper!.zip_code!;
             setSearchParams(prev => ({
               ...prev,
-              search_zip_code: zipCode
+              search_zip_code: zipCode,
+              // Set search query from URL if provided
+              ...(searchQueryFromUrl && { search_query: searchQueryFromUrl })
             }));
 
             // Automatically load tasks with the user's ZIP code
@@ -124,6 +128,7 @@ function BrowseTasks() {
                 search_offset: 0,
                 sort_by: 'post_date',
                 distance_radius: distanceRadius,
+                ...(searchQueryFromUrl && { search_query: searchQueryFromUrl }),
               });
 
               // Set tasks immediately (with zipcodes)
@@ -191,7 +196,7 @@ function BrowseTasks() {
       setFilteredTasks(tasks);
   }, [tasks]);
 
-  // Handle taskId from URL query string when tasks are already loaded
+  // Handle taskId and search_query from URL query string when tasks are already loaded
   // Only apply if it's different from what we last applied, or if no task is selected
   useEffect(() => {
     if (taskIdFromUrl && tasks.length > 0 && taskIdFromUrl !== lastAppliedUrlTaskId) {
@@ -201,7 +206,18 @@ function BrowseTasks() {
         setLastAppliedUrlTaskId(taskIdFromUrl);
       }
     }
-  }, [taskIdFromUrl, tasks, lastAppliedUrlTaskId]);
+    
+    // Update search query from URL only once when it first appears
+    if (searchQueryFromUrl && !hasAppliedSearchQueryFromUrl.current) {
+      setSearchParams(prev => ({
+        ...prev,
+        search_query: searchQueryFromUrl,
+        search_offset: 0, // Reset pagination when search query changes
+      }));
+      setHasSearched(true);
+      hasAppliedSearchQueryFromUrl.current = true;
+    }
+  }, [taskIdFromUrl, tasks, lastAppliedUrlTaskId, searchQueryFromUrl]);
 
   const fetchTasks = async () => {
     setIsLoading(true);

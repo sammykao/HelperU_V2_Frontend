@@ -228,6 +228,74 @@ function MyPosts({ setPage }: MyPostsProps) {
               </div>
             </div>
 
+            {/* Plan Comparison Info */}
+            <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <h3 className="text-sm font-semibold text-gray-900 mb-3">Plan Comparison</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className={`p-3 rounded-lg border-2 ${subscriptionStatus.plan === 'free' ? 'border-blue-300 bg-blue-50' : 'border-gray-200 bg-white'}`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-gray-900">Free Plan</span>
+                    {subscriptionStatus.plan === 'free' && (
+                      <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full font-medium">Current</span>
+                    )}
+                  </div>
+                  <ul className="text-xs text-gray-700 space-y-1 mb-3">
+                    <li className="flex items-start">
+                      <svg className="w-3 h-3 mr-1.5 mt-0.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      1 post per month (free)
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="w-3 h-3 mr-1.5 mt-0.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Basic support
+                    </li>
+                  </ul>
+                  <div className="mt-3 pt-3 border-t border-gray-300 bg-green-50 rounded-md p-2">
+                    <div className="flex items-start">
+                      <svg className="w-4 h-4 mr-1.5 mt-0.5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-green-800 mb-0.5">Reached your limit?</p>
+                        <p className="text-sm text-green-700">Pay just <span className="font-bold">$5 per post</span> to continue posting without upgrading</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className={`p-3 rounded-lg border-2 ${subscriptionStatus.plan !== 'free' ? 'border-purple-300 bg-purple-50' : 'border-gray-200 bg-white'}`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-gray-900">Premium Plan</span>
+                    {subscriptionStatus.plan !== 'free' && (
+                      <span className="text-xs px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full font-medium">Current</span>
+                    )}
+                  </div>
+                  <ul className="text-xs text-gray-700 space-y-1">
+                    <li className="flex items-start">
+                      <svg className="w-3 h-3 mr-1.5 mt-0.5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Unlimited posts
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="w-3 h-3 mr-1.5 mt-0.5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Priority support
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="w-3 h-3 mr-1.5 mt-0.5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Money back guarantee if you are not satisfied
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
                 <div className="text-sm text-gray-700 mb-1">Plan</div>
@@ -256,6 +324,7 @@ function MyPosts({ setPage }: MyPostsProps) {
                 </div>
               </div>
             </div>
+            {/* Insert info about subscription plan and one time payment on free plan here */}
           </div>
         )}
 

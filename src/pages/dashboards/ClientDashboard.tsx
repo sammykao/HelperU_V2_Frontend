@@ -4,11 +4,12 @@ import { ClientProfileData } from '@/lib/api/profile';
 import { NavSideBar } from '@/components/NavSideBar';
 import { SidebarProvider, SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { cn } from '@/lib/utils';
-import { Briefcase, PenLine, Search, User, Menu } from "lucide-react";
+import { Briefcase, PenLine, Search, User, Menu, Map } from "lucide-react";
 import { ClientPage, NavSidebarRoute } from '@/lib/utils/types';
 import Profile from '../auth/Profile';
 import MyPosts from '../tasks/MyPosts';
 import SearchHelpers from '../helpers/SearchHelpers';
+import MapView from '../helpers/MapView';
 import CreateTask from '../tasks/CreateTask';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -33,6 +34,8 @@ function ClientDashboard({ profile, isLoading }: ClientDashboardProps) {
       setPage("myPosts");
     } else if (pageParam === 'searchHelpers') {
       setPage("searchHelpers");
+    } else if (pageParam === 'mapView') {
+      setPage("mapView");
     } else if (pageParam === 'profile') {
       setPage("profile");
     }
@@ -42,6 +45,7 @@ function ClientDashboard({ profile, isLoading }: ClientDashboardProps) {
     { title: "Create a Post", page: "createPost", icon: PenLine },
     { title: "My Posts", page: "myPosts", icon: Briefcase },
     { title: "Search Helpers", page: "searchHelpers", icon: Search },
+    { title: "Map View", page: "mapView", icon: Map },
     { title: "Edit Profile", page: "profile", icon: User },
   ];
 
@@ -55,6 +59,8 @@ function ClientDashboard({ profile, isLoading }: ClientDashboardProps) {
         return <MyPosts setPage={setPage} />
       case "searchHelpers":
         return <SearchHelpers setPage={setPage} />
+      case "mapView":
+        return <MapView />
       case "profile":
         return <Profile />
       default:

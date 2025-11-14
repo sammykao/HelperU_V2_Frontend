@@ -318,41 +318,43 @@ function ModernHelperSearch({ setPage }: ModernHelperSearchProps) {
             {/* Helper Cards */}
             {!loading && helpers.length > 0 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {helpers.map((helper) => (
-                  <div
-                    key={helper.id}
-                    className="bg-white border border-gray-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:shadow-sm transition-all duration-200 flex flex-col items-start justify-between"
-                  >
-                    {/* Helper Info */}
-                    <div className="flex items-start space-x-4 mb-4">
-                      {helper.pfp_url ? (
-                        <img
-                          src={helper.pfp_url}
-                          alt={`${helper.first_name} ${helper.last_name}`}
-                          className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 bg-linear-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">
-                          {helper.first_name[0]}{helper.last_name[0]}
-                        </div>
-                      )}
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          {helper.first_name} {helper.last_name}
-                        </h3>
-                        <p className="text-gray-700 text-sm">{helper.college}</p>
-                        {helper.graduation_year && (
-                          <p className="text-gray-500 text-xs">Class of {helper.graduation_year}</p>
-                        )}
-                      </div>
-                    </div>
+                 {helpers.map((helper) => (
+                   <div
+                     key={helper.id}
+                     className="group bg-white border border-gray-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:shadow-lg hover:scale-105 transition-all duration-300 flex flex-col items-start justify-between"
+                   >
+                     {/* Helper Info */}
+                     <div className="flex items-start space-x-4 mb-4">
+                       {helper.pfp_url ? (
+                         <img
+                           src={helper.pfp_url}
+                           alt={`${helper.first_name} ${helper.last_name}`}
+                           className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+                         />
+                       ) : (
+                         <div className="w-12 h-12 bg-linear-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">
+                           {helper.first_name[0]}{helper.last_name[0]}
+                         </div>
+                       )}
+                       <div className="flex-1">
+                         <h3 className="text-lg font-semibold text-gray-900">
+                           {helper.first_name} {helper.last_name}
+                         </h3>
+                         <p className="text-gray-700 text-sm">{helper.college}</p>
+                         {helper.graduation_year && (
+                           <p className="text-gray-500 text-xs">Class of {helper.graduation_year}</p>
+                         )}
+                       </div>
+                     </div>
 
-                    {/* Bio */}
-                    {helper.bio && (
-                      <p className="text-gray-700 text-sm mb-4 line-clamp-3">
-                        {helper.bio}
-                      </p>
-                    )}
+                     {/* Bio with hover expansion */}
+                     {helper.bio && (
+                       <div className="relative mb-4 w-full">
+                         <p className="text-gray-700 text-sm line-clamp-3 group-hover:line-clamp-none transition-all duration-200 cursor-help">
+                           {helper.bio}
+                         </p>
+                       </div>
+                     )}
 
                     {/* Location */}
                     {helper.zip_code && (
