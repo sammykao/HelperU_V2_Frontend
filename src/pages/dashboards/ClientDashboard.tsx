@@ -23,12 +23,13 @@ type ClientDashboardProps = {
 
 
 function ClientDashboard({ profile, isLoading }: ClientDashboardProps) {
+  const [searchParams] = useSearchParams();
   const { page, setPage } = useNavbar()
 
   // Check if we need to switch page based on query string
   useEffect(() => {
     const pageParam = searchParams.get('page');
-    
+
     if (pageParam === 'createPost') {
       setPage("createPost");
     } else if (pageParam === 'myPosts') {
