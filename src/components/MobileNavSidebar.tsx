@@ -5,8 +5,9 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  TooltipProvider
 } from "./ui/tooltip";
-import { TooltipProvider } from "@radix-ui/react-tooltip";
+// import { TooltipProvider } from "@radix-ui/react-tooltip";
 import { useNavbar } from "@/lib/contexts/NavSidebarContext";
 
 type Profile = HelperProfileData | ClientProfileData;
