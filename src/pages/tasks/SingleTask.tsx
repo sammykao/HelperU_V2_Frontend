@@ -508,7 +508,7 @@ function SingleTask() {
                     <div className="flex items-center space-x-3">
                       {/* Invite Helpers Button */}
                       <button
-                        onClick={() => navigate(`/helpers/search?task_id=${id}`)}
+                        onClick={() => navigate(`/dashboard?page=searchHelpers&taskId=${id}`)}
                         className="px-3 py-2 sm:px-4 sm:py-2 bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium rounded-lg transition-all duration-200 flex items-center text-xs sm:text-sm w-full sm:w-auto justify-center"
                       >
                         <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

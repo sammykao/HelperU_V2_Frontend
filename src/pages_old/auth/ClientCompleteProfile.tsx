@@ -22,7 +22,7 @@ const ClientCompleteProfile: React.FC = () => {
   useEffect(() => {
     // Check if profile is already complete
     if (profileStatus?.profile_completed) {
-      navigate('/tasks/create');
+      navigate('/dashboard');
     }
   }, [profileStatus, navigate]);
 
@@ -87,7 +87,7 @@ const ClientCompleteProfile: React.FC = () => {
       toast.success('Profile completed successfully!');
       setAuthRoute('client');
       await refreshProfileStatus();
-      navigate('/tasks/create');
+      navigate('/dashboard');
     } catch (err: any) {
       toast.error(err.message || 'Failed to complete profile');
     } finally {

@@ -41,9 +41,11 @@ function BrowseTasks() {
   const [taskToQuickApply, setTaskToQuickApply] = useState<TaskSearchResponse | null>(null);
   const [helperBio, setHelperBio] = useState<string | null>(null);
   const carouselRef = React.useRef<HTMLDivElement>(null);
+  const hasAppliedSearchQueryFromUrl = React.useRef(false); // Track if we've already applied search_query from URL
 
-  // Get task ID from URL query string
+  // Get task ID and search query from URL query string
   const taskIdFromUrl = searchParamsUrl.get('taskId');
+  const searchQueryFromUrl = searchParamsUrl.get('search_query');
 
   // Load applications for helper
   const loadApplications = async () => {
@@ -54,6 +56,43 @@ function BrowseTasks() {
       setApplications(response.applications.map(app => app.application));
     } catch (error) {
       console.error('Failed to load applications:', error);
+    }
+  };
+
+  // Fetch zipcode data and map to tasks
+  const enrichTasksWithZipCodeData = async (tasksToEnrich: TaskSearchResponse[]): Promise<TaskSearchResponse[]> => {
+    // Collect unique zipcodes from tasks that are in_person
+    const zipCodes = Array.from(
+      new Set(
+        tasksToEnrich
+          .filter(task => task.location_type === 'in_person' && task.zip_code)
+          .map(task => task.zip_code!)
+      )
+    );
+
+    if (zipCodes.length === 0) {
+      return tasksToEnrich;
+    }
+
+    try {
+      const zipCodeResponse = await taskApi.getZipCodes(zipCodes);
+      const zipCodeMap = new Map(
+        zipCodeResponse.result.map(zc => [zc.zip_code, { city: zc.city, state: zc.state }])
+      );
+
+      // Map zipcode data to tasks
+      return tasksToEnrich.map(task => {
+        if (task.location_type === 'in_person' && task.zip_code) {
+          const zipData = zipCodeMap.get(task.zip_code);
+          if (zipData) {
+            return { ...task, city: zipData.city, state: zipData.state };
+          }
+        }
+        return task;
+      });
+    } catch (error) {
+      console.error('Failed to fetch zipcode data:', error);
+      return tasksToEnrich;
     }
   };
 
@@ -75,7 +114,9 @@ function BrowseTasks() {
             const zipCode = profileResponse.profile!.helper!.zip_code!;
             setSearchParams(prev => ({
               ...prev,
-              search_zip_code: zipCode
+              search_zip_code: zipCode,
+              // Set search query from URL if provided
+              ...(searchQueryFromUrl && { search_query: searchQueryFromUrl })
             }));
 
             // Automatically load tasks with the user's ZIP code
@@ -87,8 +128,10 @@ function BrowseTasks() {
                 search_offset: 0,
                 sort_by: 'post_date',
                 distance_radius: distanceRadius,
+                ...(searchQueryFromUrl && { search_query: searchQueryFromUrl }),
               });
 
+              // Set tasks immediately (with zipcodes)
               setTasks(response.tasks);
               setHasSearched(true);
 
@@ -104,6 +147,21 @@ function BrowseTasks() {
               } else {
                 setTask(response.tasks[0] || null);
               }
+
+              // Enrich tasks with zipcode data asynchronously (after page loads)
+              enrichTasksWithZipCodeData(response.tasks).then(enrichedTasks => {
+                setTasks(enrichedTasks);
+                
+                // Update selected task if it exists
+                if (selectedTask) {
+                  const enrichedSelectedTask = enrichedTasks.find(t => t.id === selectedTask.id);
+                  if (enrichedSelectedTask) {
+                    setTask(enrichedSelectedTask);
+                  }
+                }
+              }).catch(error => {
+                console.error('Failed to enrich tasks with zipcode data:', error);
+              });
             } catch (error: any) {
               toast.error('Failed to load tasks');
               console.error('Error fetching tasks:', error);
@@ -138,7 +196,7 @@ function BrowseTasks() {
     setFilteredTasks(tasks);
   }, [tasks]);
 
-  // Handle taskId from URL query string when tasks are already loaded
+  // Handle taskId and search_query from URL query string when tasks are already loaded
   // Only apply if it's different from what we last applied, or if no task is selected
   useEffect(() => {
     if (taskIdFromUrl && tasks.length > 0 && taskIdFromUrl !== lastAppliedUrlTaskId) {
@@ -148,7 +206,18 @@ function BrowseTasks() {
         setLastAppliedUrlTaskId(taskIdFromUrl);
       }
     }
-  }, [taskIdFromUrl, tasks, lastAppliedUrlTaskId]);
+    
+    // Update search query from URL only once when it first appears
+    if (searchQueryFromUrl && !hasAppliedSearchQueryFromUrl.current) {
+      setSearchParams(prev => ({
+        ...prev,
+        search_query: searchQueryFromUrl,
+        search_offset: 0, // Reset pagination when search query changes
+      }));
+      setHasSearched(true);
+      hasAppliedSearchQueryFromUrl.current = true;
+    }
+  }, [taskIdFromUrl, tasks, lastAppliedUrlTaskId, searchQueryFromUrl]);
 
   const fetchTasks = async () => {
     setIsLoading(true);
@@ -169,7 +238,7 @@ function BrowseTasks() {
       setHasMoreTasks(hasMore);
 
       if ((searchParams.search_offset || 0) === 0) {
-        // First page or new search - replace tasks
+        // First page or new search - replace tasks immediately (with zipcodes)
         setTasks(response.tasks);
 
         // Select task from URL if provided and different from last applied, otherwise select first task if none selected
@@ -185,7 +254,7 @@ function BrowseTasks() {
           setTask(response.tasks[0]);
         }
       } else {
-        // Load more - append tasks
+        // Load more - append tasks immediately (with zipcodes)
         const previousTaskCount = tasks.length;
         setTasks(prev => [...prev, ...response.tasks]);
 
@@ -204,6 +273,38 @@ function BrowseTasks() {
             });
           }
         }, 100);
+
+        // Enrich appended tasks with zipcode data asynchronously
+        enrichTasksWithZipCodeData(response.tasks).then(enrichedTasks => {
+          setTasks(prev => {
+            const updatedTasks = [...prev];
+            const startIndex = previousTaskCount;
+            enrichedTasks.forEach((enrichedTask, index) => {
+              updatedTasks[startIndex + index] = enrichedTask;
+            });
+            return updatedTasks;
+          });
+        }).catch(error => {
+          console.error('Failed to enrich tasks with zipcode data:', error);
+        });
+      }
+
+      // Enrich tasks with zipcode data asynchronously (after page loads) - for first page
+      if ((searchParams.search_offset || 0) === 0) {
+        enrichTasksWithZipCodeData(response.tasks).then(enrichedTasks => {
+          // Update tasks with enriched data
+          setTasks(enrichedTasks);
+          
+          // Update selected task if it exists
+          if (selectedTask) {
+            const enrichedSelectedTask = enrichedTasks.find(t => t.id === selectedTask.id);
+            if (enrichedSelectedTask) {
+              setTask(enrichedSelectedTask);
+            }
+          }
+        }).catch(error => {
+          console.error('Failed to enrich tasks with zipcode data:', error);
+        });
       }
     } catch (error: any) {
       toast.error('Failed to fetch tasks');

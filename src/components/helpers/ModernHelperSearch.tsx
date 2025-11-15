@@ -1,20 +1,22 @@
 import { useState, useEffect, Dispatch, SetStateAction } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { helperApi, HelperResponse, HelperSearchRequest } from '../../lib/api/helpers';
 import { applicationApi, InvitationResponse } from '../../lib/api/applications';
 import { taskApi, TaskResponse } from '../../lib/api/tasks';
 import { useAuth } from '../../lib/contexts/AuthContext';
 import CollegeInput from '../ui/CollegeInput';
 import toast from 'react-hot-toast';
-import { Page } from '@/lib/utils/types';
+import { ClientPage } from '@/lib/utils/types';
 
 type ModernHelperSearchProps = {
-  setPage: Dispatch<SetStateAction<Page>>;
+  setPage: Dispatch<SetStateAction<ClientPage>>;
 }
 
 function ModernHelperSearch({ setPage }: ModernHelperSearchProps) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { authRoute, isAuthenticated } = useAuth();
+  const taskIdFromUrl = searchParams.get('taskId');
 
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
@@ -43,6 +45,13 @@ function ModernHelperSearch({ setPage }: ModernHelperSearchProps) {
     }
     loadUserTasks();
   }, [isAuthenticated, authRoute, navigate]);
+
+  // Reload tasks when taskId is in URL to ensure newly created task is loaded
+  useEffect(() => {
+    if (taskIdFromUrl && isAuthenticated && authRoute === 'client') {
+      loadUserTasks();
+    }
+  }, [taskIdFromUrl, isAuthenticated, authRoute]);
 
   // Auto-search on component mount
   useEffect(() => {
@@ -309,41 +318,43 @@ function ModernHelperSearch({ setPage }: ModernHelperSearchProps) {
             {/* Helper Cards */}
             {!loading && helpers.length > 0 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {helpers.map((helper) => (
-                  <div
-                    key={helper.id}
-                    className="bg-white border border-gray-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:shadow-sm transition-all duration-200 flex flex-col items-start justify-between"
-                  >
-                    {/* Helper Info */}
-                    <div className="flex items-start space-x-4 mb-4">
-                      {helper.pfp_url ? (
-                        <img
-                          src={helper.pfp_url}
-                          alt={`${helper.first_name} ${helper.last_name}`}
-                          className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 bg-linear-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">
-                          {helper.first_name[0]}{helper.last_name[0]}
-                        </div>
-                      )}
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          {helper.first_name} {helper.last_name}
-                        </h3>
-                        <p className="text-gray-700 text-sm">{helper.college}</p>
-                        {helper.graduation_year && (
-                          <p className="text-gray-500 text-xs">Class of {helper.graduation_year}</p>
-                        )}
-                      </div>
-                    </div>
+                 {helpers.map((helper) => (
+                   <div
+                     key={helper.id}
+                     className="group bg-white border border-gray-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:shadow-lg hover:scale-105 transition-all duration-300 flex flex-col items-start justify-between"
+                   >
+                     {/* Helper Info */}
+                     <div className="flex items-start space-x-4 mb-4">
+                       {helper.pfp_url ? (
+                         <img
+                           src={helper.pfp_url}
+                           alt={`${helper.first_name} ${helper.last_name}`}
+                           className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+                         />
+                       ) : (
+                         <div className="w-12 h-12 bg-linear-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">
+                           {helper.first_name[0]}{helper.last_name[0]}
+                         </div>
+                       )}
+                       <div className="flex-1">
+                         <h3 className="text-lg font-semibold text-gray-900">
+                           {helper.first_name} {helper.last_name}
+                         </h3>
+                         <p className="text-gray-700 text-sm">{helper.college}</p>
+                         {helper.graduation_year && (
+                           <p className="text-gray-500 text-xs">Class of {helper.graduation_year}</p>
+                         )}
+                       </div>
+                     </div>
 
-                    {/* Bio */}
-                    {helper.bio && (
-                      <p className="text-gray-700 text-sm mb-4 line-clamp-3">
-                        {helper.bio}
-                      </p>
-                    )}
+                     {/* Bio with hover expansion */}
+                     {helper.bio && (
+                       <div className="relative mb-4 w-full">
+                         <p className="text-gray-700 text-sm line-clamp-3 group-hover:line-clamp-none transition-all duration-200 cursor-help">
+                           {helper.bio}
+                         </p>
+                       </div>
+                     )}
 
                     {/* Location */}
                     {helper.zip_code && (
@@ -357,18 +368,52 @@ function ModernHelperSearch({ setPage }: ModernHelperSearchProps) {
                     )}
 
                     {/* Invite Button */}
-                    <button
-                      onClick={() => {
-                        setSelectedHelper(helper);
-                        setShowTaskSelection(true);
-                      }}
-                      className="w-full px-4 py-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg transition-all duration-200 flex items-center justify-center"
-                    >
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                      </svg>
-                      Invite Helper
-                    </button>
+                    {(() => {
+                      const isInvited = taskIdFromUrl ? isHelperInvitedToTask(helper.id, taskIdFromUrl) : false;
+                      const isInviting = taskIdFromUrl ? invitingHelper === `${helper.id}-${taskIdFromUrl}` : false;
+                      
+                      if (taskIdFromUrl && isInvited) {
+                        return (
+                          <div className="w-full px-4 py-2 bg-green-50 border border-green-200 text-green-700 font-medium rounded-lg flex items-center justify-center">
+                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            Invited
+                          </div>
+                        );
+                      }
+                      
+                      return (
+                        <button
+                          onClick={() => {
+                            // If taskId is in URL, directly invite to that task
+                            if (taskIdFromUrl && userTasks.some(task => task.id === taskIdFromUrl)) {
+                              handleInviteHelper(helper.id, taskIdFromUrl);
+                            } else {
+                              // Otherwise, show task selection modal
+                              setSelectedHelper(helper);
+                              setShowTaskSelection(true);
+                            }
+                          }}
+                          disabled={isInviting}
+                          className="w-full px-4 py-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-blue-400 disabled:to-indigo-400 text-white font-medium rounded-lg transition-all duration-200 flex items-center justify-center disabled:cursor-not-allowed"
+                        >
+                          {isInviting ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                              Inviting...
+                            </>
+                          ) : (
+                            <>
+                              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                              </svg>
+                              Invite Helper
+                            </>
+                          )}
+                        </button>
+                      );
+                    })()}
                   </div>
                 ))}
               </div>
@@ -379,12 +424,12 @@ function ModernHelperSearch({ setPage }: ModernHelperSearchProps) {
 
       {/* Task Selection Modal */}
       {showTaskSelection && selectedHelper && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-50">
-          <div className="bg-white border border-gray-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-2xl w-full max-h-[90vh] sm:max-h-[80vh] overflow-y-auto shadow-sm">
-            <div className="flex items-start justify-between mb-4 sm:mb-6 gap-3">
-              <div className="flex-1 min-w-0">
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Invite {selectedHelper.first_name} {selectedHelper.last_name}</h2>
-                <p className="text-gray-900 text-sm sm:text-base mt-1">This helper will be notified by text message when you invite them to a task.</p>
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-start justify-center p-2 sm:p-4 z-50 overflow-y-auto">
+          <div className="bg-white border border-gray-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-2xl w-full max-h-[90vh] sm:max-h-[85vh] overflow-y-auto shadow-lg mt-4 sm:mt-8">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">Invite {selectedHelper.first_name} {selectedHelper.last_name}</h2>
+                <p className="text-gray-900 text-md">This helper will be notified by text message when you invite them to a task.</p>
               </div>
               <button
                 onClick={() => {

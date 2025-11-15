@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { AIChat } from "../../components/ai/AIChat";
-import { SidebarProvider, SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { NavSideBar } from "@/components/NavSideBar";
-import { Briefcase, ClipboardPenLine, User, Menu } from "lucide-react";
+import { Briefcase, ClipboardPenLine, User, Menu, Map, Trophy } from "lucide-react";
 import { HelperProfileData } from "@/lib/api/profile";
 import BrowseTasks from "../tasks/BrowseTasks";
 import MyApplications from "@/pages/tasks/MyApplications";
+import HelperMapView from "../helpers/HelperMapView";
+import Leaderboard from "../helpers/Leaderboard";
 import { cn } from "@/lib/utils";
 import Profile from "../auth/Profile";
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,7 @@ function HelperDashboard({ profile, isLoading }: HelperDashboardProps) {
   const [searchParams] = useSearchParams();
   const { page, setPage } = useNavbar()
 
-  // Check if we need to switch to tasks page based on query string
+  // Check if we need to switch page based on query string
   useEffect(() => {
     const taskId = searchParams.get('taskId');
     const pageParam = searchParams.get('page');
@@ -32,6 +33,14 @@ function HelperDashboard({ profile, isLoading }: HelperDashboardProps) {
       setPage("tasks");
     } else if (pageParam === 'tasks') {
       setPage("tasks");
+    } else if (pageParam === 'mapView') {
+      setPage("mapView");
+    } else if (pageParam === 'leaderboard') {
+      setPage("leaderboard");
+    } else if (pageParam === 'apps') {
+      setPage("apps");
+    } else if (pageParam === 'profile') {
+      setPage("profile");
     }
   }, [searchParams]);
 
@@ -47,6 +56,10 @@ function HelperDashboard({ profile, isLoading }: HelperDashboardProps) {
         return <BrowseTasks />;
       case "apps":
         return <MyApplications />;
+      case "mapView":
+        return <HelperMapView />;
+      case "leaderboard":
+        return <Leaderboard />;
       case "profile":
         return <Profile />
       default:

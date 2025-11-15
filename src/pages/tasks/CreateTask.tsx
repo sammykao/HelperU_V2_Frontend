@@ -1,6 +1,7 @@
 import React, { useState, useEffect, Dispatch, SetStateAction } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { taskApi, TaskCreate } from '../../lib/api/tasks';
+import { subscriptionApi } from '../../lib/api/subscriptions';
 import { useAuth } from '../../lib/contexts/AuthContext';
 import { validateRequired, validateZipCode } from '../../lib/utils/validation';
 import toast from 'react-hot-toast';
@@ -31,6 +32,10 @@ function CreateTask({ setPage }: CreateTaskProps) {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showPostLimitModal, setShowPostLimitModal] = useState(false);
+  const [pendingTaskData, setPendingTaskData] = useState<TaskCreate | null>(null);
+  const [processingOneTime, setProcessingOneTime] = useState(false);
+  const [modalError, setModalError] = useState<string | null>(null);
 
   // Handle pre-filling form data from URL parameters
   useEffect(() => {
@@ -113,6 +118,34 @@ function CreateTask({ setPage }: CreateTaskProps) {
     return Object.keys(newErrors).length === 0;
   };
 
+  const closePostLimitModal = () => {
+    setShowPostLimitModal(false);
+    setProcessingOneTime(false);
+    setModalError(null);
+  };
+
+  const handleOneTimePayment = async () => {
+    if (!pendingTaskData) {
+      setModalError('No task data available for payment. Please try submitting again.');
+      return;
+    }
+
+    try {
+      setProcessingOneTime(true);
+      setModalError(null);
+      const response = await subscriptionApi.createOnetimePaymentSession(pendingTaskData);
+      if (response.checkout_url) {
+        window.location.href = response.checkout_url;
+      } else {
+        throw new Error('Unable to start checkout. Please try again.');
+      }
+    } catch (error: any) {
+      setModalError(error?.message || 'Failed to start one-time payment. Please try again.');
+    } finally {
+      setProcessingOneTime(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -131,13 +164,18 @@ function CreateTask({ setPage }: CreateTaskProps) {
 
     try {
       const resp = await taskApi.createTask(cleanedFormData);
+      setPendingTaskData(null);
+      setShowPostLimitModal(false);
       toast.success('Task created successfully!');
-      navigate('/tasks/browse/' + resp.id);
+      // Navigate to search helpers page with the new task ID
+      navigate(`/dashboard?page=searchHelpers&taskId=${resp.id}`);
     } catch (err: any) {
       // Check if the error is due to post limit reached
-      if (err.message && err.message.includes('post limit')) {
-        toast.error('You have reached your post limit. Please upgrade your plan to create more tasks.');
-        navigate('/subscription/upgrade');
+      if (err.message && err.message.toLowerCase().includes('post limit')) {
+        setPendingTaskData(cleanedFormData);
+        setShowPostLimitModal(true);
+        setModalError(null);
+        toast.error('You have reached your post limit. Choose an option below to continue.');
       } else {
         toast.error(err.message || 'Failed to create task');
       }
@@ -383,6 +421,77 @@ function CreateTask({ setPage }: CreateTaskProps) {
           </form>
         </div>
       </div>
+
+      {showPostLimitModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 py-6">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 sm:p-8 space-y-5 relative">
+            <button
+              type="button"
+              onClick={() => {
+                closePostLimitModal();
+                setPendingTaskData(null);
+              }}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 transition-colors"
+              aria-label="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="space-y-2">
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">You're out of free posts</h2>
+              <p className="text-sm sm:text-base text-gray-700">
+                You can purchase a one-time post or upgrade your plan to continue posting without limits.
+              </p>
+            </div>
+
+            {modalError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
+                {modalError}
+              </div>
+            )}
+
+            <div className="space-y-3">
+              <button
+                type="button"
+                onClick={handleOneTimePayment}
+                disabled={processingOneTime}
+                className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium hover:from-blue-700 hover:to-indigo-700 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {processingOneTime ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                    Redirecting to checkout...
+                  </>
+                ) : (
+                  'Pay One-Time to Publish'
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  closePostLimitModal();
+                  navigate('/subscription/upgrade');
+                }}
+                className="w-full px-4 py-3 rounded-xl border border-purple-500 text-purple-600 font-medium hover:bg-purple-50 transition-all"
+              >
+                Upgrade Subscription
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                closePostLimitModal();
+                setPendingTaskData(null);
+              }}
+              className="w-full text-sm text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              Maybe Later
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

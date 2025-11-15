@@ -1,10 +1,10 @@
 import { Dispatch, SetStateAction } from 'react';
 import ModernHelperSearch from '../../components/helpers/ModernHelperSearch';
 import { useAuth } from '../../lib/contexts/AuthContext';
-import type { Page } from '@/lib/utils/types';
+import type { ClientPage } from '@/lib/utils/types';
 
 type SearchHelpersProps = {
-  setPage: Dispatch<SetStateAction<Page>>;
+  setPage: Dispatch<SetStateAction<ClientPage>>;
 }
 
 function SearchHelpers({ setPage }: SearchHelpersProps) {

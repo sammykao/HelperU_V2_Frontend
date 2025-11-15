@@ -1,6 +1,6 @@
 import React from 'react';
 import { CheckCircle2, Zap } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, formatDistance } from '@/lib/utils';
 import { TaskSearchResponse } from '@/lib/api/tasks';
 
 interface TaskCardProps {
@@ -65,10 +65,22 @@ export function TaskCard({
           </div>
         </div>
         <div className="space-y-1 text-xs text-gray-600">
-          <p>{task.location_type === 'remote' ? '🌐 Remote' : `📍 ${task.zip_code}`}</p>
+          <p>
+            {task.location_type === 'remote' 
+              ? '🌐 Remote' 
+              : task.city && task.state 
+                ? `📍 ${task.city}, ${task.state}` 
+                : `📍 ${task.zip_code}`}
+          </p>
           <p className="truncate">
             by {task.client.first_name} {task.client.last_name}
           </p>
+        </div>
+        {/* Distance field */}
+        <div className="text-xs text-gray-500">
+          {task.distance !== undefined && task.distance !== null && (
+            <span>• {formatDistance(task.distance)} away</span>
+          )}
         </div>
         {/* Quick Apply Button - Mobile */}
         {canQuickApply && !isApplied && (
@@ -160,7 +172,17 @@ export function TaskCard({
           ${task.hourly_rate}/hr
         </span>
         <span className="text-gray-600 text-xs mb-0.5 truncate w-full">
-          {task.location_type === 'remote' ? '🌐 Remote' : `📍 ${task.zip_code}`}
+          {task.location_type === 'remote' 
+            ? '🌐 Remote' 
+            : task.city && task.state 
+              ? `📍 ${task.city}, ${task.state}` 
+              : `📍 ${task.zip_code}`}
+        </span>
+        {/* Distance field, more emojis */}
+        <span className="text-gray-500 text-xs truncate w-full">
+          {task.distance !== undefined && task.distance !== null && (
+            <span>🌍 {formatDistance(task.distance)} away</span>
+          )}
         </span>
         <span className="text-gray-500 text-xs truncate w-full">
           by {task.client.first_name} {task.client.last_name}

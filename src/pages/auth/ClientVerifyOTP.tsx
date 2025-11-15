@@ -55,7 +55,7 @@ const ClientVerifyOTP: React.FC = () => {
           if (isClientCompleted.does_exist) {
             // Profile already exists, set auth route immediately
             setAuthRoute('client');
-            navigate('/dashboard');
+            navigate('/dashboard?page=createPost');
           } else {
             // Profile doesn't exist, go to profile completion
             navigate('/auth/client/complete-profile');
