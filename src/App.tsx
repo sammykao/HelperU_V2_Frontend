@@ -19,6 +19,8 @@ import SingleTask from './pages/tasks/SingleTask';
 // Subscription Pages
 import SubscriptionUpgrade from './pages/subscriptions/SubscriptionUpgrade';
 import SubscriptionSuccess from './pages/subscriptions/SubscriptionSuccess';
+import OnetimePaymentSuccess from './pages/onetime/OnetimePaymentSuccess';
+import OnetimePaymentCancel from './pages/onetime/OnetimePaymentCancel';
 
 // Auth Pages
 import ClientAuth from './pages/auth/ClientAuth';

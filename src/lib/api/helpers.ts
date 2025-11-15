@@ -20,6 +20,8 @@ export interface HelperResponse {
   pfp_url?: string;
   phone?: string;
   email?: string;
+  number_of_applications?: number;
+  invited_count?: number;
 }
 
 export interface HelperListResponse {

@@ -33,7 +33,11 @@ export function TaskDetailView({
             </span>
             <span className="text-gray-400">•</span>
             <span>
-              {task.location_type === 'remote' ? '🌐 Remote' : `📍 ${task.zip_code}`}
+              {task.location_type === 'remote' 
+                ? '🌐 Remote' 
+                : task.city && task.state 
+                  ? `📍 ${task.city}, ${task.state}` 
+                  : `📍 ${task.zip_code}`}
             </span>
           </div>
         </div>

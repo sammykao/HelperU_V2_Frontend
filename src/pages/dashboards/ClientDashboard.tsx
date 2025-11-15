@@ -1,13 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { ClientProfileData } from '@/lib/api/profile';
 import { NavSideBar } from '@/components/NavSideBar';
 import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { cn } from '@/lib/utils';
-import { Briefcase, PenLine, Search, User, Menu } from "lucide-react";
+import { Briefcase, PenLine, Search, User, Menu, Map } from "lucide-react";
 import { ClientPage, NavSidebarRoute } from '@/lib/utils/types';
 import Profile from '../auth/Profile';
 import MyPosts from '../tasks/MyPosts';
 import SearchHelpers from '../helpers/SearchHelpers';
+import MapView from '../helpers/MapView';
 import CreateTask from '../tasks/CreateTask';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -22,7 +24,23 @@ type ClientDashboardProps = {
 
 function ClientDashboard({ profile, isLoading }: ClientDashboardProps) {
   const { page, setPage } = useNavbar()
-  // const [page, setPage] = useState<ClientPage>("myPosts");
+
+  // Check if we need to switch page based on query string
+  useEffect(() => {
+    const pageParam = searchParams.get('page');
+    
+    if (pageParam === 'createPost') {
+      setPage("createPost");
+    } else if (pageParam === 'myPosts') {
+      setPage("myPosts");
+    } else if (pageParam === 'searchHelpers') {
+      setPage("searchHelpers");
+    } else if (pageParam === 'mapView') {
+      setPage("mapView");
+    } else if (pageParam === 'profile') {
+      setPage("profile");
+    }
+  }, [searchParams]);
 
   const routes: NavSidebarRoute[] = [
     { title: "Create a Post", page: "createPost", icon: PenLine, hoverText: "Create A Post" },
@@ -42,6 +60,8 @@ function ClientDashboard({ profile, isLoading }: ClientDashboardProps) {
       case "searchHelpers":
         // @ts-ignore
         return <SearchHelpers setPage={setPage} />
+      case "mapView":
+        return <MapView />
       case "profile":
         return <Profile />
       default:

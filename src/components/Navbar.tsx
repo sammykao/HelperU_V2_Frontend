@@ -10,7 +10,8 @@ const Navbar: React.FC = () => {
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Only show logged-in state if both authenticated AND authRoute is set
-  const isFullyLoggedIn = isAuthenticated && authRoute;
+  // But never show logged-in state on homepage
+  const isFullyLoggedIn = isAuthenticated && authRoute && location.pathname !== '/';
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -78,23 +79,23 @@ const Navbar: React.FC = () => {
                     {authRoute === 'client' ? (
                       // Client navbar
                       <>
-                        <Link to="/tasks/my-posts" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                        <Link to="/dashboard?page=myPosts" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                           My Posts
                         </Link>
-                        <Link to="/tasks/create" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                        <Link to="/dashboard?page=createPost" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                           Create Post
                         </Link>
-                        <Link to="/helpers/search" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                        <Link to="/dashboard?page=searchHelpers" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                           Search Helpers
                         </Link>
                       </>
                     ) : (
                       // Helper navbar
                       <>
-                        <Link to="/tasks/browse" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                        <Link to="/dashboard?page=tasks" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                           Browse Posts
                         </Link>
-                        <Link to="/applications" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                        <Link to="/dashboard?page=apps" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                           Applications
                         </Link>
                       </>
@@ -186,21 +187,21 @@ const Navbar: React.FC = () => {
                   // Client mobile navbar
                   <>
                     <Link
-                      to="/tasks/my-posts"
+                      to="/dashboard?page=myPosts"
                       onClick={closeMobileMenu}
                       className="text-gray-700 hover:text-gray-900 hover:bg-gray-50 block px-3 py-2.5 rounded-md text-base font-medium transition-colors"
                     >
                       My Posts
                     </Link>
                     <Link
-                      to="/tasks/create"
+                      to="/dashboard?page=createPost"
                       onClick={closeMobileMenu}
                       className="text-gray-700 hover:text-gray-900 hover:bg-gray-50 block px-3 py-2.5 rounded-md text-base font-medium transition-colors"
                     >
                       Create Post
                     </Link>
                     <Link
-                      to="/helpers/search"
+                      to="/dashboard?page=searchHelpers"
                       onClick={closeMobileMenu}
                       className="text-gray-700 hover:text-gray-900 hover:bg-gray-50 block px-3 py-2.5 rounded-md text-base font-medium transition-colors"
                     >
@@ -211,14 +212,14 @@ const Navbar: React.FC = () => {
                   // Helper mobile navbar
                   <>
                     <Link
-                      to="/tasks/browse"
+                      to="/dashboard?page=tasks"
                       onClick={closeMobileMenu}
                       className="text-gray-700 hover:text-gray-900 hover:bg-gray-50 block px-3 py-2.5 rounded-md text-base font-medium transition-colors"
                     >
                       Browse Posts
                     </Link>
                     <Link
-                      to="/applications"
+                      to="/dashboard?page=apps"
                       onClick={closeMobileMenu}
                       className="text-gray-700 hover:text-gray-900 hover:bg-gray-50 block px-3 py-2.5 rounded-md text-base font-medium transition-colors"
                     >

@@ -297,11 +297,11 @@ const SubscriptionUpgrade: React.FC = () => {
             </div>
             <div>
               <h3 className="text-sm font-medium text-black mb-1">What's the difference between Free and Premium?</h3>
-              <p className="text-sm text-gray-700">Free gives you 1 post per month with basic support. Premium gives you unlimited posts with priority support and advanced features.</p>
+              <p className="text-sm text-gray-700">Free gives you 1 post total with basic support. Premium gives you unlimited posts with priority support and advanced features.</p>
             </div>
             <div>
               <h3 className="text-sm font-medium text-black mb-1">Is there a free trial?</h3>
-              <p className="text-sm text-gray-700">Yes! The free plan gives you 1 post per month to try out our platform before upgrading.</p>
+              <p className="text-sm text-gray-700">Yes! The free plan gives you 1 post to try out our platform before upgrading.</p>
             </div>
             <div>
               <h3 className="text-sm font-medium text-black mb-1">Can I cancel anytime?</h3>
