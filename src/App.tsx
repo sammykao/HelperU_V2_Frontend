@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './lib/contexts/AuthContext';
+import { NavSidebarProvider } from './lib/contexts/NavSidebarContext.tsx';
 import ProtectedRoute from './components/ProtectedRoute';
 import { HomePage } from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
@@ -35,74 +36,76 @@ import "../print.config.ts";
 function App() {
   return (
     <AuthProvider>
-      <div className="App">
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<HomePage />} />
+      <NavSidebarProvider>
+        <div className="App">
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<HomePage />} />
 
-          {/* Misc. Routes */}
-          <Route path="/faqs" element={<FAQPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-          <Route path="/terms-of-use" element={<TermsOfUsePage />} />
+            {/* Misc. Routes */}
+            <Route path="/faqs" element={<FAQPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms-of-use" element={<TermsOfUsePage />} />
 
-          {/* Auth Routes */}
-          <Route path="/auth/client" element={<ClientAuth />} />
-          <Route path="/auth/client/verify-otp" element={<ClientVerifyOTP />} />
-          <Route path="/auth/client/complete-profile" element={<ClientCompleteProfile />} />
-          <Route path="/auth/helper" element={<HelperAuth />} />
-          <Route path="/become-helper" element={<HelperAuth />} />
-          <Route path="/auth/helper/verify-otp" element={<HelperVerifyOTP />} />
-          <Route path="/auth/helper/verify-email" element={<HelperVerifyEmail />} />
-          <Route path="/auth/helper/complete-profile" element={<HelperCompleteProfile />} />
+            {/* Auth Routes */}
+            <Route path="/auth/client" element={<ClientAuth />} />
+            <Route path="/auth/client/verify-otp" element={<ClientVerifyOTP />} />
+            <Route path="/auth/client/complete-profile" element={<ClientCompleteProfile />} />
+            <Route path="/auth/helper" element={<HelperAuth />} />
+            <Route path="/become-helper" element={<HelperAuth />} />
+            <Route path="/auth/helper/verify-otp" element={<HelperVerifyOTP />} />
+            <Route path="/auth/helper/verify-email" element={<HelperVerifyEmail />} />
+            <Route path="/auth/helper/complete-profile" element={<HelperCompleteProfile />} />
 
-          {/* Dashboard Routes */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute requiredRoles={['client', 'helper']}>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
+            {/* Dashboard Routes */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute requiredRoles={['client', 'helper']}>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
 
-          <Route path="/profile" element={
-            <ProtectedRoute requiredRoles={['client', 'helper']}>
-              <Profile />
-            </ProtectedRoute>
-          } />
+            <Route path="/profile" element={
+              <ProtectedRoute requiredRoles={['client', 'helper']}>
+                <Profile />
+              </ProtectedRoute>
+            } />
 
-          {/* Subscription Routes */}
-          <Route path="/subscription/upgrade" element={
-            <ProtectedRoute requiredRole="client">
-              <SubscriptionUpgrade />
-            </ProtectedRoute>
-          } />
-          <Route path="/subscription/success" element={
-            <ProtectedRoute requiredRole="client">
-              <SubscriptionSuccess />
-            </ProtectedRoute>
-          } />
+            {/* Subscription Routes */}
+            <Route path="/subscription/upgrade" element={
+              <ProtectedRoute requiredRole="client">
+                <SubscriptionUpgrade />
+              </ProtectedRoute>
+            } />
+            <Route path="/subscription/success" element={
+              <ProtectedRoute requiredRole="client">
+                <SubscriptionSuccess />
+              </ProtectedRoute>
+            } />
 
-          {/* Generic Task Routes*/}
-          <Route path="/tasks/browse/:id" element={<SingleTask />} />
+            {/* Generic Task Routes*/}
+            <Route path="/tasks/browse/:id" element={<SingleTask />} />
 
-          <Route path="/tasks/edit/:id" element={
-            <ProtectedRoute requiredRole="client">
-              <EditTask />
-            </ProtectedRoute>
-          } />
-        </Routes>
+            <Route path="/tasks/edit/:id" element={
+              <ProtectedRoute requiredRole="client">
+                <EditTask />
+              </ProtectedRoute>
+            } />
+          </Routes>
 
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#1e293b',
-              color: '#f1f5f9',
-              border: '1px solid #334155',
-            },
-          }}
-        />
-      </div>
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#1e293b',
+                color: '#f1f5f9',
+                border: '1px solid #334155',
+              },
+            }}
+          />
+        </div>
+      </NavSidebarProvider>
     </AuthProvider>
   );
 }
@@ -110,16 +113,7 @@ function App() {
 export default App;
 
 
-// {/* Task Routes */}
-// <Route path="/tasks/browse/:id" element={<SingleTask />} />
-//
 // <Route path="/ai-assistant" element={
 //   <ProtectedRoute requiredRoles={['client', 'helper']}>
 //     <AIAssistantPage />
 //   </ProtectedRoute>
-// } />
-// <Route path="/tasks/edit/:id" element={
-//   <ProtectedRoute requiredRole="client">
-//     <EditTask />
-//   </ProtectedRoute>
-// } />

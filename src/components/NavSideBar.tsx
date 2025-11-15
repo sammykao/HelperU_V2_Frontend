@@ -1,4 +1,4 @@
-import { useRef, useEffect, Dispatch, SetStateAction } from "react"
+import { useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { formatPhone, cn } from "@/lib/utils"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -19,23 +19,25 @@ import {
 import { ClientProfileData, HelperProfileData } from "@/lib/api/profile"
 import { useAuth } from "@/lib/contexts/AuthContext"
 import { useNavigate } from "react-router-dom"
-import type { NavSidebarRoute, Page } from "@/lib/utils/types"
+import type { NavSidebarRoute } from "@/lib/utils/types"
 import collegesData from "@/data/colleges.json";
+import { useNavbar } from "@/lib/contexts/NavSidebarContext"
 
 type Profile = HelperProfileData | ClientProfileData;
 
 type NavSideBarProps = {
-  setPage: Dispatch<SetStateAction<Page>>,
   navigationItems: NavSidebarRoute[],
   profile: Profile;
   isLoading: boolean
 }
 
 
-export function NavSideBar({ setPage, navigationItems, profile, isLoading }: NavSideBarProps) {
+export function NavSideBar({ navigationItems, profile, isLoading }: NavSideBarProps) {
   const { logout } = useAuth()
+  const { setPage } = useNavbar();
+
   const navigate = useNavigate()
-  const { open, setOpen, openMobile, setOpenMobile, isMobile } = useSidebar()
+  const { open, setOpen, setOpenMobile, isMobile } = useSidebar()
   const prevInRange = useRef(false)
   const isMobileDevice = useIsMobile()
 
@@ -172,7 +174,7 @@ function ProfileCard({ profile }: ProfileCardProps) {
             <img
               src={profile.pfp_url}
               alt="Profile"
-              className="size-16 rounded-full object-cover border-4 border-white shadow-md flex-1"
+              className="size-24 rounded-full object-cover border-4 border-white shadow-md flex-1"
             />
           ) : (
             <div className="size-24 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center border-4 border-white shadow-md flex-1">
@@ -222,17 +224,17 @@ function ProfileCard({ profile }: ProfileCardProps) {
                 {(() => {
                   const collegeValue = (profile as HelperProfileData).college;
                   if (!collegeValue) return "Not Set";
-                  
+
                   // First check if it's already a college name (key in collegesData)
                   if (collegesData[collegeValue as keyof typeof collegesData]) {
                     return collegeValue;
                   }
-                  
+
                   // Otherwise, try to find the college name by matching the domain (value)
                   const collegeName = Object.keys(collegesData).find(
                     key => collegesData[key as keyof typeof collegesData] === collegeValue
                   );
-                  
+
                   return collegeName || collegeValue || "Not Set";
                 })()}
               </div>

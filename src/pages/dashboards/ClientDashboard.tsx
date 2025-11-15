@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ClientProfileData } from '@/lib/api/profile';
 import { NavSideBar } from '@/components/NavSideBar';
-import { SidebarProvider, SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { cn } from '@/lib/utils';
 import { Briefcase, PenLine, Search, User, Menu } from "lucide-react";
 import { ClientPage, NavSidebarRoute } from '@/lib/utils/types';
@@ -11,6 +11,8 @@ import SearchHelpers from '../helpers/SearchHelpers';
 import CreateTask from '../tasks/CreateTask';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { MobileNavSidebar } from '@/components/MobileNavSidebar';
+import { useNavbar } from '@/lib/contexts/NavSidebarContext';
 
 type ClientDashboardProps = {
   profile: ClientProfileData;
@@ -19,13 +21,14 @@ type ClientDashboardProps = {
 
 
 function ClientDashboard({ profile, isLoading }: ClientDashboardProps) {
-  const [page, setPage] = useState<ClientPage>("myPosts");
+  const { page, setPage } = useNavbar()
+  // const [page, setPage] = useState<ClientPage>("myPosts");
 
   const routes: NavSidebarRoute[] = [
-    { title: "Create a Post", page: "createPost", icon: PenLine },
-    { title: "My Posts", page: "myPosts", icon: Briefcase },
-    { title: "Search Helpers", page: "searchHelpers", icon: Search },
-    { title: "Edit Profile", page: "profile", icon: User },
+    { title: "Create a Post", page: "createPost", icon: PenLine, hoverText: "Create A Post" },
+    { title: "My Posts", page: "myPosts", icon: Briefcase, hoverText: "My Posts" },
+    { title: "Search Helpers", page: "searchHelpers", icon: Search, hoverText: "Search Helpers" },
+    { title: "Edit Profile", page: "profile", icon: User, hoverText: "Edit Profile" },
   ];
 
   const renderComponent = () => {
@@ -37,6 +40,7 @@ function ClientDashboard({ profile, isLoading }: ClientDashboardProps) {
         // @ts-ignore
         return <MyPosts setPage={setPage} />
       case "searchHelpers":
+        // @ts-ignore
         return <SearchHelpers setPage={setPage} />
       case "profile":
         return <Profile />
@@ -61,49 +65,54 @@ function ClientDashboard({ profile, isLoading }: ClientDashboardProps) {
 }
 
 function DashboardLayout({ children, setPage, routes, profile, isLoading }: any) {
-  const { open, openMobile, isMobile, toggleSidebar } = useSidebar();
+  const { open, isMobile, toggleSidebar } = useSidebar();
   const isMobileDevice = useIsMobile();
 
   return (
     <div className="flex h-full w-full relative">
-      {/* Sidebar stays fixed */}
-      <NavSideBar
-        setPage={setPage}
-        navigationItems={routes}
-        profile={profile}
-        isLoading={isLoading}
-      />
+      {/* render out diff navbar based on mobile vs desktop */}
+      {isMobileDevice ? (
+        <MobileNavSidebar
+          setPage={setPage}
+          navigationItems={routes}
+          profile={profile}
+          isLoading={isLoading}
+        />
+      ) : (
+        <>
+          {/* Desktop Sidebar Trigger - Top Left */}
+          {!open && (
+            <Button
+              onClick={toggleSidebar}
+              className="fixed top-4 left-4 z-50 h-10 w-10 rounded-lg shadow-md bg-white hover:bg-gray-100 text-gray-700 border border-gray-200 md:flex hidden items-center justify-center"
+              size="icon"
+              aria-label="Open sidebar"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+          )}
 
-      {/* Mobile Sidebar Trigger Button - Floating */}
-      {(isMobileDevice || isMobile) && !openMobile && (
-        <Button
-          onClick={toggleSidebar}
-          className="fixed top-20 left-4 z-50 h-12 w-12 rounded-full shadow-lg bg-blue-600 hover:bg-blue-700 text-white md:hidden"
-          size="icon"
-          aria-label="Open sidebar"
-        >
-          <Menu className="h-6 w-6" />
-        </Button>
+          <NavSideBar
+            setPage={setPage}
+            navigationItems={routes}
+            profile={profile}
+            isLoading={isLoading}
+          />
+        </>
       )}
 
-      {/* Desktop Sidebar Trigger - Top Left */}
-      {!(isMobileDevice || isMobile) && !open && (
-        <Button
-          onClick={toggleSidebar}
-          className="fixed top-4 left-4 z-50 h-10 w-10 rounded-lg shadow-md bg-white hover:bg-gray-100 text-gray-700 border border-gray-200 md:flex hidden items-center justify-center"
-          size="icon"
-          aria-label="Open sidebar"
-        >
-          <Menu className="h-5 w-5" />
-        </Button>
-      )}
 
       {/* Main content area */}
       <main
         className={cn(
-          "flex-1 p-4 md:p-6 transition-all duration-300 ease-in-out h-full w-full",
-          // Only translate on desktop when sidebar is open
-          !(isMobileDevice || isMobile) && open ? "md:translate-x-40" : "translate-x-0"
+          "flex-1 p-4 md:p-6 transition-all duration-300 ease-in-out h-full",
+
+          !(isMobileDevice || isMobile) &&
+          (open
+            ? "md:ml-72 md:w-[calc(100vw-18rem)]"
+            : "ml-0 w-full"),
+
+          isMobileDevice && "pl-20 w-[calc(100%-5rem)]"
         )}
       >
         {children}

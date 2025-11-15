@@ -103,8 +103,8 @@ const TaskCard: React.FC<{ task: TaskResponse; subtitle?: string; type: 'applica
               onClick={() => {
                 if (isHelper) {
                   // Navigate to dashboard with task details loaded via query string
-                  navigate(`/dashboard?taskId=${task.id}`, { 
-                    replace: false 
+                  navigate(`/dashboard?taskId=${task.id}`, {
+                    replace: false
                   });
                 } else {
                   navigate(`/tasks/browse/${task.id}`);
@@ -134,7 +134,7 @@ const InfoBlurb: React.FC<{ type: 'applications' | 'invitations' }> = ({ type })
 
         <div className="relative z-10">
           <div className="flex items-center space-x-4 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
+            <div className="w-12 h-12 bg-linear-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -162,7 +162,7 @@ const InfoBlurb: React.FC<{ type: 'applications' | 'invitations' }> = ({ type })
 
       <div className="relative z-10">
         <div className="flex items-center space-x-4 mb-4">
-          <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
+          <div className="w-12 h-12 bg-linear-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
             </svg>
@@ -275,7 +275,7 @@ const MyApplications: React.FC = () => {
             <p className="text-gray-600 mb-8 max-w-md mx-auto leading-relaxed">{description}</p>
             <button
               onClick={() => navigate('/dashboard?page=tasks')}
-              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
+              className="px-8 py-4 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
             >
               Browse Opportunities
             </button>
@@ -286,136 +286,178 @@ const MyApplications: React.FC = () => {
   }, [tab, navigate]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-blue-50">
+      <div className="max-w-7xl mx-auto px-2 py-8">
 
         {/* Header */}
-        <div className="relative overflow-hidden bg-white border border-gray-300 rounded-xl p-8 mb-8 shadow-sm">
+        <div className="relative overflow-hidden bg-white border border-gray-300 rounded-xl p-6 md:p-8 mb-8 shadow-sm">
 
-          <div className="relative z-10">
-            <div className="flex items-center space-x-4 mb-4">
-              <div className="relative">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
-                </div>
-                <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full"></div>
+          {/* Content wrapper should stack on mobile and align side-by-side on desktop */}
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center md:space-x-4 md:gap-x-5 space-y-4 md:space-y-0">
+
+            {/* Icon + Badge */}
+            <div className="relative shrink-0 mx-auto md:mx-0">
+              <div className="w-14 h-14 md:w-16 md:h-16 bg-linear-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
+                <svg
+                  className="w-7 h-7 md:w-8 md:h-8 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                  />
+                </svg>
               </div>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  {isHelper ? 'My Applications & Invitations' : 'Applications on My Posts'}
-                </h1>
-                <p className="text-gray-700 text-lg">{isHelper ? 'Track your applications and invitations' : 'Review applications from helpers'}</p>
-              </div>
+
+              {/* Online green dot */}
+              <div className="absolute -top-1 -right-1 w-4 h-4 md:w-6 md:h-6 bg-green-500 rounded-full"></div>
+            </div>
+
+            {/* Text content */}
+            <div className="text-center md:text-left flex-1">
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1 md:mb-2">
+                {isHelper ? "My Applications & Invitations" : "Applications on My Posts"}
+              </h1>
+
+              <p className="text-gray-700 text-base md:text-lg">
+                {isHelper
+                  ? "Track your applications and invitations"
+                  : "Review applications from helpers"}
+              </p>
             </div>
           </div>
         </div>
+      </div>
 
-
-
-        {/* Tab Navigation */}
-        <div className="flex items-center justify-center mb-8">
-          <div className="bg-white border border-gray-400 rounded-2xl p-2 inline-flex shadow-sm">
-            <TabButton active={tab === 'applications'} onClick={() => { setTab('applications'); if (apps === null) loadData('applications'); }}>
-              Applications
-            </TabButton>
-            <TabButton active={tab === 'invitations'} onClick={() => { setTab('invitations'); if (invites === null) loadData('invitations'); }}>
-              Invitations
-            </TabButton>
-          </div>
+      {/* Tab Navigation */}
+      <div className="flex items-center justify-center mb-8">
+        <div className="bg-white border border-gray-400 rounded-2xl p-2 inline-flex shadow-sm">
+          <TabButton active={tab === 'applications'} onClick={() => { setTab('applications'); if (apps === null) loadData('applications'); }}>
+            Applications
+          </TabButton>
+          <TabButton active={tab === 'invitations'} onClick={() => { setTab('invitations'); if (invites === null) loadData('invitations'); }}>
+            Invitations
+          </TabButton>
         </div>
+      </div>
 
-        {/* Info Blurb */}
+      {/* Info Blurb */}
+      <div className='max-w-7xl mx-auto px-2'>
         <InfoBlurb type={tab} />
+      </div>
 
-        {/* Content */}
-        <div className="space-y-6">
-          {loading && (
-            <div className="space-y-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="relative overflow-hidden bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
-                  <div className="animate-pulse">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-16 h-16 bg-gray-100 rounded-2xl"></div>
-                      <div className="flex-1 space-y-3">
-                        <div className="h-6 bg-gray-100 rounded w-3/4"></div>
-                        <div className="h-4 bg-gray-100 rounded w-1/2"></div>
-                        <div className="h-4 bg-gray-100 rounded w-full"></div>
-                        <div className="h-4 bg-gray-100 rounded w-2/3"></div>
-                      </div>
+      {/* Content */}
+      <div className="space-y-6 max-w-7xl mx-auto px-2">
+        {loading && (
+          <div className="space-y-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="relative overflow-hidden bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
+                <div className="animate-pulse">
+                  <div className="flex items-start space-x-4">
+                    <div className="w-16 h-16 bg-gray-100 rounded-2xl"></div>
+                    <div className="flex-1 space-y-3">
+                      <div className="h-6 bg-gray-100 rounded w-3/4"></div>
+                      <div className="h-4 bg-gray-100 rounded w-1/2"></div>
+                      <div className="h-4 bg-gray-100 rounded w-full"></div>
+                      <div className="h-4 bg-gray-100 rounded w-2/3"></div>
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
+              </div>
+            ))}
+          </div>
+        )}
 
-          {error && !loading && (
-            <div className="relative overflow-hidden bg-red-50 border border-red-200 rounded-3xl p-6 shadow-sm">
-              <div className="relative z-10 flex items-center space-x-4">
-                <div className="w-12 h-12 bg-linear-to-r from-red-500 to-red-600 rounded-2xl flex items-center justify-center">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-red-700 mb-1">Error Loading Data</h3>
-                  <p className="text-red-700">{error}</p>
-                </div>
+        {error && !loading && (
+          <div className="relative overflow-hidden bg-red-50 border border-red-200 rounded-3xl p-6 shadow-sm">
+            <div className="relative z-10 flex items-center space-x-4">
+              <div className="w-12 h-12 bg-linear-to-r from-red-500 to-red-600 rounded-2xl flex items-center justify-center">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-red-700 mb-1">Error Loading Data</h3>
+                <p className="text-red-700">{error}</p>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {!loading && !error && tab === 'applications' && (
-            apps && apps.length > 0 ? (
-              <div className="space-y-6">
-                {apps.map((a, index) => {
-                  const task = taskMap[a.application.task_id];
-                  if (!task) return null;
-                  return (
-                    <div key={a.application.id} style={{ animationDelay: `${index * 100}ms` }}>
-                      <TaskCard
-                        task={task}
-                        subtitle={`Applied on ${new Date(a.application.created_at).toLocaleDateString()}`}
-                        type="application"
-                        isHelper={isHelper}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              emptyState
-            )
-          )}
+        {!loading && !error && tab === 'applications' && (
+          apps && apps.length > 0 ? (
+            <div className="space-y-6">
+              {apps.map((a, index) => {
+                const task = taskMap[a.application.task_id];
+                if (!task) return null;
+                return (
+                  <div key={a.application.id} style={{ animationDelay: `${index * 100}ms` }}>
+                    <TaskCard
+                      task={task}
+                      subtitle={`Applied on ${new Date(a.application.created_at).toLocaleDateString()}`}
+                      type="application"
+                      isHelper={isHelper}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            emptyState
+          )
+        )}
 
-          {!loading && !error && tab === 'invitations' && (
-            invites && invites.length > 0 ? (
-              <div className="space-y-6">
-                {invites.map((i, index) => {
-                  const task = taskMap[i.task_id];
-                  if (!task) return null;
-                  return (
-                    <div key={i.id} style={{ animationDelay: `${index * 100}ms` }}>
-                      <TaskCard
-                        task={task}
-                        subtitle={`Invited on ${new Date(i.created_at).toLocaleDateString()}`}
-                        type="invitation"
-                        isHelper={isHelper}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              emptyState
-            )
-          )}
-        </div>
+        {!loading && !error && tab === 'invitations' && (
+          invites && invites.length > 0 ? (
+            <div className="space-y-6">
+              {invites.map((i, index) => {
+                const task = taskMap[i.task_id];
+                if (!task) return null;
+                return (
+                  <div key={i.id} style={{ animationDelay: `${index * 100}ms` }}>
+                    <TaskCard
+                      task={task}
+                      subtitle={`Invited on ${new Date(i.created_at).toLocaleDateString()}`}
+                      type="invitation"
+                      isHelper={isHelper}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            emptyState
+          )
+        )}
       </div>
     </div>
   );
 };
 
 export default MyApplications;
+
+
+// <div className="relative overflow-hidden bg-white border border-gray-300 rounded-xl p-8 mb-8 shadow-sm">
+//
+//   <div className="relative z-10">
+//     <div className="flex items-center space-x-4 mb-4">
+//       <div className="relative">
+//         <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
+//           <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+//           </svg>
+//         </div>
+//         <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full"></div>
+//       </div>
+//       <div>
+//         <h1 className="text-3xl font-bold text-gray-900 mb-2">
+//           {isHelper ? 'My Applications & Invitations' : 'Applications on My Posts'}
+//         </h1>
+//         <p className="text-gray-700 text-lg">{isHelper ? 'Track your applications and invitations' : 'Review applications from helpers'}</p>
+//       </div>
+//     </div>
+//   </div>
