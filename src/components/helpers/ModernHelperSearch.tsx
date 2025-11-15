@@ -151,8 +151,8 @@ function ModernHelperSearch({ setPage }: ModernHelperSearchProps) {
   return (
     <div className="min-h-screen bg-linear-to-b from-white via-blue-50 to-blue-100">
       {/* Header */}
-      <div className="bg-white border border-gray-200 shadow-sm mx-0 sm:mx-4 md:mx-8 lg:mx-52 rounded-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+      <div className='max-w-7xl mx-auto'>
+        <div className="mx-4 sm:mx-5 md:mx-6 lg:mx-8 px-4 sm:px-6 lg:px-8 py-4 sm:py-6 bg-white border border-gray-200 shadow-sm rounded-lg">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
             <div className="flex items-center space-x-4">
               <div>

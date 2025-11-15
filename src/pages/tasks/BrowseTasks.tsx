@@ -109,7 +109,7 @@ function BrowseTasks() {
           if (profileResponse.profile?.helper?.bio) {
             setHelperBio(profileResponse.profile.helper.bio);
           }
-          
+
           if (profileResponse.profile?.helper?.zip_code) {
             const zipCode = profileResponse.profile!.helper!.zip_code!;
             setSearchParams(prev => ({
@@ -134,7 +134,7 @@ function BrowseTasks() {
               // Set tasks immediately (with zipcodes)
               setTasks(response.tasks);
               setHasSearched(true);
-              
+
               // Select task from URL if provided, otherwise select first task
               if (taskIdFromUrl) {
                 const taskFromUrl = response.tasks.find(t => t.id === taskIdFromUrl);
@@ -193,7 +193,7 @@ function BrowseTasks() {
 
   // Show all tasks (don't filter out applied ones)
   useEffect(() => {
-      setFilteredTasks(tasks);
+    setFilteredTasks(tasks);
   }, [tasks]);
 
   // Handle taskId and search_query from URL query string when tasks are already loaded
@@ -240,7 +240,7 @@ function BrowseTasks() {
       if ((searchParams.search_offset || 0) === 0) {
         // First page or new search - replace tasks immediately (with zipcodes)
         setTasks(response.tasks);
-        
+
         // Select task from URL if provided and different from last applied, otherwise select first task if none selected
         if (taskIdFromUrl && taskIdFromUrl !== lastAppliedUrlTaskId) {
           const taskFromUrl = response.tasks.find(t => t.id === taskIdFromUrl);
@@ -257,7 +257,7 @@ function BrowseTasks() {
         // Load more - append tasks immediately (with zipcodes)
         const previousTaskCount = tasks.length;
         setTasks(prev => [...prev, ...response.tasks]);
-        
+
         // On mobile, scroll carousel to show newly loaded tasks
         // Use setTimeout to ensure DOM has updated
         setTimeout(() => {
@@ -439,7 +439,7 @@ function BrowseTasks() {
       toast.success('Application submitted successfully!');
       setShowApplicationModal(false);
       setApplicationMessage('');
-      
+
       // Reload applications to update the UI
       await loadApplications();
     } catch (err: any) {
@@ -490,10 +490,10 @@ function BrowseTasks() {
 
       await applicationApi.createApplication(taskId, applicationData);
       toast.success('Quick applied successfully!');
-      
+
       // Reload applications to update the UI
       await loadApplications();
-      
+
       // Select the task to show it as applied
       setTask(taskToQuickApply);
     } catch (err: any) {
@@ -519,7 +519,7 @@ function BrowseTasks() {
   }, [showApplicationModal, showQuickApplyModal]);
 
   return (
-    <div className="min-h-screen h-full bg-gradient-to-br from-gray-50 to-blue-50 w-full py-4 sm:py-6">
+    <div className="min-h-screen h-full bg-linear-to-br from-gray-50 to-blue-50 w-full py-4 sm:py-6">
 
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         {/* Header */}
@@ -569,11 +569,11 @@ function BrowseTasks() {
             <>
               {/* Horizontal Swipeable Carousel */}
               <div className='relative'>
-                <div 
+                <div
                   ref={carouselRef}
-                  className='flex overflow-x-auto gap-3 pb-4 px-1 scrollbar-hide' 
-                  style={{ 
-                    WebkitOverflowScrolling: 'touch', 
+                  className='flex overflow-x-auto gap-3 pb-4 px-1 scrollbar-hide'
+                  style={{
+                    WebkitOverflowScrolling: 'touch',
                     scrollSnapType: 'x mandatory',
                   }}
                 >
@@ -591,7 +591,7 @@ function BrowseTasks() {
                       onQuickApply={(e) => handleQuickApplyClick(task, e)}
                     />
                   ))}
-                  
+
                   {/* Load More Button - At End of Carousel */}
                   {hasMoreTasks && (
                     <div className='flex-shrink-0 w-[280px] snap-start flex items-center justify-center'>
@@ -615,17 +615,17 @@ function BrowseTasks() {
                           <span>Load More</span>
                         )}
                       </button>
-          </div>
-        )}
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Job Details Below Carousel on Mobile */}
               {selectedTask && (
                 <div className='bg-white border rounded-xl border-gray-300 overflow-hidden shadow-sm'>
-                  <TaskDetailView 
-                    task={selectedTask} 
-                    isApplied={isTaskApplied(selectedTask.id)} 
+                  <TaskDetailView
+                    task={selectedTask}
+                    isApplied={isTaskApplied(selectedTask.id)}
                     applicationMessage={getApplicationMessage(selectedTask.id)}
                     onShare={handleShare}
                     onApply={handleApply}
@@ -678,11 +678,11 @@ function BrowseTasks() {
 
                 {hasMoreTasks && (
                   <div className='w-full h-fit pt-2 border-t border-gray-200 flex-shrink-0 mt-auto'>
-                  <button
+                    <button
                       disabled={isLoading}
                       className={cn('h-9 py-1.5 w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 flex justify-center items-center rounded-lg text-white active:scale-[99%] text-xs font-medium transition-all shadow-sm hover:shadow-md whitespace-nowrap', isLoading && 'opacity-70')}
-                    onClick={loadMore}
-                  >
+                      onClick={loadMore}
+                    >
                       {isLoading ? (
                         <span className="flex items-center gap-1.5">
                           <svg className="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -694,8 +694,8 @@ function BrowseTasks() {
                       ) : (
                         <span className="text-xs">Load More</span>
                       )}
-                  </button>
-                </div>
+                    </button>
+                  </div>
                 )}
               </div>
             )}
@@ -704,28 +704,28 @@ function BrowseTasks() {
             {isLoading && !hasSearched ? (
               <TaskDetailSkeleton />
             ) : selectedTask ? (
-              <TaskDetailView 
-                task={selectedTask} 
-                isApplied={isTaskApplied(selectedTask.id)} 
+              <TaskDetailView
+                task={selectedTask}
+                isApplied={isTaskApplied(selectedTask.id)}
                 applicationMessage={getApplicationMessage(selectedTask.id)}
                 onShare={handleShare}
                 onApply={handleApply}
               />
             ) : (
-              <div className="rounded-xl p-6 py-16 mx-4 h-full w-full flex flex-col items-center justify-center overflow-y-hidden bg-gradient-to-br from-gray-50 to-blue-50">
+              <div className="rounded-xl p-6 py-16 mx-4 h-full w-full flex flex-col items-center justify-center overflow-y-hidden bg-linear-to-br from-gray-50 to-blue-50">
                 <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-4">
                   <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                   </svg>
-                  </div>
+                </div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">No Task Selected</h2>
                 <p className="text-base text-gray-600 text-center px-4 max-w-sm">Click on a task from the list to view full details</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+              </div>
+            )}
+          </div>
+        </div>
 
-                        </div>
+      </div>
 
       {/* Modals */}
       <QuickApplyModal

@@ -370,7 +370,7 @@ function CreateTask({ setPage }: CreateTaskProps) {
                 name="tools_info"
                 value={formData.tools_info}
                 onChange={handleInputChange}
-                rows={2}
+                rows={4}
                 className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/30"
                 placeholder="List any tools, equipment, or software the helper will need..."
                 disabled={isLoading}
@@ -386,7 +386,7 @@ function CreateTask({ setPage }: CreateTaskProps) {
                 name="public_transport_info"
                 value={formData.public_transport_info}
                 onChange={handleInputChange}
-                rows={2}
+                rows={4}
                 className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-300 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/30"
                 placeholder="Provide information about nearby public transportation options..."
                 disabled={isLoading}

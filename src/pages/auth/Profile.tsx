@@ -6,6 +6,7 @@ import { FileUpload } from '../../components/ui/FileUpload';
 import CollegeInput from '../../components/ui/CollegeInput';
 import { authApi, ClientProfileUpdateRequest, HelperProfileUpdateRequest } from '../../lib/api/auth';
 import { formatPhone } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 
 const Profile: React.FC = () => {
   const { authRoute } = useAuth();
@@ -56,8 +57,8 @@ const Profile: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-white via-blue-50 to-blue-100 w-screen overflow-x-hidden">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-linear-to-b from-white via-blue-50 to-blue-100 w-full overflow-x-hidden">
+      <div className="w-full md:max-w-4xl md:mx-auto sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
@@ -68,61 +69,111 @@ const Profile: React.FC = () => {
         </div>
 
         {/* Subscription Information for Clients */}
-        {authRoute === 'client' && subscription && (
+        {authRoute === "client" && subscription && (
           <div className="mb-8 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-            <div className="flex items-start justify-between">
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-linear-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shrink-0">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+
+              {/* Left Section — Icon + Info */}
+              <div className="flex items-start gap-4">
+
+                {/* Icon */}
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shrink-0">
+                  <svg
+                    className="w-6 h-6 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                 </div>
+
+                {/* Subscription Info */}
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Subscription Plan</h3>
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-gray-700 text-sm">Plan:</span>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                    Subscription Plan
+                  </h3>
+
+                  <div className="space-y-3">
+
+                    {/* Plan */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-600 text-sm">Plan:</span>
                       <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-md text-sm font-medium capitalize border border-blue-200">
                         {subscription.plan}
                       </span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-gray-700 text-sm">Status:</span>
-                      <span className={`px-2 py-1 rounded-md text-sm font-medium ${subscription.status === 'active'
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-yellow-100 text-yellow-700'
-                        }`}>
+
+                    {/* Status */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-600 text-sm">Status:</span>
+                      <span
+                        className={cn(
+                          "px-2 py-1 rounded-md text-sm font-medium",
+                          subscription.status === "active"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-yellow-100 text-yellow-700"
+                        )}
+                      >
                         {subscription.status}
                       </span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-gray-700 text-sm">Posts:</span>
+
+                    {/* Posts */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-600 text-sm">Posts:</span>
                       <span className="text-gray-900 text-sm">
-                        {subscription.posts_used} / {subscription.post_limit === -1 ? '∞' : subscription.post_limit}
+                        {subscription.posts_used} /{" "}
+                        {subscription.post_limit === -1 ? "∞" : subscription.post_limit}
                       </span>
                     </div>
+
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col space-y-2">
+
+              {/* Right Section — CTA Buttons */}
+              <div className="flex flex-col items-start md:items-end gap-2 w-full md:w-auto">
+
                 <button
-                  onClick={() => navigate('/subscription/upgrade')}
-                  className="px-4 py-2 bg-linear-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-lg transition-all duration-200 flex items-center text-sm font-medium"
+                  onClick={() => navigate("/subscription/upgrade")}
+                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-lg transition-all duration-200 flex items-center text-sm font-medium w-full md:w-auto justify-center md:justify-normal"
                 >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  <svg
+                    className="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                    />
                   </svg>
                   Manage Subscription
                 </button>
-                {subscription.post_limit !== -1 && subscription.posts_used >= subscription.post_limit && (
-                  <span className="text-red-300 text-xs text-center">
-                    Post limit reached
-                  </span>
-                )}
+
+                {/* Limit Reached */}
+                {subscription.post_limit !== -1 &&
+                  subscription.posts_used >= subscription.post_limit && (
+                    <span className="text-red-500 text-xs text-center md:text-right">
+                      Post limit reached
+                    </span>
+                  )}
               </div>
             </div>
           </div>
         )}
+
+
+
 
         {loading ? (
           <div className="flex justify-center items-center py-20">
@@ -212,9 +263,9 @@ const Profile: React.FC = () => {
                   {'email' in profile && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                      <div className="flex items-center space-x-2 justify-between">
+                      <div className="flex items-center space-x-2 justify-between overflow-x-auto" style={{ scrollbarWidth: "none" }}>
                         <p className="text-gray-900">{profile.email || 'Not provided'}</p>
-                        <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded border border-gray-200">Read-only</span>
+                        <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded border border-gray-200 text-nowrap">Read-only</span>
                       </div>
                     </div>
                   )}
@@ -364,5 +415,4 @@ const Profile: React.FC = () => {
 };
 
 export default Profile;
-
 
