@@ -6,7 +6,7 @@ import {
   TooltipContent,
   TooltipTrigger,
   TooltipProvider
-} from "./ui/tooltip";
+} from "./ui/Tooltip";
 
 import { useNavbar } from "@/lib/contexts/NavSidebarContext";
 
