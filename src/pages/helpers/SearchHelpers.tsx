@@ -15,7 +15,7 @@ function SearchHelpers({ setPage }: SearchHelpersProps) {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-white via-blue-50 to-blue-100">
+    <div className="min-h-screen bg-linear-to-b from-white via-blue-50 to-blue-100 py-4">
       <ModernHelperSearch setPage={setPage} />
     </div>
   );

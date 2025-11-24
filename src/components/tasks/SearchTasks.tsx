@@ -25,46 +25,53 @@ export function SearchTasks({ handleSearch, searchParams, setSearchParams }: Sea
   };
 
   return (
-    <form className='flex flex-col gap-y-4 w-full h-full px-2 py-4 gap-x-3 mb-2 rounded-xl' onSubmit={(e) => handleSearch(e)}>
-      <div className="w-full flex flex-col sm:flex-row items-stretch sm:items-end justify-between gap-3 sm:gap-x-2">
-        <div className="flex-1 flex flex-col">
-          <label
-            htmlFor="search"
-            className="text-xs sm:text-sm font-medium text-gray-700 mb-1"
-          >
-            Search Criteria
-          </label>
-          <input
-            id="search"
-            className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white border border-gray-300 rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
-            placeholder="Babysitting, Furniture Moving, etc..."
-            value={searchParams.search_query || ''}
-            onChange={(e) => handleFilterChange("search_query", e.target.value)}
-          />
+    <form className='flex flex-col gap-y-4 w-full h-full px-0 py-4 gap-x-3 mb-2 rounded-xl' onSubmit={(e) => handleSearch(e)}>
+      <div className="w-full grid grid-rows-[auto_auto] gap-3">
+
+        {/* Input Container */}
+        <div className="flex-1 flex flex-row w-full gap-x-2">
+          <div className="flex flex-col gap-y-1 flex-1">
+            <label
+              htmlFor="search"
+              className="text-xs sm:text-sm font-medium text-gray-700 mb-1"
+            >
+              Search Criteria
+            </label>
+            <input
+              id="search"
+              className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white border border-gray-300 rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+              placeholder="Babysitting, Furniture Moving, etc..."
+              value={searchParams.search_query || ''}
+              onChange={(e) => handleFilterChange("search_query", e.target.value)}
+            />
+          </div>
+
+          <div className="flex flex-col gap-y-1 flex-1">
+            <label
+              htmlFor="zipcode"
+              className="text-xs sm:text-sm font-medium text-gray-700 mb-1"
+            >
+              Search Zipcode
+            </label>
+            <input
+              id="zipcode"
+              className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white border border-gray-300 rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+              placeholder="Your Location"
+              value={searchParams.search_zip_code}
+              onChange={(e) => handleFilterChange("search_zip_code", e.target.value)}
+            />
+
+          </div>
         </div>
 
-        <div className="w-full sm:w-48 flex flex-col">
-          <label
-            htmlFor="zipcode"
-            className="text-xs sm:text-sm font-medium text-gray-700 mb-1"
-          >
-            Search Zipcode
-          </label>
-          <input
-            id="zipcode"
-            className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white border border-gray-300 rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
-            placeholder="Your Location"
-            value={searchParams.search_zip_code}
-            onChange={(e) => handleFilterChange("search_zip_code", e.target.value)}
-          />
-        </div>
-
-        <div className="flex flex-row gap-x-2 self-stretch sm:self-end">
-          <button className="bg-blue-500 px-3 sm:px-4 py-2 sm:py-3 text-white rounded-lg sm:rounded-xl transition-all active:scale-95 text-sm sm:text-base flex-1 sm:flex-none" onClick={handleSearch} type="submit">
+        {/* Buttons Container */}
+        <div className="w-full grid grid-cols-2 gap-x-2">
+          <button className="w-full bg-blue-500 px-3 sm:px-4 py-2 sm:py-3 text-white rounded-lg sm:rounded-xl transition-all active:scale-95 text-sm sm:text-base">
             Search
           </button>
           <button
-            className="px-3 sm:px-4 py-2 sm:py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg sm:rounded-xl transition-all active:scale-95 flex flex-row gap-x-2 items-center justify-center text-sm sm:text-base flex-1 sm:flex-none"
+            className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg sm:rounded-xl transition-all active:scale-95 flex flex-row gap-x-2 items-center justify-center text-sm sm:text-base  sm:flex-none border border-gray-200 shadow-sm"
+
             onClick={() => setIsSearchSettingsOpen(!isSearchSettingsOpen)}
             type="button"
           >
@@ -73,10 +80,11 @@ export function SearchTasks({ handleSearch, searchParams, setSearchParams }: Sea
             <span className="sm:hidden">Filters</span>
           </button>
         </div>
+
       </div>
 
       {isSearchSettingsOpen && (
-        <div className='w-full h-fit flex flex-col sm:flex-row gap-3 sm:gap-x-2'>
+        <div className="w-full grid grid-cols-[auto_auto] gap-3">
           <div className="flex-1 flex flex-col">
             <label
               htmlFor="sortBy"
@@ -155,3 +163,20 @@ export function SearchTasks({ handleSearch, searchParams, setSearchParams }: Sea
     </form>
   )
 }
+
+// <div className="w-full sm:w-48 flex flex-col">
+//   <label
+//     htmlFor="zipcode"
+//     className="text-xs sm:text-sm font-medium text-gray-700 mb-1"
+//   >
+//     Search Zipcode
+//   </label>
+//   <input
+//     id="zipcode"
+//     className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white border border-gray-300 rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+//     placeholder="Your Location"
+//     value={searchParams.search_zip_code}
+//     onChange={(e) => handleFilterChange("search_zip_code", e.target.value)}
+//   />
+// </div>
+//
