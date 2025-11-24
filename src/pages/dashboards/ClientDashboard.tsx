@@ -1,17 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ClientProfileData } from '@/lib/api/profile';
-import { NavSideBar } from '@/components/NavSideBar';
+import { NavSideBar } from '@/components/NavSideBar_v2';
 import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { cn } from '@/lib/utils';
 import { Briefcase, PenLine, Search, User, Menu, Map } from "lucide-react";
-import { ClientPage, NavSidebarRoute } from '@/lib/utils/types';
+import { NavSidebarRoute } from '@/lib/utils/types';
 import Profile from '../auth/Profile';
 import MyPosts from '../tasks/MyPosts';
 import SearchHelpers from '../helpers/SearchHelpers';
 import MapView from '../helpers/MapView';
 import CreateTask from '../tasks/CreateTask';
-import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileNavSidebar } from '@/components/MobileNavSidebar';
 import { useNavbar } from '@/lib/contexts/NavSidebarContext';
@@ -86,60 +85,95 @@ function ClientDashboard({ profile, isLoading }: ClientDashboardProps) {
 }
 
 function DashboardLayout({ children, setPage, routes, profile, isLoading }: any) {
-  const { open, isMobile, toggleSidebar } = useSidebar();
+  const { open, isMobile } = useSidebar();
   const isMobileDevice = useIsMobile();
 
   return (
-    <div className="flex h-full w-full relative">
+    <div className={cn("flex h-full w-full relative mx-0 px-0")}>
+
       {/* render out diff navbar based on mobile vs desktop */}
       {isMobileDevice ? (
         <MobileNavSidebar
-          setPage={setPage}
           navigationItems={routes}
           profile={profile}
           isLoading={isLoading}
         />
       ) : (
-        <>
-          {/* Desktop Sidebar Trigger - Top Left */}
-          {!open && (
-            <Button
-              onClick={toggleSidebar}
-              className="fixed top-4 left-4 z-50 h-10 w-10 rounded-lg shadow-md bg-white hover:bg-gray-100 text-gray-700 border border-gray-200 md:flex hidden items-center justify-center"
-              size="icon"
-              aria-label="Open sidebar"
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
-          )}
-
-          <NavSideBar
-            setPage={setPage}
-            navigationItems={routes}
-            profile={profile}
-            isLoading={isLoading}
-          />
-        </>
+        <NavSideBar
+          navigationItems={routes}
+          profile={profile}
+          isLoading={isLoading}
+        />
       )}
 
-
-      {/* Main content area */}
       <main
         className={cn(
-          "flex-1 p-4 md:p-6 transition-all duration-300 ease-in-out h-full",
+          "transition-all duration-300 ease-in-out h-full",
 
           !(isMobileDevice || isMobile) &&
           (open
-            ? "md:ml-72 md:w-[calc(100vw-18rem)]"
-            : "ml-0 w-full"),
+            ? "md:ml-80 md:w-[calc(100vw-20rem)]"
+            : "ml-12 w-[calc(100vw-2.5rem)]"),
 
-          isMobileDevice && "pl-20 w-[calc(100%-5rem)]"
+          isMobileDevice && "pl-20 w-[calc(100%-4px)]"
         )}
       >
+        {/* Main content area */}
         {children}
       </main>
-    </div>
+    </div >
   );
 }
 
 export default ClientDashboard;
+
+
+// <div className="flex h-full w-full relative">
+//   {/* render out diff navbar based on mobile vs desktop */}
+//   {isMobileDevice ? (
+//     <MobileNavSidebar
+//       setPage={setPage}
+//       navigationItems={routes}
+//       profile={profile}
+//       isLoading={isLoading}
+//     />
+//   ) : (
+//     <>
+//       {/* Desktop Sidebar Trigger - Top Left */}
+//       {!open && (
+//         <Button
+//           onClick={toggleSidebar}
+//           className="fixed top-4 left-4 z-50 h-10 w-10 rounded-lg shadow-md bg-white hover:bg-gray-100 text-gray-700 border border-gray-200 md:flex hidden items-center justify-center"
+//           size="icon"
+//           aria-label="Open sidebar"
+//         >
+//           <Menu className="h-5 w-5" />
+//         </Button>
+//       )}
+//
+//       <NavSideBar
+//         setPage={setPage}
+//         navigationItems={routes}
+//         profile={profile}
+//         isLoading={isLoading}
+//       />
+//     </>
+//   )}
+//
+//
+//   {/* Main content area */}
+//   <main
+//     className={cn(
+//       "flex-1 p-4 md:p-6 transition-all duration-300 ease-in-out h-full",
+//
+//       !(isMobileDevice || isMobile) &&
+//       (open
+//         ? "md:ml-72 md:w-[calc(100vw-18rem)]"
+//         : "ml-0 w-full"),
+//
+//       isMobileDevice && "pl-20 w-[calc(100%-5rem)]"
+//     )}
+//   >
+//     {children}
+//   </main>
+// </div>

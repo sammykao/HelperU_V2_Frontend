@@ -178,7 +178,7 @@ function MyPosts({ setPage }: MyPostsProps) {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-white via-blue-50 to-blue-100">
+    <div className="min-h-screen bg-linear-to-b from-white via-blue-50 to-blue-100 py-4">
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         {/* Header */}

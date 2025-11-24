@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
-import { NavSideBar } from "@/components/NavSideBar";
-import { Briefcase, ClipboardPenLine, User, Menu, Map, Trophy } from "lucide-react";
+import { SidebarInset, SidebarProvider, SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+// import { NavSideBar } from "@/components/NavSideBar";
+import { NavSideBar } from "@/components/NavSideBar_v2";
+import { Briefcase, ClipboardPenLine, User, Menu, Map, Trophy, PanelLeft, MapPin, ChartColumn } from "lucide-react";
 import { HelperProfileData } from "@/lib/api/profile";
 import BrowseTasks from "../tasks/BrowseTasks";
 import MyApplications from "@/pages/tasks/MyApplications";
@@ -47,6 +48,8 @@ function HelperDashboard({ profile, isLoading }: HelperDashboardProps) {
   const routes: any = [
     { title: "Job Board", page: "tasks", icon: Briefcase, hoverText: "Job Board" },
     { title: "Applications", page: "apps", icon: ClipboardPenLine, hoverText: "Your Applications" },
+    // { title: "Map View", page: "mapView", icon: MapPin, hoverText: "Map View" },
+    // { title: "Leaderboard", page: "leaderboard", icon: ChartColumn, hoverText: "Leaderboard" },
     { title: "Edit Profile", page: "profile", icon: User, hoverText: "Edit Profile" },
   ];
 
@@ -69,16 +72,17 @@ function HelperDashboard({ profile, isLoading }: HelperDashboardProps) {
 
   return (
     <div className="min-h-screen h-full w-full bg-linear-to-b from-white via-blue-50 to-blue-100 overflow-x-hidden">
-
       {/* @ts-ignore */}
       <SidebarProvider style={{ "--sidebar-width": "20rem" }} defaultOpen={false} className={cn("w-full h-full flex flex-1 items-center justify-center")}>
-        <DashboardLayout
-          routes={routes}
-          profile={profile}
-          isLoading={isLoading}
-        >
-          {renderComponent()}
-        </DashboardLayout>
+        <SidebarInset>
+          <DashboardLayout
+            routes={routes}
+            profile={profile}
+            isLoading={isLoading}
+          >
+            {renderComponent()}
+          </DashboardLayout>
+        </SidebarInset>
       </SidebarProvider>
     </div>
   );
@@ -87,11 +91,11 @@ function HelperDashboard({ profile, isLoading }: HelperDashboardProps) {
 export default HelperDashboard;
 
 function DashboardLayout({ children, routes, profile, isLoading }: any) {
-  const { open, isMobile, toggleSidebar } = useSidebar();
+  const { open, isMobile } = useSidebar();
   const isMobileDevice = useIsMobile();
 
   return (
-    <div className={cn("flex h-full w-full relative")}>
+    <div className={cn("flex h-full w-full relative mx-0 px-0")}>
 
       {/* render out diff navbar based on mobile vs desktop */}
       {isMobileDevice ? (
@@ -101,44 +105,28 @@ function DashboardLayout({ children, routes, profile, isLoading }: any) {
           isLoading={isLoading}
         />
       ) : (
-        <>
-          {/* Desktop Sidebar Trigger - Top Left */}
-          {!open && (
-            <Button
-              onClick={toggleSidebar}
-              className="fixed top-4 left-4 z-50 h-10 w-10 rounded-lg shadow-md bg-white hover:bg-gray-100 text-gray-700 border border-gray-200 md:flex hidden items-center justify-center"
-              size="icon"
-              aria-label="Open sidebar"
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
-          )}
-
-          <NavSideBar
-            navigationItems={routes}
-            profile={profile}
-            isLoading={isLoading}
-          />
-        </>
+        <NavSideBar
+          navigationItems={routes}
+          profile={profile}
+          isLoading={isLoading}
+        />
       )}
 
       <main
         className={cn(
-          "flex-1 p-4 md:p-6 transition-all duration-300 ease-in-out h-full",
+          "transition-all duration-300 ease-in-out h-full",
 
           !(isMobileDevice || isMobile) &&
           (open
-            ? "md:ml-80 md:w-[calc(100vw-18rem)]"
-            : "ml-0 w-full"),
+            ? "md:ml-80 md:w-[calc(100vw-20rem)]"
+            : "ml-12 w-[calc(100vw-2.5rem)]"),
 
-          isMobileDevice && "pl-20 w-[calc(100%-5rem)]"
+          isMobileDevice && "pl-20 w-[calc(100%-4px)]"
         )}
       >
         {/* Main content area */}
         {children}
       </main>
-    </div>
+    </div >
   );
 }
-
-
